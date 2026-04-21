@@ -1,8 +1,10 @@
 "use client";
 
-import { Badge, Card, Flex, Spinner, Text } from "@radix-ui/themes";
+import { Badge, Box, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchActivitiesAction } from "@/shared/actions/activity";
 import { ACTIVITY_TYPE_COLORS } from "@/shared/constants/application";
@@ -131,9 +133,16 @@ export function ActivityList({
 										)}
 									</Flex>
 									{e.type === "COMMENT" && e.comment && (
-										<Text size="2" style={{ whiteSpace: "pre-wrap" }}>
-											{e.comment}
-										</Text>
+										<Box
+											style={{
+												fontSize: "var(--font-size-2)",
+												lineHeight: "1.5",
+											}}
+										>
+											<ReactMarkdown remarkPlugins={[remarkGfm]}>
+												{e.comment}
+											</ReactMarkdown>
+										</Box>
 									)}
 									{(e.type === "FIELD_CHANGE" ||
 										e.type === "STATUS_CHANGE") && (
