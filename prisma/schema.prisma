@@ -43,8 +43,23 @@ model Application {
   status          String   @default("APPLIED") // APPLIED | SCREENING | INTERVIEW | OFFER | REJECTED | WITHDRAWN | ON_HOLD
   outcomeReason   String?  // NO_RESPONSE | ROLE_CLOSED | SALARY_MISMATCH | LOCATION_MISMATCH | SKILL_MISMATCH | FAILED_SCREEN | FAILED_INTERVIEW | ACCEPTED_OTHER | WITHDREW_BY_CHOICE | OTHER
   contactName     String?
+  contactRole     String?
   contactEmail    String?
   contactPhone    String?
+  contactProfileUrl String?
+  resumeVersion   String?
+  coverLetterVersion String?
+  portfolioUrl    String?
+  needsSponsorship Boolean?
+  relocationPreference String? // OPEN | CONDITIONAL | NOT_OPEN
+  workAuthorizationNote String?
+  team            String?
+  department      String?
+  companySize     String?  // STARTUP | SMALL | MID_SIZE | LARGE | ENTERPRISE
+  industry        String?
+  applicationMethod String? // EASY_APPLY | COMPANY_ATS | REFERRAL | RECRUITER_DIRECT | EMAIL | OTHER
+  timezoneOverlapHours Int?
+  officeDaysPerWeek Int?
   notes           String?  // markdown
   nextStepAt      DateTime?
   nextStepNote    String?
@@ -58,6 +73,8 @@ model Application {
 
   @@index([status])
   @@index([priority])
+  @@index([companySize])
+  @@index([applicationMethod])
   @@index([appliedAt])
 }
 

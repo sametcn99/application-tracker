@@ -35,6 +35,19 @@ export function parseFilters(
 	const sourceType = get("sourceType");
 	if (sourceType) f.sourceType = sourceType;
 
+	const relocationPreference = get("relocationPreference");
+	if (relocationPreference) f.relocationPreference = relocationPreference;
+
+	const companySize = get("companySize");
+	if (companySize) f.companySize = companySize;
+
+	const applicationMethod = get("applicationMethod");
+	if (applicationMethod) f.applicationMethod = applicationMethod;
+
+	const needsSponsorship = get("needsSponsorship");
+	if (needsSponsorship === "true") f.needsSponsorship = true;
+	if (needsSponsorship === "false") f.needsSponsorship = false;
+
 	const nextActionType = get("nextActionType");
 	if (nextActionType) f.nextActionType = nextActionType;
 

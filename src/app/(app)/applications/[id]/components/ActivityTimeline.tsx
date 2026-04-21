@@ -45,6 +45,8 @@ export function ActivityTimeline({ entries }: { entries: Entry[] }) {
 
 				const renderValue = (field: string | null, v: unknown): string => {
 					if (v == null) return "—";
+					if (typeof v === "boolean")
+						return v ? t("common.yes") : t("common.no");
 					if (Array.isArray(v)) return v.join(", ");
 					if (typeof v === "string") {
 						switch (field) {
@@ -62,6 +64,12 @@ export function ActivityTimeline({ entries }: { entries: Entry[] }) {
 								return translateKey("nextActionType." + v);
 							case "outcomeReason":
 								return translateKey("outcomeReason." + v);
+							case "relocationPreference":
+								return translateKey("relocationPreference." + v);
+							case "companySize":
+								return translateKey("companySize." + v);
+							case "applicationMethod":
+								return translateKey("applicationMethod." + v);
 							default:
 								return v;
 						}

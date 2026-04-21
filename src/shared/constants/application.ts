@@ -50,6 +50,32 @@ export const OUTCOME_REASONS = [
 ] as const;
 export type OutcomeReason = (typeof OUTCOME_REASONS)[number];
 
+export const RELOCATION_PREFERENCES = [
+	"OPEN",
+	"CONDITIONAL",
+	"NOT_OPEN",
+] as const;
+export type RelocationPreference = (typeof RELOCATION_PREFERENCES)[number];
+
+export const COMPANY_SIZES = [
+	"STARTUP",
+	"SMALL",
+	"MID_SIZE",
+	"LARGE",
+	"ENTERPRISE",
+] as const;
+export type CompanySize = (typeof COMPANY_SIZES)[number];
+
+export const APPLICATION_METHODS = [
+	"EASY_APPLY",
+	"COMPANY_ATS",
+	"REFERRAL",
+	"RECRUITER_DIRECT",
+	"EMAIL",
+	"OTHER",
+] as const;
+export type ApplicationMethod = (typeof APPLICATION_METHODS)[number];
+
 export const STATUSES = [
 	"APPLIED",
 	"SCREENING",
@@ -120,18 +146,40 @@ export const TRACKED_FIELDS = [
 	"location",
 	"workMode",
 	"employmentType",
+	"priority",
 	"salaryMin",
 	"salaryMax",
+	"targetSalaryMin",
+	"targetSalaryMax",
 	"currency",
 	"source",
+	"sourceType",
+	"referralName",
 	"jobUrl",
 	"appliedAt",
 	"status",
 	"contactName",
+	"contactRole",
 	"contactEmail",
 	"contactPhone",
+	"contactProfileUrl",
+	"resumeVersion",
+	"coverLetterVersion",
+	"portfolioUrl",
+	"needsSponsorship",
+	"relocationPreference",
+	"workAuthorizationNote",
+	"team",
+	"department",
+	"companySize",
+	"industry",
+	"applicationMethod",
+	"timezoneOverlapHours",
+	"officeDaysPerWeek",
 	"notes",
 	"nextStepAt",
 	"nextStepNote",
+	"outcomeReason",
+	"nextActionType",
 ] as const;
 export type TrackedField = (typeof TRACKED_FIELDS)[number];

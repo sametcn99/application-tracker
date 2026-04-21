@@ -5,9 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import {
+	APPLICATION_METHODS,
+	COMPANY_SIZES,
 	NEXT_ACTION_TYPES,
 	OUTCOME_REASONS,
 	PRIORITIES,
+	RELOCATION_PREFERENCES,
 	SOURCE_TYPES,
 	STATUSES,
 	WORK_MODES,
@@ -110,6 +113,81 @@ export function FiltersBar({ tags }: { tags: Tag[] }) {
 									{t(("sourceType." + sourceType) as never)}
 								</Select.Item>
 							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>{t("filters.companySize")}</label>
+					<Select.Root
+						value={sp.get("companySize") ?? "all"}
+						onValueChange={(v) => update({ companySize: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{COMPANY_SIZES.map((size) => (
+								<Select.Item key={size} value={size}>
+									{t(("companySize." + size) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>
+						{t("filters.applicationMethod")}
+					</label>
+					<Select.Root
+						value={sp.get("applicationMethod") ?? "all"}
+						onValueChange={(v) => update({ applicationMethod: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{APPLICATION_METHODS.map((method) => (
+								<Select.Item key={method} value={method}>
+									{t(("applicationMethod." + method) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>
+						{t("filters.relocationPreference")}
+					</label>
+					<Select.Root
+						value={sp.get("relocationPreference") ?? "all"}
+						onValueChange={(v) => update({ relocationPreference: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{RELOCATION_PREFERENCES.map((preference) => (
+								<Select.Item key={preference} value={preference}>
+									{t(("relocationPreference." + preference) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>
+						{t("filters.needsSponsorship")}
+					</label>
+					<Select.Root
+						value={sp.get("needsSponsorship") ?? "all"}
+						onValueChange={(v) => update({ needsSponsorship: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							<Select.Item value="true">{t("common.yes")}</Select.Item>
+							<Select.Item value="false">{t("common.no")}</Select.Item>
 						</Select.Content>
 					</Select.Root>
 				</Flex>

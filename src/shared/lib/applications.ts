@@ -14,6 +14,10 @@ export type ListFilters = {
 	priority?: string[];
 	source?: string;
 	sourceType?: string;
+	relocationPreference?: string;
+	companySize?: string;
+	applicationMethod?: string;
+	needsSponsorship?: boolean;
 	nextActionType?: string;
 	outcomeReason?: string;
 	tagIds?: string[];
@@ -33,6 +37,10 @@ export function buildWhere(f: ListFilters) {
 			{ source: { contains: f.q } },
 			{ referralName: { contains: f.q } },
 			{ contactName: { contains: f.q } },
+			{ contactRole: { contains: f.q } },
+			{ team: { contains: f.q } },
+			{ department: { contains: f.q } },
+			{ industry: { contains: f.q } },
 		];
 	}
 	if (f.status && f.status.length) where.status = { in: f.status };
@@ -40,6 +48,12 @@ export function buildWhere(f: ListFilters) {
 	if (f.priority && f.priority.length) where.priority = { in: f.priority };
 	if (f.source) where.source = { contains: f.source };
 	if (f.sourceType) where.sourceType = f.sourceType;
+	if (f.relocationPreference)
+		where.relocationPreference = f.relocationPreference;
+	if (f.companySize) where.companySize = f.companySize;
+	if (f.applicationMethod) where.applicationMethod = f.applicationMethod;
+	if (f.needsSponsorship !== undefined)
+		where.needsSponsorship = f.needsSponsorship;
 	if (f.nextActionType) where.nextActionType = f.nextActionType;
 	if (f.outcomeReason) where.outcomeReason = f.outcomeReason;
 	if (f.from || f.to) {
@@ -102,8 +116,23 @@ function toDbData(values: ApplicationFormValues) {
 		status: values.status,
 		outcomeReason: values.outcomeReason ?? null,
 		contactName: values.contactName ?? null,
+		contactRole: values.contactRole ?? null,
 		contactEmail: values.contactEmail ?? null,
 		contactPhone: values.contactPhone ?? null,
+		contactProfileUrl: values.contactProfileUrl ?? null,
+		resumeVersion: values.resumeVersion ?? null,
+		coverLetterVersion: values.coverLetterVersion ?? null,
+		portfolioUrl: values.portfolioUrl ?? null,
+		needsSponsorship: values.needsSponsorship ?? null,
+		relocationPreference: values.relocationPreference ?? null,
+		workAuthorizationNote: values.workAuthorizationNote ?? null,
+		team: values.team ?? null,
+		department: values.department ?? null,
+		companySize: values.companySize ?? null,
+		industry: values.industry ?? null,
+		applicationMethod: values.applicationMethod ?? null,
+		timezoneOverlapHours: values.timezoneOverlapHours ?? null,
+		officeDaysPerWeek: values.officeDaysPerWeek ?? null,
 		notes: values.notes ?? null,
 		nextStepAt: values.nextStepAt ?? null,
 		nextStepNote: values.nextStepNote ?? null,

@@ -26,10 +26,13 @@ import {
 	updateApplicationAction,
 } from "@/shared/actions/applications";
 import {
+	APPLICATION_METHODS,
+	COMPANY_SIZES,
 	EMPLOYMENT_TYPES,
 	NEXT_ACTION_TYPES,
 	OUTCOME_REASONS,
 	PRIORITIES,
+	RELOCATION_PREFERENCES,
 	SOURCE_TYPES,
 	STATUSES,
 	WORK_MODES,
@@ -140,12 +143,16 @@ export function ApplicationForm({
 	const referralName = watch("referralName");
 	const selectedStatus = watch("status");
 	const selectedOutcomeReason = watch("outcomeReason");
+	const selectedNeedsSponsorship = watch("needsSponsorship");
+	const workAuthorizationNote = watch("workAuthorizationNote");
 	const showReferralField =
 		selectedSourceType === "REFERRAL" || Boolean(referralName);
 	const showOutcomeField =
 		selectedStatus === "REJECTED" ||
 		selectedStatus === "WITHDRAWN" ||
 		Boolean(selectedOutcomeReason);
+	const showWorkAuthorizationNote =
+		selectedNeedsSponsorship === true || Boolean(workAuthorizationNote);
 
 	const onSubmit = (values: ApplicationFormInput) => {
 		setTopError(null);
@@ -519,7 +526,7 @@ export function ApplicationForm({
 				<Card>
 					<Flex direction="column" gap="3">
 						<Heading size="4">{t("applicationForm.sections.contact")}</Heading>
-						<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+						<Grid columns={{ initial: "1", sm: "2" }} gap="3">
 							<Field
 								label={t("fields.contactName")}
 								error={tx(errors.contactName?.message)}
@@ -527,6 +534,15 @@ export function ApplicationForm({
 								<TextField.Root
 									{...register("contactName")}
 									placeholder={t("applicationForm.placeholders.contactName")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.contactRole")}
+								error={tx(errors.contactRole?.message)}
+							>
+								<TextField.Root
+									{...register("contactRole")}
+									placeholder={t("applicationForm.placeholders.contactRole")}
 								/>
 							</Field>
 							<Field
@@ -546,6 +562,286 @@ export function ApplicationForm({
 								<TextField.Root
 									{...register("contactPhone")}
 									placeholder={t("applicationForm.placeholders.contactPhone")}
+								/>
+							</Field>
+							<Box style={{ gridColumn: "1 / -1" }}>
+								<Field
+									label={t("fields.contactProfileUrl")}
+									error={tx(errors.contactProfileUrl?.message)}
+								>
+									<TextField.Root
+										{...register("contactProfileUrl")}
+										placeholder={t(
+											"applicationForm.placeholders.contactProfileUrl",
+										)}
+									/>
+								</Field>
+							</Box>
+						</Grid>
+					</Flex>
+				</Card>
+
+				<Card>
+					<Flex direction="column" gap="3">
+						<Heading size="4">
+							{t("applicationForm.sections.applicationPackage")}
+						</Heading>
+						<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+							<Field
+								label={t("fields.resumeVersion")}
+								error={tx(errors.resumeVersion?.message)}
+							>
+								<TextField.Root
+									{...register("resumeVersion")}
+									placeholder={t("applicationForm.placeholders.resumeVersion")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.coverLetterVersion")}
+								error={tx(errors.coverLetterVersion?.message)}
+							>
+								<TextField.Root
+									{...register("coverLetterVersion")}
+									placeholder={t(
+										"applicationForm.placeholders.coverLetterVersion",
+									)}
+								/>
+							</Field>
+							<Field
+								label={t("fields.portfolioUrl")}
+								error={tx(errors.portfolioUrl?.message)}
+							>
+								<TextField.Root
+									{...register("portfolioUrl")}
+									placeholder={t("applicationForm.placeholders.portfolioUrl")}
+								/>
+							</Field>
+						</Grid>
+					</Flex>
+				</Card>
+
+				<Card>
+					<Flex direction="column" gap="3">
+						<Heading size="4">
+							{t("applicationForm.sections.eligibility")}
+						</Heading>
+						<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+							<Field
+								label={t("fields.needsSponsorship")}
+								error={tx(
+									errors.needsSponsorship?.message as string | undefined,
+								)}
+							>
+								<Controller
+									control={control}
+									name="needsSponsorship"
+									render={({ field }) => (
+										<Select.Root
+											value={
+												field.value == null
+													? NONE_VALUE
+													: field.value
+														? "true"
+														: "false"
+											}
+											onValueChange={(value) => {
+												if (value === NONE_VALUE) field.onChange(undefined);
+												else field.onChange(value === "true");
+											}}
+										>
+											<Select.Trigger
+												placeholder={t(
+													"applicationForm.selectNeedsSponsorship",
+												)}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												<Select.Item value="true">
+													{t("common.yes")}
+												</Select.Item>
+												<Select.Item value="false">
+													{t("common.no")}
+												</Select.Item>
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							<Field
+								label={t("fields.relocationPreference")}
+								error={tx(errors.relocationPreference?.message)}
+							>
+								<Controller
+									control={control}
+									name="relocationPreference"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t(
+													"applicationForm.selectRelocationPreference",
+												)}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{RELOCATION_PREFERENCES.map((preference) => (
+													<Select.Item key={preference} value={preference}>
+														{t(`relocationPreference.${preference}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							{showWorkAuthorizationNote ? (
+								<Box style={{ gridColumn: "1 / -1" }}>
+									<Field
+										label={t("fields.workAuthorizationNote")}
+										error={tx(errors.workAuthorizationNote?.message)}
+									>
+										<TextArea
+											{...register("workAuthorizationNote")}
+											rows={3}
+											placeholder={t(
+												"applicationForm.placeholders.workAuthorizationNote",
+											)}
+										/>
+									</Field>
+								</Box>
+							) : null}
+						</Grid>
+					</Flex>
+				</Card>
+
+				<Card>
+					<Flex direction="column" gap="3">
+						<Heading size="4">
+							{t("applicationForm.sections.companyContext")}
+						</Heading>
+						<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+							<Field label={t("fields.team")} error={tx(errors.team?.message)}>
+								<TextField.Root
+									{...register("team")}
+									placeholder={t("applicationForm.placeholders.team")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.department")}
+								error={tx(errors.department?.message)}
+							>
+								<TextField.Root
+									{...register("department")}
+									placeholder={t("applicationForm.placeholders.department")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.companySize")}
+								error={tx(errors.companySize?.message)}
+							>
+								<Controller
+									control={control}
+									name="companySize"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t("applicationForm.selectCompanySize")}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{COMPANY_SIZES.map((size) => (
+													<Select.Item key={size} value={size}>
+														{t(`companySize.${size}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							<Field
+								label={t("fields.industry")}
+								error={tx(errors.industry?.message)}
+							>
+								<TextField.Root
+									{...register("industry")}
+									placeholder={t("applicationForm.placeholders.industry")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.applicationMethod")}
+								error={tx(errors.applicationMethod?.message)}
+							>
+								<Controller
+									control={control}
+									name="applicationMethod"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t(
+													"applicationForm.selectApplicationMethod",
+												)}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{APPLICATION_METHODS.map((method) => (
+													<Select.Item key={method} value={method}>
+														{t(`applicationMethod.${method}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							<Field
+								label={t("fields.timezoneOverlapHours")}
+								error={tx(errors.timezoneOverlapHours?.message)}
+							>
+								<TextField.Root
+									type="number"
+									min="0"
+									max="24"
+									{...register("timezoneOverlapHours")}
+									placeholder={t(
+										"applicationForm.placeholders.timezoneOverlapHours",
+									)}
+								/>
+							</Field>
+							<Field
+								label={t("fields.officeDaysPerWeek")}
+								error={tx(errors.officeDaysPerWeek?.message)}
+							>
+								<TextField.Root
+									type="number"
+									min="0"
+									max="7"
+									{...register("officeDaysPerWeek")}
+									placeholder={t(
+										"applicationForm.placeholders.officeDaysPerWeek",
+									)}
 								/>
 							</Field>
 						</Grid>

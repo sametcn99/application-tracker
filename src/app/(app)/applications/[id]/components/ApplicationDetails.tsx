@@ -32,8 +32,23 @@ type App = {
 	appliedAt: Date;
 	outcomeReason: string | null;
 	contactName: string | null;
+	contactRole: string | null;
 	contactEmail: string | null;
 	contactPhone: string | null;
+	contactProfileUrl: string | null;
+	resumeVersion: string | null;
+	coverLetterVersion: string | null;
+	portfolioUrl: string | null;
+	needsSponsorship: boolean | null;
+	relocationPreference: string | null;
+	workAuthorizationNote: string | null;
+	team: string | null;
+	department: string | null;
+	companySize: string | null;
+	industry: string | null;
+	applicationMethod: string | null;
+	timezoneOverlapHours: number | null;
+	officeDaysPerWeek: number | null;
 	notes: string | null;
 	nextStepAt: Date | null;
 	nextStepNote: string | null;
@@ -180,10 +195,14 @@ export async function ApplicationDetails({
 				<Heading size="3" mb="2">
 					{t("applicationDetail.details.contact")}
 				</Heading>
-				<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+				<Grid columns={{ initial: "1", sm: "2" }} gap="3">
 					<Field
 						label={t("fields.contactName")}
 						value={app.contactName ?? "—"}
+					/>
+					<Field
+						label={t("fields.contactRole")}
+						value={app.contactRole ?? "—"}
 					/>
 					<Field
 						label={t("fields.contactEmail")}
@@ -192,6 +211,126 @@ export async function ApplicationDetails({
 					<Field
 						label={t("fields.contactPhone")}
 						value={app.contactPhone ?? "—"}
+					/>
+					<Field
+						label={t("fields.contactProfileUrl")}
+						value={
+							app.contactProfileUrl ? (
+								<a
+									href={app.contactProfileUrl}
+									target="_blank"
+									rel="noreferrer"
+								>
+									{app.contactProfileUrl}
+								</a>
+							) : (
+								"—"
+							)
+						}
+					/>
+				</Grid>
+			</Card>
+
+			<Card>
+				<Heading size="3" mb="2">
+					{t("applicationDetail.details.applicationPackage")}
+				</Heading>
+				<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+					<Field
+						label={t("fields.resumeVersion")}
+						value={app.resumeVersion ?? "—"}
+					/>
+					<Field
+						label={t("fields.coverLetterVersion")}
+						value={app.coverLetterVersion ?? "—"}
+					/>
+					<Field
+						label={t("fields.portfolioUrl")}
+						value={
+							app.portfolioUrl ? (
+								<a href={app.portfolioUrl} target="_blank" rel="noreferrer">
+									{app.portfolioUrl}
+								</a>
+							) : (
+								"—"
+							)
+						}
+					/>
+				</Grid>
+			</Card>
+
+			<Card>
+				<Heading size="3" mb="2">
+					{t("applicationDetail.details.eligibility")}
+				</Heading>
+				<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+					<Field
+						label={t("fields.needsSponsorship")}
+						value={
+							app.needsSponsorship == null
+								? "—"
+								: app.needsSponsorship
+									? t("common.yes")
+									: t("common.no")
+						}
+					/>
+					<Field
+						label={t("fields.relocationPreference")}
+						value={
+							app.relocationPreference
+								? t(
+										("relocationPreference." +
+											app.relocationPreference) as never,
+									)
+								: "—"
+						}
+					/>
+					<Field
+						label={t("fields.workAuthorizationNote")}
+						value={app.workAuthorizationNote ?? "—"}
+					/>
+				</Grid>
+			</Card>
+
+			<Card>
+				<Heading size="3" mb="2">
+					{t("applicationDetail.details.companyContext")}
+				</Heading>
+				<Grid columns={{ initial: "1", sm: "3" }} gap="3">
+					<Field label={t("fields.team")} value={app.team ?? "—"} />
+					<Field label={t("fields.department")} value={app.department ?? "—"} />
+					<Field
+						label={t("fields.companySize")}
+						value={
+							app.companySize
+								? t(("companySize." + app.companySize) as never)
+								: "—"
+						}
+					/>
+					<Field label={t("fields.industry")} value={app.industry ?? "—"} />
+					<Field
+						label={t("fields.applicationMethod")}
+						value={
+							app.applicationMethod
+								? t(("applicationMethod." + app.applicationMethod) as never)
+								: "—"
+						}
+					/>
+					<Field
+						label={t("fields.timezoneOverlapHours")}
+						value={
+							app.timezoneOverlapHours == null
+								? "—"
+								: String(app.timezoneOverlapHours)
+						}
+					/>
+					<Field
+						label={t("fields.officeDaysPerWeek")}
+						value={
+							app.officeDaysPerWeek == null
+								? "—"
+								: String(app.officeDaysPerWeek)
+						}
 					/>
 				</Grid>
 			</Card>
