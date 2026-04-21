@@ -4,6 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { ApplicationForm } from "@/shared/components/ApplicationForm";
 import type {
 	EmploymentType,
+	NextActionType,
+	OutcomeReason,
+	Priority,
+	SourceType,
 	Status,
 	WorkMode,
 } from "@/shared/constants/application";
@@ -37,19 +41,26 @@ export default async function EditApplicationPage({
 		location: app.location ?? undefined,
 		workMode: app.workMode as WorkMode,
 		employmentType: app.employmentType as EmploymentType,
+		priority: app.priority as Priority,
 		salaryMin: app.salaryMin ?? undefined,
 		salaryMax: app.salaryMax ?? undefined,
+		targetSalaryMin: app.targetSalaryMin ?? undefined,
+		targetSalaryMax: app.targetSalaryMax ?? undefined,
 		currency: app.currency ?? undefined,
 		source: app.source ?? undefined,
+		sourceType: (app.sourceType as SourceType | null) ?? undefined,
+		referralName: app.referralName ?? undefined,
 		jobUrl: app.jobUrl ?? undefined,
 		appliedAt: app.appliedAt,
 		status: app.status as Status,
+		outcomeReason: (app.outcomeReason as OutcomeReason | null) ?? undefined,
 		contactName: app.contactName ?? undefined,
 		contactEmail: app.contactEmail ?? undefined,
 		contactPhone: app.contactPhone ?? undefined,
 		notes: app.notes ?? undefined,
 		nextStepAt: app.nextStepAt ?? undefined,
 		nextStepNote: app.nextStepNote ?? undefined,
+		nextActionType: (app.nextActionType as NextActionType | null) ?? undefined,
 	};
 
 	return (

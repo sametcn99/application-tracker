@@ -4,7 +4,14 @@ import { Button, Card, Flex, Select, TextField } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { STATUSES, WORK_MODES } from "@/shared/constants/application";
+import {
+	NEXT_ACTION_TYPES,
+	OUTCOME_REASONS,
+	PRIORITIES,
+	SOURCE_TYPES,
+	STATUSES,
+	WORK_MODES,
+} from "@/shared/constants/application";
 
 type Tag = { id: string; name: string };
 
@@ -54,6 +61,24 @@ export function FiltersBar({ tags }: { tags: Tag[] }) {
 				</Flex>
 
 				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>{t("filters.priority")}</label>
+					<Select.Root
+						value={sp.get("priority") ?? "all"}
+						onValueChange={(v) => update({ priority: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{PRIORITIES.map((priority) => (
+								<Select.Item key={priority} value={priority}>
+									{t(("priority." + priority) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
 					<label style={{ fontSize: 12 }}>{t("filters.workMode")}</label>
 					<Select.Root
 						value={sp.get("workMode") ?? "all"}
@@ -65,6 +90,60 @@ export function FiltersBar({ tags }: { tags: Tag[] }) {
 							{WORK_MODES.map((s) => (
 								<Select.Item key={s} value={s}>
 									{t(("workMode." + s) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>{t("filters.sourceType")}</label>
+					<Select.Root
+						value={sp.get("sourceType") ?? "all"}
+						onValueChange={(v) => update({ sourceType: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{SOURCE_TYPES.map((sourceType) => (
+								<Select.Item key={sourceType} value={sourceType}>
+									{t(("sourceType." + sourceType) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>{t("filters.nextActionType")}</label>
+					<Select.Root
+						value={sp.get("nextActionType") ?? "all"}
+						onValueChange={(v) => update({ nextActionType: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{NEXT_ACTION_TYPES.map((actionType) => (
+								<Select.Item key={actionType} value={actionType}>
+									{t(("nextActionType." + actionType) as never)}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</Flex>
+
+				<Flex direction="column" gap="1">
+					<label style={{ fontSize: 12 }}>{t("filters.outcomeReason")}</label>
+					<Select.Root
+						value={sp.get("outcomeReason") ?? "all"}
+						onValueChange={(v) => update({ outcomeReason: v })}
+					>
+						<Select.Trigger />
+						<Select.Content>
+							<Select.Item value="all">{t("common.all")}</Select.Item>
+							{OUTCOME_REASONS.map((reason) => (
+								<Select.Item key={reason} value={reason}>
+									{t(("outcomeReason." + reason) as never)}
 								</Select.Item>
 							))}
 						</Select.Content>

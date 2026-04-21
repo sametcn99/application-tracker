@@ -1,6 +1,17 @@
+import "server-only";
+
 import { cache } from "react";
 import { normalizeCurrencyCode } from "./currencies";
 import { prisma } from "./prisma";
+import type {
+	CurrencyOptionRecord,
+	SourceOptionRecord,
+} from "./reference-data.shared";
+
+export {
+	convertViaUsd,
+	formatCurrencyOptionLabel,
+} from "./reference-data.shared";
 
 const DEFAULT_SOURCES = ["LinkedIn", "Indeed"] as const;
 
@@ -13,21 +24,6 @@ const DEFAULT_CURRENCIES = [
 		rateSource: "default",
 	},
 ] as const;
-
-export type SourceOptionRecord = {
-	id: string;
-	name: string;
-};
-
-export type CurrencyOptionRecord = {
-	id: string;
-	code: string;
-	name: string;
-	symbol: string | null;
-	usdRate: number | null;
-	rateSource: string | null;
-	lastSyncedAt: Date | null;
-};
 
 export async function ensureDefaultReferenceData(): Promise<void> {
 	for (const name of DEFAULT_SOURCES) {
@@ -104,18 +100,4 @@ export async function fetchUsdRateForCurrency(
 	} catch {
 		return null;
 	}
-}
-
-export function convertViaUsd(
-	amount: number,
-	fromUsdRate: number,
-	toUsdRate: number,
-): number {
-	return (amount * fromUsdRate) / toUsdRate;
-}
-
-export function formatCurrencyOptionLabel(
-	currency: Pick<CurrencyOptionRecord, "code" | "name">,
-): string {
-	return `${currency.code} - ${currency.name}`;
 }

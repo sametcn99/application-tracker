@@ -12,12 +12,11 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { STATUS_COLORS } from "@/shared/constants/application";
+import { PRIORITY_COLORS, STATUS_COLORS } from "@/shared/constants/application";
 import { getApplication } from "@/shared/lib/applications";
 import { formatDate } from "@/shared/lib/format";
 import { getCurrencyOptions } from "@/shared/lib/reference-data";
 import { ActivityTimeline } from "./components/ActivityTimeline";
-import { AddActivityBox } from "./components/AddActivityBox";
 import { ApplicationDetails } from "./components/ApplicationDetails";
 import { AttachmentList } from "./components/AttachmentList";
 import { DeleteApplicationButton } from "./components/DeleteApplicationButton";
@@ -50,6 +49,16 @@ export default async function ApplicationDetailPage({
 								}
 							>
 								{t(("status." + app.status) as never)}
+							</Badge>
+							<Badge
+								variant="soft"
+								color={
+									PRIORITY_COLORS[
+										app.priority as keyof typeof PRIORITY_COLORS
+									] ?? "gray"
+								}
+							>
+								{t(("priority." + app.priority) as never)}
 							</Badge>
 						</Flex>
 						<Text color="gray" size="3">
@@ -94,7 +103,6 @@ export default async function ApplicationDetailPage({
 					</Tabs.Content>
 					<Tabs.Content value="activity">
 						<Flex direction="column" gap="3">
-							<AddActivityBox applicationId={app.id} />
 							<ActivityTimeline entries={app.activities} />
 						</Flex>
 					</Tabs.Content>

@@ -9,27 +9,35 @@ import {
 import {
 	type CurrencyOptionRecord,
 	convertViaUsd,
-} from "@/shared/lib/reference-data";
+} from "@/shared/lib/reference-data.shared";
 
 type App = {
 	company: string;
 	position: string;
 	listingDetails: string | null;
 	location: string | null;
+	status: string;
 	workMode: string;
 	employmentType: string;
+	priority: string;
 	salaryMin: number | null;
 	salaryMax: number | null;
+	targetSalaryMin: number | null;
+	targetSalaryMax: number | null;
 	currency: string | null;
 	source: string | null;
+	sourceType: string | null;
+	referralName: string | null;
 	jobUrl: string | null;
 	appliedAt: Date;
+	outcomeReason: string | null;
 	contactName: string | null;
 	contactEmail: string | null;
 	contactPhone: string | null;
 	notes: string | null;
 	nextStepAt: Date | null;
 	nextStepNote: string | null;
+	nextActionType: string | null;
 };
 
 export async function ApplicationDetails({
@@ -99,11 +107,45 @@ export async function ApplicationDetails({
 
 			<Card>
 				<Heading size="3" mb="2">
+					{t("applicationDetail.details.pipeline")}
+				</Heading>
+				<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+					<Field
+						label={t("fields.priority")}
+						value={t(("priority." + app.priority) as never)}
+					/>
+					<Field
+						label={t("fields.sourceType")}
+						value={
+							app.sourceType
+								? t(("sourceType." + app.sourceType) as never)
+								: "—"
+						}
+					/>
+					<Field
+						label={t("fields.referralName")}
+						value={app.referralName ?? "—"}
+					/>
+				</Grid>
+			</Card>
+
+			<Card>
+				<Heading size="3" mb="2">
 					{t("applicationDetail.details.salary")}
 				</Heading>
 				<Field
 					label={t("fields.salaryMin") + " / " + t("fields.salaryMax")}
 					value={formatSalary(app.salaryMin, app.salaryMax, app.currency)}
+				/>
+				<Field
+					label={
+						t("fields.targetSalaryMin") + " / " + t("fields.targetSalaryMax")
+					}
+					value={formatSalary(
+						app.targetSalaryMin,
+						app.targetSalaryMax,
+						app.currency,
+					)}
 				/>
 				{conversions.length > 0 && (
 					<Flex direction="column" gap="1" mt="3">
@@ -158,10 +200,18 @@ export async function ApplicationDetails({
 				<Heading size="3" mb="2">
 					{t("applicationDetail.details.nextStep")}
 				</Heading>
-				<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+				<Grid columns={{ initial: "1", sm: "3" }} gap="3">
 					<Field
 						label={t("fields.nextStepAt")}
 						value={app.nextStepAt ? formatDateTime(app.nextStepAt) : "—"}
+					/>
+					<Field
+						label={t("fields.nextActionType")}
+						value={
+							app.nextActionType
+								? t(("nextActionType." + app.nextActionType) as never)
+								: "—"
+						}
 					/>
 					<Field
 						label={t("fields.nextStepNote")}
@@ -169,6 +219,24 @@ export async function ApplicationDetails({
 					/>
 				</Grid>
 			</Card>
+
+			{app.status === "REJECTED" ||
+			app.status === "WITHDRAWN" ||
+			app.outcomeReason ? (
+				<Card>
+					<Heading size="3" mb="2">
+						{t("applicationDetail.details.outcome")}
+					</Heading>
+					<Field
+						label={t("fields.outcomeReason")}
+						value={
+							app.outcomeReason
+								? t(("outcomeReason." + app.outcomeReason) as never)
+								: "—"
+						}
+					/>
+				</Card>
+			) : null}
 
 			{app.jobUrl && (
 				<Card>

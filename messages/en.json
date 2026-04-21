@@ -89,7 +89,10 @@
 		"manageSources": "Manage sources",
 		"manageCurrencies": "Manage currencies",
 		"selectSource": "Select source",
+		"selectSourceType": "Select source type",
 		"selectCurrency": "Select currency",
+		"selectNextActionType": "Select next action type",
+		"selectOutcomeReason": "Select outcome reason",
 		"notSpecified": "Not specified",
 		"currencyRateHint": "1 {code} = {amount} USD",
 		"saving": "Saving…",
@@ -100,6 +103,7 @@
 			"salary": "Salary",
 			"contact": "Contact",
 			"nextStep": "Next Step",
+			"outcome": "Outcome",
 			"tags": "Tags",
 			"notes": "Notes"
 		},
@@ -109,6 +113,7 @@
 			"listingDetails": "Paste the job description, responsibilities, benefits, or any notes from the posting…",
 			"location": "Remote / New York",
 			"source": "LinkedIn, referral, company site…",
+			"referralName": "Jane Doe",
 			"jobUrl": "https://…",
 			"contactName": "Jane Doe",
 			"contactEmail": "jane@example.com",
@@ -129,10 +134,12 @@
 		},
 		"details": {
 			"overview": "Overview",
+			"pipeline": "Pipeline",
 			"salary": "Salary",
 			"listingDetails": "Job Posting Details",
 			"contact": "Contact",
 			"nextStep": "Next Step",
+			"outcome": "Outcome",
 			"notes": "Notes",
 			"links": "Links",
 			"openJobUrl": "Open job posting"
@@ -148,7 +155,11 @@
 		"asc": "Ascending",
 		"desc": "Descending",
 		"status": "Status",
+		"priority": "Priority",
 		"workMode": "Work mode",
+		"sourceType": "Source type",
+		"nextActionType": "Next action",
+		"outcomeReason": "Outcome reason",
 		"tag": "Tag",
 		"reset": "Reset filters",
 		"sortField": {
@@ -242,7 +253,10 @@
 		"invalidUrl": "Invalid URL.",
 		"invalidEmail": "Invalid email address.",
 		"invalidNumber": "Invalid number.",
-		"invalidDate": "Invalid date."
+		"invalidDate": "Invalid date.",
+		"invalidSalaryRange": "Max salary must be greater than or equal to min salary.",
+		"referralRequiresSourceType": "Referral name can only be set when source type is Referral.",
+		"outcomeReasonRequiresClosedStatus": "Outcome reason can only be set for Rejected or Withdrawn applications."
 	},
 	"fields": {
 		"company": "Company",
@@ -251,20 +265,32 @@
 		"location": "Location",
 		"workMode": "Work Mode",
 		"employmentType": "Employment Type",
+		"priority": "Priority",
 		"salaryMin": "Min Salary",
 		"salaryMax": "Max Salary",
+		"targetSalaryMin": "Target Min Salary",
+		"targetSalaryMax": "Target Max Salary",
 		"currency": "Currency",
 		"source": "Source",
+		"sourceType": "Source Type",
+		"referralName": "Referral Name",
 		"jobUrl": "Job URL",
 		"appliedAt": "Applied Date",
 		"status": "Status",
+		"outcomeReason": "Outcome Reason",
 		"contactName": "Contact Name",
 		"contactEmail": "Contact Email",
 		"contactPhone": "Contact Phone",
 		"notes": "Notes",
 		"nextStepAt": "Next Step Date",
 		"nextStepNote": "Next Step Note",
+		"nextActionType": "Next Action Type",
 		"tags": "Tags"
+	},
+	"priority": {
+		"HIGH": "High",
+		"MEDIUM": "Medium",
+		"LOW": "Low"
 	},
 	"status": {
 		"APPLIED": "Applied",
@@ -286,6 +312,37 @@
 		"CONTRACT": "Contract",
 		"INTERN": "Intern",
 		"FREELANCE": "Freelance"
+	},
+	"sourceType": {
+		"JOB_BOARD": "Job board",
+		"COMPANY_SITE": "Company site",
+		"REFERRAL": "Referral",
+		"RECRUITER": "Recruiter outreach",
+		"NETWORK": "Network",
+		"OTHER": "Other"
+	},
+	"nextActionType": {
+		"FOLLOW_UP": "Follow up",
+		"RECRUITER_CALL": "Recruiter call",
+		"PHONE_SCREEN": "Phone screen",
+		"TECH_INTERVIEW": "Technical interview",
+		"TAKE_HOME": "Take-home",
+		"ONSITE": "On-site",
+		"OFFER_DISCUSSION": "Offer discussion",
+		"WAITING": "Waiting",
+		"OTHER": "Other"
+	},
+	"outcomeReason": {
+		"NO_RESPONSE": "No response",
+		"ROLE_CLOSED": "Role closed",
+		"SALARY_MISMATCH": "Salary mismatch",
+		"LOCATION_MISMATCH": "Location mismatch",
+		"SKILL_MISMATCH": "Skill mismatch",
+		"FAILED_SCREEN": "Failed screen",
+		"FAILED_INTERVIEW": "Failed interview",
+		"ACCEPTED_OTHER": "Accepted another offer",
+		"WITHDREW_BY_CHOICE": "Withdrew by choice",
+		"OTHER": "Other"
 	},
 	"activityType": {
 		"CREATED": "Created",

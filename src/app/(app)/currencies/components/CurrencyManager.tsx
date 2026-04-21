@@ -13,7 +13,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { formatCurrencyAmount } from "@/shared/lib/format";
-import { convertViaUsd } from "@/shared/lib/reference-data";
+import { convertViaUsd } from "@/shared/lib/reference-data.shared";
 import {
 	createCurrencyAction,
 	deleteCurrencyAction,

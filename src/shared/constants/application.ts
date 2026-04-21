@@ -80,6 +80,12 @@ export const STATUS_COLORS: Record<Status, StatusColor> = {
 	ON_HOLD: "yellow",
 };
 
+export const PRIORITY_COLORS: Record<Priority, StatusColor> = {
+	HIGH: "red",
+	MEDIUM: "amber",
+	LOW: "gray",
+};
+
 export const ACTIVITY_TYPES = [
 	"CREATED",
 	"FIELD_CHANGE",

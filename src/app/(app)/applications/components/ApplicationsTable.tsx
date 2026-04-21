@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchApplicationsAction } from "@/shared/actions/applications";
-import { STATUS_COLORS } from "@/shared/constants/application";
+import { PRIORITY_COLORS, STATUS_COLORS } from "@/shared/constants/application";
 import type { ListFilters } from "@/shared/lib/applications";
 import { formatDate, formatSalary } from "@/shared/lib/format";
 
@@ -14,6 +14,7 @@ type Item = {
 	company: string;
 	position: string;
 	status: string;
+	priority: string;
 	workMode: string;
 	location: string | null;
 	salaryMin: number | null;
@@ -130,13 +131,26 @@ export function ApplicationsTable({
 									style={{ textDecoration: "none", color: "inherit" }}
 								>
 									<Text weight="medium">{a.position}</Text>
-									<Text
-										size="1"
-										color="gray"
-										style={{ display: "block", marginBottom: "4px" }}
+									<Flex
+										gap="2"
+										align="center"
+										wrap="wrap"
+										style={{ marginTop: "4px" }}
 									>
-										&
-									</Text>
+										<Text size="1" color="gray">
+											{a.company}
+										</Text>
+										<Badge
+											color={
+												PRIORITY_COLORS[
+													a.priority as keyof typeof PRIORITY_COLORS
+												] ?? "gray"
+											}
+											variant="soft"
+										>
+											{t(("priority." + a.priority) as never)}
+										</Badge>
+									</Flex>
 								</Link>
 							</Table.Cell>
 							<Table.Cell>

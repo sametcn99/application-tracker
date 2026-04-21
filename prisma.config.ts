@@ -1,6 +1,6 @@
 import { defineConfig } from "@prisma/config";
 
 export default defineConfig({
-        // @ts-ignore
-        earlyAccess: true,
+	// @ts-ignore
+	earlyAccess: true,
 });

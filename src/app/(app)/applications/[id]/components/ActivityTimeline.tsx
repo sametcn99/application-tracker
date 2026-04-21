@@ -35,14 +35,40 @@ export function ActivityTimeline({ entries }: { entries: Entry[] }) {
 					"gray";
 				const oldV = decodeValue(e.oldValue);
 				const newV = decodeValue(e.newValue);
+				const translateKey = (key: string): string => {
+					try {
+						return t(key as never);
+					} catch {
+						return key;
+					}
+				};
 
-				const renderValue = (v: unknown): string => {
+				const renderValue = (field: string | null, v: unknown): string => {
 					if (v == null) return "—";
 					if (Array.isArray(v)) return v.join(", ");
+					if (typeof v === "string") {
+						switch (field) {
+							case "status":
+								return translateKey("status." + v);
+							case "workMode":
+								return translateKey("workMode." + v);
+							case "employmentType":
+								return translateKey("employmentType." + v);
+							case "priority":
+								return translateKey("priority." + v);
+							case "sourceType":
+								return translateKey("sourceType." + v);
+							case "nextActionType":
+								return translateKey("nextActionType." + v);
+							case "outcomeReason":
+								return translateKey("outcomeReason." + v);
+							default:
+								return v;
+						}
+					}
 					return String(v);
 				};
 
-				const isStatusField = e.field === "status";
 				const fieldLabel = e.field
 					? (() => {
 							try {
@@ -82,17 +108,9 @@ export function ActivityTimeline({ entries }: { entries: Entry[] }) {
 								{(e.type === "FIELD_CHANGE" || e.type === "STATUS_CHANGE") && (
 									<Text size="2" color="gray">
 										{t("activity.changedFrom")}:{" "}
-										<code>
-											{isStatusField && typeof oldV === "string"
-												? t(("status." + oldV) as never)
-												: renderValue(oldV)}
-										</code>{" "}
+										<code>{renderValue(e.field, oldV)}</code>{" "}
 										{t("activity.changedTo")}:{" "}
-										<code>
-											{isStatusField && typeof newV === "string"
-												? t(("status." + newV) as never)
-												: renderValue(newV)}
-										</code>
+										<code>{renderValue(e.field, newV)}</code>
 									</Text>
 								)}
 							</Flex>

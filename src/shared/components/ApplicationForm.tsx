@@ -27,6 +27,10 @@ import {
 } from "@/shared/actions/applications";
 import {
 	EMPLOYMENT_TYPES,
+	NEXT_ACTION_TYPES,
+	OUTCOME_REASONS,
+	PRIORITIES,
+	SOURCE_TYPES,
 	STATUSES,
 	WORK_MODES,
 } from "@/shared/constants/application";
@@ -35,7 +39,7 @@ import {
 	type CurrencyOptionRecord,
 	formatCurrencyOptionLabel,
 	type SourceOptionRecord,
-} from "@/shared/lib/reference-data";
+} from "@/shared/lib/reference-data.shared";
 import {
 	type ApplicationFormInput,
 	applicationFormSchema,
@@ -85,6 +89,7 @@ export function ApplicationForm({
 			location: "",
 			workMode: "REMOTE",
 			employmentType: "FULL_TIME",
+			priority: "MEDIUM",
 			currency: "USD",
 			status: "APPLIED",
 			appliedAt: new Date().toISOString().slice(0, 10) as unknown as Date,
@@ -131,6 +136,16 @@ export function ApplicationForm({
 	const selectedCurrency = currencyOptions.find(
 		(currency) => currency.code === watch("currency"),
 	);
+	const selectedSourceType = watch("sourceType");
+	const referralName = watch("referralName");
+	const selectedStatus = watch("status");
+	const selectedOutcomeReason = watch("outcomeReason");
+	const showReferralField =
+		selectedSourceType === "REFERRAL" || Boolean(referralName);
+	const showOutcomeField =
+		selectedStatus === "REJECTED" ||
+		selectedStatus === "WITHDRAWN" ||
+		Boolean(selectedOutcomeReason);
 
 	const onSubmit = (values: ApplicationFormInput) => {
 		setTopError(null);
@@ -283,6 +298,30 @@ export function ApplicationForm({
 								/>
 							</Field>
 							<Field
+								label={t("fields.priority")}
+								error={tx(errors.priority?.message)}
+							>
+								<Controller
+									control={control}
+									name="priority"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value}
+											onValueChange={field.onChange}
+										>
+											<Select.Trigger />
+											<Select.Content>
+												{PRIORITIES.map((priority) => (
+													<Select.Item key={priority} value={priority}>
+														{t(`priority.${priority}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							<Field
 								label={t("fields.appliedAt")}
 								error={tx(errors.appliedAt?.message as string | undefined)}
 							>
@@ -335,6 +374,48 @@ export function ApplicationForm({
 									)}
 								/>
 							</Field>
+							<Field
+								label={t("fields.sourceType")}
+								error={tx(errors.sourceType?.message)}
+							>
+								<Controller
+									control={control}
+									name="sourceType"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t("applicationForm.selectSourceType")}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{SOURCE_TYPES.map((sourceType) => (
+													<Select.Item key={sourceType} value={sourceType}>
+														{t(`sourceType.${sourceType}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							{showReferralField ? (
+								<Field
+									label={t("fields.referralName")}
+									error={tx(errors.referralName?.message)}
+								>
+									<TextField.Root
+										{...register("referralName")}
+										placeholder={t("applicationForm.placeholders.referralName")}
+									/>
+								</Field>
+							) : null}
 							<Field
 								label={t("fields.jobUrl")}
 								error={tx(errors.jobUrl?.message)}
@@ -413,6 +494,24 @@ export function ApplicationForm({
 									</Text>
 								)}
 							</Field>
+							<Field
+								label={t("fields.targetSalaryMin")}
+								error={tx(errors.targetSalaryMin?.message)}
+							>
+								<TextField.Root
+									type="number"
+									{...register("targetSalaryMin")}
+								/>
+							</Field>
+							<Field
+								label={t("fields.targetSalaryMax")}
+								error={tx(errors.targetSalaryMax?.message)}
+							>
+								<TextField.Root
+									type="number"
+									{...register("targetSalaryMax")}
+								/>
+							</Field>
 						</Grid>
 					</Flex>
 				</Card>
@@ -456,7 +555,7 @@ export function ApplicationForm({
 				<Card>
 					<Flex direction="column" gap="3">
 						<Heading size="4">{t("applicationForm.sections.nextStep")}</Heading>
-						<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+						<Grid columns={{ initial: "1", sm: "3" }} gap="3">
 							<Field
 								label={t("fields.nextStepAt")}
 								error={tx(errors.nextStepAt?.message as string | undefined)}
@@ -476,6 +575,37 @@ export function ApplicationForm({
 								/>
 							</Field>
 							<Field
+								label={t("fields.nextActionType")}
+								error={tx(errors.nextActionType?.message)}
+							>
+								<Controller
+									control={control}
+									name="nextActionType"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t("applicationForm.selectNextActionType")}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{NEXT_ACTION_TYPES.map((actionType) => (
+													<Select.Item key={actionType} value={actionType}>
+														{t(`nextActionType.${actionType}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+							<Field
 								label={t("fields.nextStepNote")}
 								error={tx(errors.nextStepNote?.message)}
 							>
@@ -487,6 +617,47 @@ export function ApplicationForm({
 						</Grid>
 					</Flex>
 				</Card>
+
+				{showOutcomeField ? (
+					<Card>
+						<Flex direction="column" gap="3">
+							<Heading size="4">
+								{t("applicationForm.sections.outcome")}
+							</Heading>
+							<Field
+								label={t("fields.outcomeReason")}
+								error={tx(errors.outcomeReason?.message)}
+							>
+								<Controller
+									control={control}
+									name="outcomeReason"
+									render={({ field }) => (
+										<Select.Root
+											value={field.value ?? NONE_VALUE}
+											onValueChange={(value) =>
+												field.onChange(value === NONE_VALUE ? undefined : value)
+											}
+										>
+											<Select.Trigger
+												placeholder={t("applicationForm.selectOutcomeReason")}
+											/>
+											<Select.Content>
+												<Select.Item value={NONE_VALUE}>
+													{t("applicationForm.notSpecified")}
+												</Select.Item>
+												{OUTCOME_REASONS.map((reason) => (
+													<Select.Item key={reason} value={reason}>
+														{t(`outcomeReason.${reason}`)}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+									)}
+								/>
+							</Field>
+						</Flex>
+					</Card>
+				) : null}
 
 				<Card>
 					<Flex direction="column" gap="3">
