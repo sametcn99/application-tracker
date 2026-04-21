@@ -1,0 +1,142 @@
+// Prisma schema for Application Tracker (PostgreSQL)
+// Enums are represented as string fields validated in zod, and old/new
+// values are JSON-encoded strings to keep parity with previous schema.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Application {
+  comments        Comment[]
+  id              String   @id @default(cuid())
+  company         String
+  position        String
+  listingDetails  String?
+  location        String?
+  workMode        String   @default("REMOTE") // REMOTE | HYBRID | ONSITE
+  employmentType  String   @default("FULL_TIME") // FULL_TIME | PART_TIME | CONTRACT | INTERN | FREELANCE
+  priority        String   @default("MEDIUM") // HIGH | MEDIUM | LOW
+  salaryMin       Int?
+  salaryMax       Int?
+  targetSalaryMin Int?
+  targetSalaryMax Int?
+  currency        String?  @default("USD")
+  source          String?  // LinkedIn, Indeed, Kariyer.net, Referral, Other...
+  sourceType      String?  // JOB_BOARD | COMPANY_SITE | REFERRAL | RECRUITER | NETWORK | OTHER
+  referralName    String?
+  jobUrl          String?
+  appliedAt       DateTime @default(now())
+  status          String   @default("APPLIED") // APPLIED | SCREENING | INTERVIEW | OFFER | REJECTED | WITHDRAWN | ON_HOLD
+  outcomeReason   String?  // NO_RESPONSE | ROLE_CLOSED | SALARY_MISMATCH | LOCATION_MISMATCH | SKILL_MISMATCH | FAILED_SCREEN | FAILED_INTERVIEW | ACCEPTED_OTHER | WITHDREW_BY_CHOICE | OTHER
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  notes           String?  // markdown
+  nextStepAt      DateTime?
+  nextStepNote    String?
+  nextActionType  String?  // FOLLOW_UP | RECRUITER_CALL | PHONE_SCREEN | TECH_INTERVIEW | TAKE_HOME | ONSITE | OFFER_DISCUSSION | WAITING | OTHER
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tags        ApplicationTag[]
+  attachments Attachment[]
+  activities  ActivityEntry[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([appliedAt])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   @default("gray")
+  createdAt DateTime @default(now())
+
+  applications ApplicationTag[]
+}
+
+model SourceOption {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model CurrencyOption {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  symbol        String?
+  usdRate       Decimal? @db.Decimal(18, 6)
+  rateSource    String?
+  lastSyncedAt  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ApplicationTag {
+  applicationId String
+  tagId         String
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, tagId])
+  @@index([tagId])
+}
+
+model Attachment {
+  id            String   @id @default(cuid())
+  applicationId String
+  fileName      String
+  mimeType      String
+  size          Int
+  storagePath   String
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+model ActivityEntry {
+  id            String   @id @default(cuid())
+  applicationId String
+  type          String   // CREATED | FIELD_CHANGE | STATUS_CHANGE | COMMENT | ATTACHMENT_ADDED | ATTACHMENT_REMOVED
+  field         String?
+  oldValue      String?  // JSON-encoded
+  newValue      String?  // JSON-encoded
+  comment       String?
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+  @@index([createdAt])
+}
+
+model Comment {
+  id            String   @id @default(cuid())
+  applicationId String
+  content       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  @@index([applicationId])
+}

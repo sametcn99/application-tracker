@@ -1,0 +1,615 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://application-tracker.local/schemas/messages.schema.json",
+	"title": "ApplicationTrackerMessages",
+	"description": "Schema for next-intl message catalogs in this project. All locale JSON files must conform to this schema.",
+	"type": "object",
+	"required": [
+		"common",
+		"nav",
+		"auth",
+		"login",
+		"dashboard",
+		"applications",
+		"applicationForm",
+		"applicationDetail",
+		"filters",
+		"activity",
+		"tags",
+		"attachments",
+		"comments",
+		"errors",
+		"validation",
+		"fields",
+		"status",
+		"workMode",
+		"employmentType",
+		"activityType",
+		"metadata"
+	],
+	"additionalProperties": false,
+	"properties": {
+		"$schema": { "type": "string" },
+		"common": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"save",
+				"cancel",
+				"delete",
+				"edit",
+				"create",
+				"add",
+				"remove",
+				"loading",
+				"back",
+				"yes",
+				"no",
+				"search",
+				"reset",
+				"all",
+				"tryAgain",
+				"viewAll",
+				"noData",
+				"open",
+				"close",
+				"submit",
+				"actions",
+				"appName",
+				"logout"
+			],
+			"properties": {
+				"save": { "type": "string" },
+				"cancel": { "type": "string" },
+				"delete": { "type": "string" },
+				"edit": { "type": "string" },
+				"create": { "type": "string" },
+				"add": { "type": "string" },
+				"remove": { "type": "string" },
+				"loading": { "type": "string" },
+				"back": { "type": "string" },
+				"yes": { "type": "string" },
+				"no": { "type": "string" },
+				"search": { "type": "string" },
+				"reset": { "type": "string" },
+				"all": { "type": "string" },
+				"tryAgain": { "type": "string" },
+				"viewAll": { "type": "string" },
+				"noData": { "type": "string" },
+				"open": { "type": "string" },
+				"close": { "type": "string" },
+				"submit": { "type": "string" },
+				"actions": { "type": "string" },
+				"appName": { "type": "string" },
+				"logout": { "type": "string" }
+			}
+		},
+		"nav": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"dashboard",
+				"applications",
+				"newApplication",
+				"activity",
+				"tags"
+			],
+			"properties": {
+				"dashboard": { "type": "string" },
+				"applications": { "type": "string" },
+				"newApplication": { "type": "string" },
+				"activity": { "type": "string" },
+				"tags": { "type": "string" }
+			}
+		},
+		"auth": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"signIn",
+				"signOut",
+				"email",
+				"password",
+				"invalidCredentials",
+				"unauthorized"
+			],
+			"properties": {
+				"signIn": { "type": "string" },
+				"signOut": { "type": "string" },
+				"email": { "type": "string" },
+				"password": { "type": "string" },
+				"invalidCredentials": { "type": "string" },
+				"unauthorized": { "type": "string" }
+			}
+		},
+		"login": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["title", "subtitle", "submit", "loggingIn"],
+			"properties": {
+				"title": { "type": "string" },
+				"subtitle": { "type": "string" },
+				"submit": { "type": "string" },
+				"loggingIn": { "type": "string" }
+			}
+		},
+		"dashboard": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"totalApplications",
+				"active",
+				"thisWeek",
+				"interviews",
+				"statusDistribution",
+				"upcomingSteps",
+				"noUpcomingSteps",
+				"recentActivity",
+				"noActivity"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"totalApplications": { "type": "string" },
+				"active": { "type": "string" },
+				"thisWeek": { "type": "string" },
+				"interviews": { "type": "string" },
+				"statusDistribution": { "type": "string" },
+				"upcomingSteps": { "type": "string" },
+				"noUpcomingSteps": { "type": "string" },
+				"recentActivity": { "type": "string" },
+				"noActivity": { "type": "string" }
+			}
+		},
+		"applications": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"newApplication",
+				"recordCount",
+				"noResults",
+				"columns",
+				"deleteConfirmTitle",
+				"deleteConfirmDescription",
+				"deleted",
+				"created",
+				"updated"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"newApplication": { "type": "string" },
+				"recordCount": { "type": "string" },
+				"noResults": { "type": "string" },
+				"deleteConfirmTitle": { "type": "string" },
+				"deleteConfirmDescription": { "type": "string" },
+				"deleted": { "type": "string" },
+				"created": { "type": "string" },
+				"updated": { "type": "string" },
+				"columns": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"positionCompany",
+						"status",
+						"mode",
+						"location",
+						"salary",
+						"source",
+						"date",
+						"tags"
+					],
+					"properties": {
+						"positionCompany": { "type": "string" },
+						"status": { "type": "string" },
+						"mode": { "type": "string" },
+						"location": { "type": "string" },
+						"salary": { "type": "string" },
+						"source": { "type": "string" },
+						"date": { "type": "string" },
+						"tags": { "type": "string" }
+					}
+				}
+			}
+		},
+		"applicationForm": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"createTitle",
+				"editTitle",
+				"sections",
+				"placeholders",
+				"noTags",
+				"saving",
+				"saveCreate",
+				"saveUpdate"
+			],
+			"properties": {
+				"createTitle": { "type": "string" },
+				"editTitle": { "type": "string" },
+				"noTags": { "type": "string" },
+				"saving": { "type": "string" },
+				"saveCreate": { "type": "string" },
+				"saveUpdate": { "type": "string" },
+				"sections": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"general",
+						"salary",
+						"contact",
+						"nextStep",
+						"tags",
+						"notes"
+					],
+					"properties": {
+						"general": { "type": "string" },
+						"salary": { "type": "string" },
+						"contact": { "type": "string" },
+						"nextStep": { "type": "string" },
+						"tags": { "type": "string" },
+						"notes": { "type": "string" }
+					}
+				},
+				"placeholders": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"company",
+						"position",
+						"location",
+						"source",
+						"jobUrl",
+						"contactName",
+						"contactEmail",
+						"contactPhone",
+						"nextStepNote",
+						"notes"
+					],
+					"properties": {
+						"company": { "type": "string" },
+						"position": { "type": "string" },
+						"location": { "type": "string" },
+						"source": { "type": "string" },
+						"jobUrl": { "type": "string" },
+						"contactName": { "type": "string" },
+						"contactEmail": { "type": "string" },
+						"contactPhone": { "type": "string" },
+						"nextStepNote": { "type": "string" },
+						"notes": { "type": "string" }
+					}
+				}
+			}
+		},
+		"applicationDetail": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["tabs", "details", "noNotes", "deleteButton"],
+			"properties": {
+				"noNotes": { "type": "string" },
+				"deleteButton": { "type": "string" },
+				"tabs": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["details", "activity", "attachments"],
+					"properties": {
+						"details": { "type": "string" },
+						"activity": { "type": "string" },
+						"attachments": { "type": "string" }
+					}
+				},
+				"details": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"overview",
+						"salary",
+						"contact",
+						"nextStep",
+						"notes",
+						"links",
+						"openJobUrl"
+					],
+					"properties": {
+						"overview": { "type": "string" },
+						"salary": { "type": "string" },
+						"contact": { "type": "string" },
+						"nextStep": { "type": "string" },
+						"notes": { "type": "string" },
+						"links": { "type": "string" },
+						"openJobUrl": { "type": "string" }
+					}
+				}
+			}
+		},
+		"filters": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"search",
+				"searchPlaceholder",
+				"from",
+				"to",
+				"sortBy",
+				"order",
+				"asc",
+				"desc",
+				"status",
+				"workMode",
+				"tag",
+				"reset",
+				"sortField"
+			],
+			"properties": {
+				"search": { "type": "string" },
+				"searchPlaceholder": { "type": "string" },
+				"from": { "type": "string" },
+				"to": { "type": "string" },
+				"sortBy": { "type": "string" },
+				"order": { "type": "string" },
+				"asc": { "type": "string" },
+				"desc": { "type": "string" },
+				"status": { "type": "string" },
+				"workMode": { "type": "string" },
+				"tag": { "type": "string" },
+				"reset": { "type": "string" },
+				"sortField": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"appliedAt",
+						"company",
+						"position",
+						"status",
+						"createdAt"
+					],
+					"properties": {
+						"appliedAt": { "type": "string" },
+						"company": { "type": "string" },
+						"position": { "type": "string" },
+						"status": { "type": "string" },
+						"createdAt": { "type": "string" }
+					}
+				}
+			}
+		},
+		"activity": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"noActivity",
+				"changedFrom",
+				"changedTo"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"subtitle": { "type": "string" },
+				"noActivity": { "type": "string" },
+				"changedFrom": { "type": "string" },
+				"changedTo": { "type": "string" }
+			}
+		},
+		"tags": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"name",
+				"color",
+				"addButton",
+				"deleteConfirm",
+				"noTags",
+				"namePlaceholder",
+				"applicationsCount"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"subtitle": { "type": "string" },
+				"name": { "type": "string" },
+				"color": { "type": "string" },
+				"addButton": { "type": "string" },
+				"deleteConfirm": { "type": "string" },
+				"noTags": { "type": "string" },
+				"namePlaceholder": { "type": "string" },
+				"applicationsCount": { "type": "string" }
+			}
+		},
+		"attachments": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"upload",
+				"uploading",
+				"name",
+				"size",
+				"uploadedAt",
+				"noAttachments",
+				"tooLarge"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"upload": { "type": "string" },
+				"uploading": { "type": "string" },
+				"name": { "type": "string" },
+				"size": { "type": "string" },
+				"uploadedAt": { "type": "string" },
+				"noAttachments": { "type": "string" },
+				"tooLarge": { "type": "string" }
+			}
+		},
+		"comments": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["addPlaceholder", "addButton", "submitting"],
+			"properties": {
+				"addPlaceholder": { "type": "string" },
+				"addButton": { "type": "string" },
+				"submitting": { "type": "string" }
+			}
+		},
+		"errors": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"generic",
+				"notFound",
+				"notFoundDescription",
+				"backToDashboard",
+				"occurred"
+			],
+			"properties": {
+				"generic": { "type": "string" },
+				"notFound": { "type": "string" },
+				"notFoundDescription": { "type": "string" },
+				"backToDashboard": { "type": "string" },
+				"occurred": { "type": "string" }
+			}
+		},
+		"validation": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"required",
+				"invalid",
+				"tooLong",
+				"invalidUrl",
+				"invalidEmail",
+				"invalidNumber",
+				"invalidDate"
+			],
+			"properties": {
+				"required": { "type": "string" },
+				"invalid": { "type": "string" },
+				"tooLong": { "type": "string" },
+				"invalidUrl": { "type": "string" },
+				"invalidEmail": { "type": "string" },
+				"invalidNumber": { "type": "string" },
+				"invalidDate": { "type": "string" }
+			}
+		},
+		"fields": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"company",
+				"position",
+				"location",
+				"workMode",
+				"employmentType",
+				"salaryMin",
+				"salaryMax",
+				"currency",
+				"source",
+				"jobUrl",
+				"appliedAt",
+				"status",
+				"contactName",
+				"contactEmail",
+				"contactPhone",
+				"notes",
+				"nextStepAt",
+				"nextStepNote",
+				"tags"
+			],
+			"properties": {
+				"company": { "type": "string" },
+				"position": { "type": "string" },
+				"location": { "type": "string" },
+				"workMode": { "type": "string" },
+				"employmentType": { "type": "string" },
+				"salaryMin": { "type": "string" },
+				"salaryMax": { "type": "string" },
+				"currency": { "type": "string" },
+				"source": { "type": "string" },
+				"jobUrl": { "type": "string" },
+				"appliedAt": { "type": "string" },
+				"status": { "type": "string" },
+				"contactName": { "type": "string" },
+				"contactEmail": { "type": "string" },
+				"contactPhone": { "type": "string" },
+				"notes": { "type": "string" },
+				"nextStepAt": { "type": "string" },
+				"nextStepNote": { "type": "string" },
+				"tags": { "type": "string" }
+			}
+		},
+		"status": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"APPLIED",
+				"SCREENING",
+				"INTERVIEW",
+				"OFFER",
+				"REJECTED",
+				"WITHDRAWN",
+				"ON_HOLD"
+			],
+			"properties": {
+				"APPLIED": { "type": "string" },
+				"SCREENING": { "type": "string" },
+				"INTERVIEW": { "type": "string" },
+				"OFFER": { "type": "string" },
+				"REJECTED": { "type": "string" },
+				"WITHDRAWN": { "type": "string" },
+				"ON_HOLD": { "type": "string" }
+			}
+		},
+		"workMode": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["REMOTE", "HYBRID", "ONSITE"],
+			"properties": {
+				"REMOTE": { "type": "string" },
+				"HYBRID": { "type": "string" },
+				"ONSITE": { "type": "string" }
+			}
+		},
+		"employmentType": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["FULL_TIME", "PART_TIME", "CONTRACT", "INTERN", "FREELANCE"],
+			"properties": {
+				"FULL_TIME": { "type": "string" },
+				"PART_TIME": { "type": "string" },
+				"CONTRACT": { "type": "string" },
+				"INTERN": { "type": "string" },
+				"FREELANCE": { "type": "string" }
+			}
+		},
+		"activityType": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"CREATED",
+				"FIELD_CHANGE",
+				"STATUS_CHANGE",
+				"COMMENT",
+				"ATTACHMENT_ADDED",
+				"ATTACHMENT_REMOVED"
+			],
+			"properties": {
+				"CREATED": { "type": "string" },
+				"FIELD_CHANGE": { "type": "string" },
+				"STATUS_CHANGE": { "type": "string" },
+				"COMMENT": { "type": "string" },
+				"ATTACHMENT_ADDED": { "type": "string" },
+				"ATTACHMENT_REMOVED": { "type": "string" }
+			}
+		},
+		"metadata": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["title", "description"],
+			"properties": {
+				"title": { "type": "string" },
+				"description": { "type": "string" }
+			}
+		}
+	}
+}

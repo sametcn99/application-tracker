@@ -1,0 +1,302 @@
+{
+	"$schema": "./messages.schema.json",
+	"common": {
+		"save": "Save",
+		"cancel": "Cancel",
+		"delete": "Delete",
+		"edit": "Edit",
+		"create": "Create",
+		"add": "Add",
+		"remove": "Remove",
+		"loading": "Loading…",
+		"back": "Back",
+		"yes": "Yes",
+		"no": "No",
+		"search": "Search",
+		"reset": "Reset",
+		"all": "All",
+		"tryAgain": "Try again",
+		"viewAll": "View all",
+		"noData": "No data",
+		"open": "Open",
+		"close": "Close",
+		"submit": "Submit",
+		"actions": "Actions",
+		"appName": "Application Tracker",
+		"logout": "Sign out"
+	},
+	"nav": {
+		"dashboard": "Dashboard",
+		"applications": "Applications",
+		"newApplication": "New Application",
+		"activity": "Activity",
+		"tags": "Tags",
+		"sources": "Sources",
+		"currencies": "Currencies"
+	},
+	"auth": {
+		"signIn": "Sign in",
+		"signOut": "Sign out",
+		"email": "Email",
+		"password": "Password",
+		"invalidCredentials": "Invalid email or password.",
+		"unauthorized": "You are not authorized."
+	},
+	"login": {
+		"title": "Sign in",
+		"subtitle": "Sign in to your Application Tracker account.",
+		"submit": "Sign in",
+		"loggingIn": "Signing in…"
+	},
+	"dashboard": {
+		"title": "Dashboard",
+		"totalApplications": "Total Applications",
+		"active": "Active",
+		"thisWeek": "This Week",
+		"interviews": "Interviews",
+		"statusDistribution": "Status Distribution",
+		"upcomingSteps": "Upcoming Steps",
+		"noUpcomingSteps": "No upcoming steps.",
+		"recentActivity": "Recent Activity",
+		"noActivity": "No activity yet."
+	},
+	"applications": {
+		"title": "Applications",
+		"newApplication": "New Application",
+		"recordCount": "{count} records",
+		"noResults": "No applications match your filters.",
+		"deleteConfirmTitle": "Delete application?",
+		"deleteConfirmDescription": "This will permanently delete the application and all related activity. This action cannot be undone.",
+		"deleted": "Application deleted.",
+		"created": "Application created.",
+		"updated": "Application updated.",
+		"columns": {
+			"positionCompany": "Position / Company",
+			"status": "Status",
+			"mode": "Mode",
+			"location": "Location",
+			"salary": "Salary",
+			"source": "Source",
+			"date": "Date",
+			"tags": "Tags"
+		}
+	},
+	"applicationForm": {
+		"createTitle": "New Application",
+		"editTitle": "Edit Application",
+		"noTags": "No tags yet. Create some on the /tags page.",
+		"manageTags": "Manage tags",
+		"manageSources": "Manage sources",
+		"manageCurrencies": "Manage currencies",
+		"selectSource": "Select source",
+		"selectCurrency": "Select currency",
+		"notSpecified": "Not specified",
+		"currencyRateHint": "1 {code} = {amount} USD",
+		"saving": "Saving…",
+		"saveCreate": "Create",
+		"saveUpdate": "Save changes",
+		"sections": {
+			"general": "General Information",
+			"salary": "Salary",
+			"contact": "Contact",
+			"nextStep": "Next Step",
+			"tags": "Tags",
+			"notes": "Notes"
+		},
+		"placeholders": {
+			"company": "Acme Inc.",
+			"position": "Senior Software Engineer",
+			"listingDetails": "Paste the job description, responsibilities, benefits, or any notes from the posting…",
+			"location": "Remote / New York",
+			"source": "LinkedIn, referral, company site…",
+			"jobUrl": "https://…",
+			"contactName": "Jane Doe",
+			"contactEmail": "jane@example.com",
+			"contactPhone": "+1 555 000 0000",
+			"nextStepNote": "Phone screen with HR",
+			"notes": "Interview notes, prep links, observations…"
+		}
+	},
+	"applicationDetail": {
+		"noNotes": "No notes added.",
+		"noListingDetails": "No job-posting details added.",
+		"deleteButton": "Delete application",
+		"salaryConversions": "Approximate equivalents",
+		"tabs": {
+			"details": "Details",
+			"activity": "Activity",
+			"attachments": "Attachments"
+		},
+		"details": {
+			"overview": "Overview",
+			"salary": "Salary",
+			"listingDetails": "Job Posting Details",
+			"contact": "Contact",
+			"nextStep": "Next Step",
+			"notes": "Notes",
+			"links": "Links",
+			"openJobUrl": "Open job posting"
+		}
+	},
+	"filters": {
+		"search": "Search",
+		"searchPlaceholder": "Search company, position, location…",
+		"from": "From",
+		"to": "To",
+		"sortBy": "Sort by",
+		"order": "Order",
+		"asc": "Ascending",
+		"desc": "Descending",
+		"status": "Status",
+		"workMode": "Work mode",
+		"tag": "Tag",
+		"reset": "Reset filters",
+		"sortField": {
+			"appliedAt": "Applied date",
+			"company": "Company",
+			"position": "Position",
+			"status": "Status",
+			"createdAt": "Created date"
+		}
+	},
+	"activity": {
+		"title": "Activity Feed",
+		"subtitle": "Latest updates across all applications. ({count})",
+		"noActivity": "No activity yet.",
+		"changedFrom": "From",
+		"changedTo": "To"
+	},
+	"tags": {
+		"title": "Tags",
+		"subtitle": "Tags to classify your applications.",
+		"name": "Tag name",
+		"color": "Color",
+		"addButton": "Add",
+		"deleteConfirm": "Delete \"{name}\"?",
+		"noTags": "No tags yet.",
+		"namePlaceholder": "e.g. backend",
+		"applicationsCount": "{count} applications"
+	},
+	"sources": {
+		"title": "Sources",
+		"subtitle": "Manage the application sources available in the dropdown.",
+		"name": "Source name",
+		"addButton": "Add source",
+		"noSources": "No sources added yet.",
+		"namePlaceholder": "e.g. Company website",
+		"applicationsCount": "{count} applications",
+		"deleteConfirm": "Delete \"{name}\"?"
+	},
+	"currencies": {
+		"title": "Currencies",
+		"subtitle": "Manage selectable currencies and their USD exchange rate.",
+		"code": "Currency code",
+		"name": "Currency name",
+		"symbol": "Symbol",
+		"manualUsdRate": "Manual USD rate",
+		"usdRate": "USD rate",
+		"addButton": "Add currency",
+		"noCurrencies": "No currencies added yet.",
+		"codePlaceholder": "EUR",
+		"namePlaceholder": "Euro",
+		"symbolPlaceholder": "€",
+		"manualUsdRatePlaceholder": "1.08",
+		"manualRateHint": "If the live API is unavailable, enter how much 1 unit of this currency is worth in USD.",
+		"manualRateRequired": "Live exchange rate could not be fetched. Enter a manual USD rate.",
+		"deleteConfirm": "Delete \"{code}\"?",
+		"applicationsCount": "{count} applications",
+		"rateSourceApi": "API",
+		"rateSourceManual": "Manual",
+		"rateSourceDefault": "Default",
+		"equivalents": "Approximate equivalents",
+		"lastSynced": "Last synced {date}"
+	},
+	"attachments": {
+		"title": "Attachments",
+		"upload": "Upload file",
+		"uploading": "Uploading…",
+		"name": "Name",
+		"size": "Size",
+		"uploadedAt": "Uploaded",
+		"noAttachments": "No attachments uploaded.",
+		"tooLarge": "File is too large."
+	},
+	"comments": {
+		"addNoteTitle": "Add a Note (Markdown supported)",
+		"addPlaceholder": "Write a note…",
+		"addButton": "Add comment",
+		"submitting": "Submitting…",
+		"errorAddingActivity": "Failed to add activity."
+	},
+	"errors": {
+		"generic": "Something went wrong.",
+		"notFound": "Page not found",
+		"notFoundDescription": "The page you are looking for does not exist.",
+		"backToDashboard": "Back to dashboard",
+		"occurred": "An error occurred: {message}"
+	},
+	"validation": {
+		"required": "This field is required.",
+		"invalid": "Invalid value.",
+		"tooLong": "Value is too long.",
+		"invalidUrl": "Invalid URL.",
+		"invalidEmail": "Invalid email address.",
+		"invalidNumber": "Invalid number.",
+		"invalidDate": "Invalid date."
+	},
+	"fields": {
+		"company": "Company",
+		"position": "Position",
+		"listingDetails": "Job Posting Details",
+		"location": "Location",
+		"workMode": "Work Mode",
+		"employmentType": "Employment Type",
+		"salaryMin": "Min Salary",
+		"salaryMax": "Max Salary",
+		"currency": "Currency",
+		"source": "Source",
+		"jobUrl": "Job URL",
+		"appliedAt": "Applied Date",
+		"status": "Status",
+		"contactName": "Contact Name",
+		"contactEmail": "Contact Email",
+		"contactPhone": "Contact Phone",
+		"notes": "Notes",
+		"nextStepAt": "Next Step Date",
+		"nextStepNote": "Next Step Note",
+		"tags": "Tags"
+	},
+	"status": {
+		"APPLIED": "Applied",
+		"SCREENING": "Screening",
+		"INTERVIEW": "Interview",
+		"OFFER": "Offer",
+		"REJECTED": "Rejected",
+		"WITHDRAWN": "Withdrawn",
+		"ON_HOLD": "On Hold"
+	},
+	"workMode": {
+		"REMOTE": "Remote",
+		"HYBRID": "Hybrid",
+		"ONSITE": "On-site"
+	},
+	"employmentType": {
+		"FULL_TIME": "Full-time",
+		"PART_TIME": "Part-time",
+		"CONTRACT": "Contract",
+		"INTERN": "Intern",
+		"FREELANCE": "Freelance"
+	},
+	"activityType": {
+		"CREATED": "Created",
+		"FIELD_CHANGE": "Field changed",
+		"STATUS_CHANGE": "Status changed",
+		"COMMENT": "Comment",
+		"ATTACHMENT_ADDED": "Attachment added",
+		"ATTACHMENT_REMOVED": "Attachment removed"
+	},
+	"metadata": {
+		"title": "Application Tracker",
+		"description": "Personal job application tracking system."
+	}
+}
