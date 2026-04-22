@@ -1,7 +1,7 @@
 import { Flex, Heading } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ApplicationForm } from "@/shared/components/ApplicationForm";
+import { ApplicationForm } from "@/app/(app)/applications/components/ApplicationForm";
 import type {
 	ApplicationMethod,
 	CompanySize,

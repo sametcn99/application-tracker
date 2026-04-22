@@ -1,6 +1,6 @@
 import { Flex, Heading } from "@radix-ui/themes";
 import { getTranslations } from "next-intl/server";
-import { ApplicationForm } from "@/shared/components/ApplicationForm";
+import { ApplicationForm } from "@/app/(app)/applications/components/ApplicationForm";
 import { listCompanyFormOptions } from "@/shared/lib/companies";
 import { prisma } from "@/shared/lib/prisma";
 import {
