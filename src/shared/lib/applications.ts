@@ -5,6 +5,10 @@ import {
 	diffTags,
 	writeActivityEntries,
 } from "./audit";
+import {
+	logCompanyApplicationLink,
+	resolveCompanyForApplication,
+} from "./companies";
 import { prisma } from "./prisma";
 
 export type ListFilters = {
@@ -90,6 +94,7 @@ export async function getApplication(id: string) {
 			tags: { include: { tag: true } },
 			attachments: { orderBy: { createdAt: "desc" } },
 			activities: { orderBy: { createdAt: "desc" } },
+			companyRecord: true,
 		},
 	});
 }
@@ -142,9 +147,23 @@ function toDbData(values: ApplicationFormValues) {
 
 export async function createApplication(values: ApplicationFormValues) {
 	return prisma.$transaction(async (tx) => {
+		const companyId = await resolveCompanyForApplication(tx, {
+			companyId: values.companyId ?? null,
+			companyName: values.company,
+			profile: {
+				website: values.companyWebsite ?? null,
+				careersUrl: values.companyCareersUrl ?? null,
+				linkedinUrl: values.companyLinkedinUrl ?? null,
+				location: values.companyLocation ?? null,
+				industry: values.industry ?? null,
+				companySize: values.companySize ?? null,
+			},
+		});
+
 		const app = await tx.application.create({
 			data: {
 				...toDbData(values),
+				companyId,
 				tags: {
 					create: (values.tagIds ?? []).map((tagId) => ({ tagId })),
 				},
@@ -153,6 +172,12 @@ export async function createApplication(values: ApplicationFormValues) {
 
 		const entries: AuditEntry[] = [{ type: "CREATED" }];
 		await writeActivityEntries(tx, app.id, entries);
+		await logCompanyApplicationLink(
+			tx,
+			companyId,
+			app.id,
+			"LINKED_APPLICATION",
+		);
 		return app;
 	});
 }
@@ -167,6 +192,19 @@ export async function updateApplication(
 			include: { tags: true },
 		});
 		if (!prev) throw new Error("Application not found");
+
+		const companyId = await resolveCompanyForApplication(tx, {
+			companyId: values.companyId ?? null,
+			companyName: values.company,
+			profile: {
+				website: values.companyWebsite ?? null,
+				careersUrl: values.companyCareersUrl ?? null,
+				linkedinUrl: values.companyLinkedinUrl ?? null,
+				location: values.companyLocation ?? null,
+				industry: values.industry ?? null,
+				companySize: values.companySize ?? null,
+			},
+		});
 
 		const data = toDbData(values);
 		const next = { ...prev, ...data };
@@ -183,6 +221,7 @@ export async function updateApplication(
 			where: { id },
 			data: {
 				...data,
+				companyId,
 				tags: {
 					deleteMany: {},
 					create: nextTagIds.map((tagId) => ({ tagId })),
@@ -193,6 +232,18 @@ export async function updateApplication(
 		const entries: AuditEntry[] = [...fieldEntries];
 		if (tagEntry) entries.push(tagEntry);
 		await writeActivityEntries(tx, id, entries);
+
+		if (prev.companyId !== companyId) {
+			if (prev.companyId) {
+				await logCompanyApplicationLink(
+					tx,
+					prev.companyId,
+					id,
+					"UNLINKED_APPLICATION",
+				);
+			}
+			await logCompanyApplicationLink(tx, companyId, id, "LINKED_APPLICATION");
+		}
 
 		return updated;
 	});

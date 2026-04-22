@@ -68,7 +68,23 @@ import {
 
 type Tag = { id: string; name: string; color: string };
 
+export type CompanyOption = {
+	id: string;
+	name: string;
+	normalizedName: string;
+	website: string | null;
+	careersUrl: string | null;
+	linkedinUrl: string | null;
+	location: string | null;
+	industry: string | null;
+	companySize: string | null;
+};
+
 const NONE_VALUE = "__none__";
+
+function normalizeCompanyName(name: string): string {
+	return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
 
 type Props = {
 	mode: "create" | "edit";
@@ -78,6 +94,7 @@ type Props = {
 	tags: Tag[];
 	sources: SourceOptionRecord[];
 	currencies: CurrencyOptionRecord[];
+	companies: CompanyOption[];
 };
 
 export function ApplicationForm({
@@ -88,6 +105,7 @@ export function ApplicationForm({
 	tags,
 	sources,
 	currencies,
+	companies,
 }: Props) {
 	const router = useRouter();
 	const t = useTranslations();
@@ -119,6 +137,7 @@ export function ApplicationForm({
 		watch,
 		reset,
 		getValues,
+		setValue,
 	} = useForm<ApplicationFormInput>({
 		// biome-ignore lint/suspicious/noExplicitAny: using any to force zodResolver to accept our schema
 		resolver: zodResolver(applicationFormSchema as any) as any,
@@ -361,9 +380,78 @@ export function ApplicationForm({
 									error={tx(errors.company?.message)}
 								>
 									<TextField.Root
-										{...register("company")}
+										{...register("company", {
+											onChange: (e) => {
+												const v = (e.target as HTMLInputElement).value;
+												const norm = normalizeCompanyName(v);
+												const match = companies.find(
+													(c) => c.normalizedName === norm,
+												);
+												if (match) {
+													if (getValues("companyId") !== match.id) {
+														setValue("companyId", match.id, {
+															shouldDirty: true,
+														});
+														if (!getValues("companyWebsite") && match.website) {
+															setValue("companyWebsite", match.website, {
+																shouldDirty: true,
+															});
+														}
+														if (
+															!getValues("companyCareersUrl") &&
+															match.careersUrl
+														) {
+															setValue("companyCareersUrl", match.careersUrl, {
+																shouldDirty: true,
+															});
+														}
+														if (
+															!getValues("companyLinkedinUrl") &&
+															match.linkedinUrl
+														) {
+															setValue(
+																"companyLinkedinUrl",
+																match.linkedinUrl,
+																{ shouldDirty: true },
+															);
+														}
+														if (
+															!getValues("companyLocation") &&
+															match.location
+														) {
+															setValue("companyLocation", match.location, {
+																shouldDirty: true,
+															});
+														}
+														if (!getValues("industry") && match.industry) {
+															setValue("industry", match.industry, {
+																shouldDirty: true,
+															});
+														}
+														if (
+															!getValues("companySize") &&
+															match.companySize
+														) {
+															setValue(
+																"companySize",
+																match.companySize as never,
+																{ shouldDirty: true },
+															);
+														}
+													}
+												} else if (getValues("companyId")) {
+													setValue("companyId", "", { shouldDirty: true });
+												}
+											},
+										})}
 										placeholder={t("applicationForm.placeholders.company")}
+										list="company-options"
 									/>
+									<datalist id="company-options">
+										{companies.map((c) => (
+											<option key={c.id} value={c.name} />
+										))}
+									</datalist>
 								</Field>
 								<Field
 									label={`${t("fields.position")} *`}
@@ -602,6 +690,43 @@ export function ApplicationForm({
 										{...register("jobUrl")}
 										placeholder={t("applicationForm.placeholders.jobUrl")}
 									/>
+								</Field>
+							</Grid>
+						</Flex>
+					</Card>
+
+					<Card>
+						<Flex direction="column" gap="3">
+							<Heading size="4">{t("companies.profile")}</Heading>
+							<Text size="1" color="gray">
+								{watch("companyId")
+									? t("companies.hydrateHint")
+									: t("companies.newWillBeCreated")}
+							</Text>
+							<Grid columns={{ initial: "1", sm: "2" }} gap="3">
+								<Field
+									label={t("fields.companyWebsite")}
+									error={tx(errors.companyWebsite?.message)}
+								>
+									<TextField.Root {...register("companyWebsite")} />
+								</Field>
+								<Field
+									label={t("fields.companyCareersUrl")}
+									error={tx(errors.companyCareersUrl?.message)}
+								>
+									<TextField.Root {...register("companyCareersUrl")} />
+								</Field>
+								<Field
+									label={t("fields.companyLinkedinUrl")}
+									error={tx(errors.companyLinkedinUrl?.message)}
+								>
+									<TextField.Root {...register("companyLinkedinUrl")} />
+								</Field>
+								<Field
+									label={t("fields.companyLocation")}
+									error={tx(errors.companyLocation?.message)}
+								>
+									<TextField.Root {...register("companyLocation")} />
 								</Field>
 							</Grid>
 						</Flex>

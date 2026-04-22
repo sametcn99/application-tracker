@@ -2,10 +2,14 @@
  * Idempotent admin seed. Reads ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_NAME
  * from env. Run with: `bun run db:seed`.
  */
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { Pool } from "pg";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
 	const email = process.env.ADMIN_EMAIL;
@@ -77,6 +81,69 @@ async function main() {
 		},
 	});
 	console.log("✓ default currency ready");
+
+	await backfillCompanies();
+}
+
+function normalizeCompanyName(name: string): string {
+	return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+async function backfillCompanies() {
+	const apps = await prisma.application.findMany({
+		where: { companyId: null },
+		select: { id: true, company: true, industry: true, companySize: true },
+	});
+
+	if (apps.length === 0) {
+		console.log("✓ companies backfill: nothing to do");
+		return;
+	}
+
+	let created = 0;
+	let linked = 0;
+	for (const app of apps) {
+		const rawName = (app.company ?? "").trim();
+		if (!rawName) continue;
+		const normalized = normalizeCompanyName(rawName);
+
+		let company = await prisma.company.findUnique({
+			where: { normalizedName: normalized },
+		});
+		if (!company) {
+			company = await prisma.company.create({
+				data: {
+					name: rawName,
+					normalizedName: normalized,
+					industry: app.industry ?? null,
+					companySize: app.companySize ?? null,
+				},
+			});
+			await prisma.companyActivityEntry.create({
+				data: {
+					companyId: company.id,
+					type: "BOOTSTRAPPED_FROM_APPLICATION",
+				},
+			});
+			created++;
+		}
+		await prisma.application.update({
+			where: { id: app.id },
+			data: { companyId: company.id },
+		});
+		await prisma.companyActivityEntry.create({
+			data: {
+				companyId: company.id,
+				type: "LINKED_APPLICATION",
+				comment: app.id,
+			},
+		});
+		linked++;
+	}
+
+	console.log(
+		`✓ companies backfill: created ${created}, linked ${linked} applications`,
+	);
 }
 
 main()
@@ -86,4 +153,5 @@ main()
 	})
 	.finally(async () => {
 		await prisma.$disconnect();
+		await pool.end();
 	});

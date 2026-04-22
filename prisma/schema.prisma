@@ -26,6 +26,8 @@ model Application {
   comments        Comment[]
   id              String   @id @default(cuid())
   company         String
+  companyId       String?
+  companyRecord   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   position        String
   listingDetails  String?
   location        String?
@@ -79,6 +81,98 @@ model Application {
   @@index([companySize])
   @@index([applicationMethod])
   @@index([appliedAt])
+  @@index([companyId])
+}
+
+model Company {
+  id             String   @id @default(cuid())
+  name           String
+  normalizedName String   @unique
+  legalName      String?
+  aliases        String? // comma-separated
+  description    String?
+  tagline        String?
+  foundedYear    Int?
+  companyType    String? // PUBLIC | PRIVATE | NONPROFIT | GOVERNMENT | STARTUP | SUBSIDIARY | OTHER
+  industry       String?
+  subIndustry    String?
+  companySize    String? // STARTUP | SMALL | MID_SIZE | LARGE | ENTERPRISE
+  stockSymbol    String?
+  parentCompany  String?
+
+  // Location
+  location        String? // primary / display
+  headquarters    String?
+  country         String?
+  timezone        String?
+  officeLocations String?
+
+  // Online presence
+  website       String?
+  careersUrl    String?
+  linkedinUrl   String?
+  twitterUrl    String?
+  githubUrl     String?
+  glassdoorUrl  String?
+  crunchbaseUrl String?
+  blogUrl       String?
+  youtubeUrl    String?
+
+  // Business
+  revenue       String?
+  fundingStage  String? // SEED | SERIES_A | SERIES_B | SERIES_C | SERIES_D | LATE_STAGE | IPO | BOOTSTRAPPED | ACQUIRED | UNKNOWN
+  fundingTotal  String?
+  valuation     String?
+  employeeCount Int?
+  ceo           String?
+
+  // Tech / Culture
+  techStack       String?
+  benefits        String?
+  workCulture     String?
+  remotePolicy    String? // FULLY_REMOTE | HYBRID | ONSITE | FLEXIBLE | UNKNOWN
+  hiringStatus    String? // ACTIVELY_HIRING | LIMITED | FROZEN | UNKNOWN
+  glassdoorRating Float?
+
+  // Main contact
+  mainContactName  String?
+  mainContactRole  String?
+  mainContactEmail String?
+  mainContactPhone String?
+  mainPhone        String?
+  mainEmail        String?
+
+  // Personal tracking
+  rating         Int? // 1-5
+  priority       String? // HIGH | MEDIUM | LOW
+  trackingStatus String? // INTERESTED | RESEARCHING | APPLIED | TALKING | ARCHIVED
+  pros           String?
+  cons           String?
+  notes          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications Application[]
+  activities   CompanyActivityEntry[]
+
+  @@index([name])
+}
+
+model CompanyActivityEntry {
+  id        String   @id @default(cuid())
+  companyId String
+  type      String // CREATED | FIELD_CHANGE | NOTE_ADDED | BOOTSTRAPPED_FROM_APPLICATION | LINKED_APPLICATION | UNLINKED_APPLICATION
+  field     String?
+  oldValue  String?
+  newValue  String?
+  comment   String?
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, createdAt])
+  @@index([createdAt])
 }
 
 model Tag {

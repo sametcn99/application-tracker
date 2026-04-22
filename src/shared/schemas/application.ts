@@ -74,6 +74,14 @@ export const applicationFormSchema = z
 			.string()
 			.min(1, "validation.required")
 			.max(200, "validation.tooLong"),
+		companyId: z
+			.string()
+			.optional()
+			.or(z.literal("").transform(() => undefined)),
+		companyWebsite: optionalUrl,
+		companyCareersUrl: optionalUrl,
+		companyLinkedinUrl: optionalUrl,
+		companyLocation: optionalStr(200),
 		position: z
 			.string()
 			.min(1, "validation.required")

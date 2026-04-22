@@ -9,6 +9,7 @@ import {
 	ExitIcon,
 	GearIcon,
 	GlobeIcon,
+	IdCardIcon,
 	ListBulletIcon,
 	MixIcon,
 	PlusIcon,
@@ -30,7 +31,7 @@ import { signOutAction } from "@/shared/actions/auth";
 const MAIN_NAV = [
 	{ href: "/", labelKey: "dashboard", icon: DashboardIcon },
 	{ href: "/applications", labelKey: "applications", icon: ListBulletIcon },
-	{ href: "/applications/new", labelKey: "newApplication", icon: PlusIcon },
+	{ href: "/companies", labelKey: "companies", icon: IdCardIcon },
 	{ href: "/activity", labelKey: "activity", icon: ActivityLogIcon },
 ] as const;
 

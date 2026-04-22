@@ -15,6 +15,7 @@ import type {
 	WorkMode,
 } from "@/shared/constants/application";
 import { getApplication } from "@/shared/lib/applications";
+import { listCompanyFormOptions } from "@/shared/lib/companies";
 import { prisma } from "@/shared/lib/prisma";
 import {
 	getCurrencyOptions,
@@ -28,17 +29,23 @@ export default async function EditApplicationPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const [app, tags, sources, currencies] = await Promise.all([
+	const [app, tags, sources, currencies, companies] = await Promise.all([
 		getApplication(id),
 		prisma.tag.findMany({ orderBy: { name: "asc" } }),
 		getSourceOptions(),
 		getCurrencyOptions(),
+		listCompanyFormOptions(),
 	]);
 	if (!app) notFound();
 	const t = await getTranslations();
 
 	const defaults: Partial<ApplicationFormInput> = {
 		company: app.company,
+		companyId: app.companyId ?? undefined,
+		companyWebsite: app.companyRecord?.website ?? undefined,
+		companyCareersUrl: app.companyRecord?.careersUrl ?? undefined,
+		companyLinkedinUrl: app.companyRecord?.linkedinUrl ?? undefined,
+		companyLocation: app.companyRecord?.location ?? undefined,
 		position: app.position,
 		listingDetails: app.listingDetails ?? undefined,
 		location: app.location ?? undefined,
@@ -94,6 +101,7 @@ export default async function EditApplicationPage({
 				tags={tags}
 				sources={sources}
 				currencies={currencies}
+				companies={companies}
 			/>
 		</Flex>
 	);
