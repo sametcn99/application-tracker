@@ -3,9 +3,9 @@
 import { Badge, Box, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchActivitiesAction } from "@/shared/actions/activity";
 import { ACTIVITY_TYPE_COLORS } from "@/shared/constants/application";
 import { decodeValue } from "@/shared/lib/audit";

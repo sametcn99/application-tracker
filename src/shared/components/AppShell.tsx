@@ -2,6 +2,7 @@ import { Box, Flex } from "@radix-ui/themes";
 import { auth } from "@/auth";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
+import { UnsavedChangesShell } from "./UnsavedChangesShell";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
 	const session = await auth();
@@ -16,21 +17,26 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 		: undefined;
 
 	return (
-		<Flex style={{ minHeight: "100vh" }} align="start">
-			<Box
-				display={{ initial: "none", md: "block" }}
-				style={{ position: "sticky", top: 0, height: "100vh" }}
-			>
-				<Sidebar user={user} />
-			</Box>
-			<Flex direction="column" style={{ flex: 1, minWidth: 0, width: "100%" }}>
-				<Box display={{ initial: "block", md: "none" }}>
-					<Header userEmail={session?.user?.email} />
+		<UnsavedChangesShell>
+			<Flex style={{ minHeight: "100vh" }} align="start">
+				<Box
+					display={{ initial: "none", md: "block" }}
+					style={{ position: "sticky", top: 0, height: "100vh" }}
+				>
+					<Sidebar user={user} />
 				</Box>
-				<Box p={{ initial: "4", md: "5" }} style={{ flex: 1 }}>
-					{children}
-				</Box>
+				<Flex
+					direction="column"
+					style={{ flex: 1, minWidth: 0, width: "100%" }}
+				>
+					<Box display={{ initial: "block", md: "none" }}>
+						<Header userEmail={session?.user?.email} />
+					</Box>
+					<Box p={{ initial: "4", md: "5" }} style={{ flex: 1 }}>
+						{children}
+					</Box>
+				</Flex>
 			</Flex>
-		</Flex>
+		</UnsavedChangesShell>
 	);
 }

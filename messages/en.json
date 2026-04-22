@@ -264,6 +264,27 @@
 		"submitting": "Submitting…",
 		"errorAddingActivity": "Failed to add activity."
 	},
+	"unsavedChanges": {
+		"title": "Unsaved changes",
+		"description": "You have unsaved changes on this form. What would you like to do before leaving?",
+		"stay": "Stay on page",
+		"discard": "Discard changes",
+		"saveDraft": "Save as draft"
+	},
+	"applicationDrafts": {
+		"title": "Saved drafts",
+		"descriptionCreate": "You have unfinished application drafts. Pick one to continue, start fresh, or clean up.",
+		"descriptionEdit": "You have unsaved drafts for this application. Pick one to continue, start fresh, or clean up.",
+		"empty": "No drafts saved.",
+		"use": "Continue",
+		"deleteAll": "Delete all drafts",
+		"startBlank": "Start blank",
+		"openPicker": "Drafts ({count})",
+		"recoveryBadge": "Auto-saved",
+		"recoveryLabel": "Last unsaved session",
+		"recover": "Recover",
+		"staleBadge": "Outdated"
+	},
 	"errors": {
 		"generic": "Something went wrong.",
 		"notFound": "Page not found",

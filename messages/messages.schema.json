@@ -452,6 +452,35 @@
 				"submitting": { "type": "string" }
 			}
 		},
+		"unsavedChanges": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": { "type": "string" },
+				"description": { "type": "string" },
+				"stay": { "type": "string" },
+				"discard": { "type": "string" },
+				"saveDraft": { "type": "string" }
+			}
+		},
+		"applicationDrafts": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": { "type": "string" },
+				"descriptionCreate": { "type": "string" },
+				"descriptionEdit": { "type": "string" },
+				"empty": { "type": "string" },
+				"use": { "type": "string" },
+				"deleteAll": { "type": "string" },
+				"startBlank": { "type": "string" },
+				"openPicker": { "type": "string" },
+				"recoveryBadge": { "type": "string" },
+				"recoveryLabel": { "type": "string" },
+				"recover": { "type": "string" },
+				"staleBadge": { "type": "string" }
+			}
+		},
 		"errors": {
 			"type": "object",
 			"additionalProperties": false,

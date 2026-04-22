@@ -18,6 +18,8 @@ model User {
   name         String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  applicationDrafts ApplicationDraft[]
 }
 
 model Application {
@@ -70,6 +72,7 @@ model Application {
   tags        ApplicationTag[]
   attachments Attachment[]
   activities  ActivityEntry[]
+  drafts      ApplicationDraft[]
 
   @@index([status])
   @@index([priority])
@@ -156,4 +159,24 @@ model Comment {
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   
   @@index([applicationId])
+}
+
+model ApplicationDraft {
+  id                       String   @id @default(cuid())
+  userId                   String
+  applicationId            String?
+  mode                     String   // CREATE | EDIT
+  label                    String?
+  payload                  Json
+  schemaVersion            Int      @default(1)
+  baseApplicationUpdatedAt DateTime?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, mode])
+  @@index([userId, applicationId])
+  @@index([updatedAt])
 }
