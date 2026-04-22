@@ -16,10 +16,16 @@ const tagActions = vi.hoisted(() => ({
 	createTagAction: vi.fn(),
 	deleteTagAction: vi.fn(),
 }));
+const router = vi.hoisted(() => ({
+	refresh: vi.fn(),
+}));
 
 vi.mock("@/app/(app)/currencies/actions/currencies", () => currencyActions);
 vi.mock("@/app/(app)/sources/actions/sources", () => sourceActions);
 vi.mock("@/app/(app)/tags/actions/tags", () => tagActions);
+vi.mock("next/navigation", () => ({
+	useRouter: () => router,
+}));
 
 import { CurrencyManager } from "@/app/(app)/currencies/components/CurrencyManager";
 import { SourceManager } from "@/app/(app)/sources/components/SourceManager";
