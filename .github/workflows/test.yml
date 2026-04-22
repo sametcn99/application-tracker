@@ -50,13 +50,6 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U appuser -d appdb"
           --health-interval 5s --health-timeout 5s --health-retries 10
-      minio:
-        image: bitnami/minio:latest
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-          MINIO_DEFAULT_BUCKETS: attachments
-        ports: ["9000:9000"]
     env:
       DATABASE_URL: postgresql://appuser:apppassword@localhost:5432/appdb?schema=public
       AUTH_SECRET: ci-secret-please-change-please-change-please-change
@@ -78,6 +71,17 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+      - name: Start MinIO
+        run: |
+          docker network create minio-net || true
+          docker run -d --name minio --network minio-net -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio:latest server /data
+          # Wait for minio to start
+          sleep 5
+          docker run --rm --network minio-net minio/mc:latest alias set myminio http://minio:9000 minioadmin minioadmin
+          docker run --rm --network minio-net minio/mc:latest mb myminio/attachments || true
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Push Prisma schema
