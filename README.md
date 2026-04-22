@@ -1,431 +1,737 @@
 # Application Tracker
 
-A self-hosted, full-stack job application tracking system built with **Next.js 16 (App Router)**, **React 19**, **Radix Themes**, **Prisma 7 / PostgreSQL**, **Auth.js v5**, and **MinIO (S3-compatible)** storage. It is designed to run as a single `docker compose up` deployment for a single user (or a small private team) and to capture every meaningful detail of a job search — applications, companies, contacts, interviews, attachments, drafts, and a complete change-audit history.
+Application Tracker is a self-hosted job search operating system built with **Next.js 16 App Router**, **React 19**, **Prisma 7**, **PostgreSQL**, **Auth.js v5 credentials auth**, and **MinIO / S3-compatible object storage**. The project is optimized for running as a single private deployment with `docker compose`, while still keeping the internal architecture explicit: typed server actions, transactional entity writes, append-only audit logs, draft persistence, and strongly validated forms.
 
-> Status: actively developed. Schema is managed via `prisma db push` (no migration history yet). Single-locale (`en`) wired through `next-intl` with a JSON Schema-backed message catalog.
-
----
+The current implementation is English-only (`en`), stores schema changes with **`prisma db push`** instead of migration history, and boots the application stack from Docker with PostgreSQL and MinIO sidecars.
 
 ## Table of Contents
 
-1. [Feature Overview](#feature-overview)
-2. [Architecture](#architecture)
-3. [Tech Stack](#tech-stack)
-4. [Repository Layout](#repository-layout)
-5. [Quick Start (Docker Compose)](#quick-start-docker-compose)
-6. [Local Development](#local-development)
-7. [Environment Variables](#environment-variables)
-8. [Database & Prisma Workflow](#database--prisma-workflow)
-9. [Authentication](#authentication)
-10. [File Storage (MinIO / S3)](#file-storage-minio--s3)
-11. [Internationalization](#internationalization)
-12. [Coding Standards & Tooling](#coding-standards--tooling)
-13. [Domain Model](#domain-model)
-14. [Server Actions & Data Layer](#server-actions--data-layer)
-15. [Audit / Activity Log](#audit--activity-log)
-16. [Common Operations](#common-operations)
-17. [Troubleshooting](#troubleshooting)
-18. [License](#license)
+- [Overview](#overview)
+- [Feature Set](#feature-set)
+  - [Application lifecycle tracking](#application-lifecycle-tracking)
+  - [Company intelligence and bidirectional linkage](#company-intelligence-and-bidirectional-linkage)
+  - [Attachments and controlled downloads](#attachments-and-controlled-downloads)
+  - [Drafts local recovery and unsaved change guards](#drafts-local-recovery-and-unsaved-change-guards)
+  - [Reference data management](#reference-data-management)
+  - [Dashboard and activity surfaces](#dashboard-and-activity-surfaces)
+  - [Localization and validation first UX](#localization-and-validation-first-ux)
+- [Architecture](#architecture)
+  - [System context](#system-context)
+  - [Mutation lifecycle](#mutation-lifecycle)
+  - [Container topology](#container-topology)
+  - [Domain relationships](#domain-relationships)
+  - [Draft persistence lifecycle](#draft-persistence-lifecycle)
+- [Technology Stack](#technology-stack)
+  - [Runtime stack](#runtime-stack)
+  - [Developer tooling](#developer-tooling)
+- [Repository Layout](#repository-layout)
+- [Execution Model](#execution-model)
+  - [Rendering boundaries](#rendering-boundaries)
+  - [Server action pattern](#server-action-pattern)
+  - [Filtering and query model](#filtering-and-query-model)
+- [Quick Start with Docker Compose](#quick-start-with-docker-compose)
+  - [Bootstrap sequence](#bootstrap-sequence)
+- [Local Development](#local-development)
+  - [Package scripts](#package-scripts)
+- [Environment Variables](#environment-variables)
+- [Database and Persistence Model](#database-and-persistence-model)
+  - [Schema management](#schema-management)
+  - [Seeded bootstrap data](#seeded-bootstrap-data)
+- [Authentication and Route Protection](#authentication-and-route-protection)
+- [Storage and Attachment Delivery](#storage-and-attachment-delivery)
+- [Internationalization](#internationalization)
+- [Testing and CI](#testing-and-ci)
+- [Common Operations](#common-operations)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
 
----
+## Overview
 
-## Feature Overview
+The application tracks the full lifecycle of a job search across three primary surfaces:
 
-- **Applications** — full lifecycle tracking: position, company, salary range (min/max + target), currency with USD conversion, source / source type, referral, work mode, employment type, priority, status, outcome reason, contact information, work-authorization context, application package (resume / cover letter / portfolio), next-step scheduling, and free-form Markdown notes.
-- **Companies** — first-class entity with ~50 fields organized into **Identity / Location / Online Presence / Business & Financials / Tech & Culture / Primary Contact / Personal Tracking / Notes**. Companies can be linked to applications and accumulate their own activity history.
-- **Drafts** — auto-saved per-user drafts for both create and edit flows of applications, with stale detection against `baseApplicationUpdatedAt` and an unsaved-changes guard at the route level.
-- **Attachments** — uploaded to MinIO (S3-compatible), size-capped via `UPLOAD_MAX_BYTES`, served through a server route that proxies signed/owned access.
-- **Activity Feed** — every field change, status change, comment, attachment add/remove, and link/unlink event is recorded as a typed `ActivityEntry` (per application) or `CompanyActivityEntry` (per company), with old/new values stored as JSON-encoded strings for round-trip rendering.
-- **Reference Data** — user-managed lists for Tags, Sources, and Currencies (the latter with manual or API-sourced USD rate).
-- **Filtering & Sorting** — typed filter parser shared between server components and the URL, supporting status, priority, work mode, source type, company size, application method, relocation preference, sponsorship, next action, outcome reason, tag, full-text search, date range, sort field/order.
-- **i18n** — every UI string flows through `next-intl` and is validated against [messages/messages.schema.json](messages/messages.schema.json).
-- **Single-user auth** — credentials provider with bcrypt; the seed script provisions the admin user on first boot.
+1. **Applications** - the operational record for each role, including status, compensation, source, contacts, attachments, next actions, and notes.
+2. **Companies** - a first-class entity that can be created directly or auto-bootstrapped from application form data.
+3. **Activity history** - append-only audit streams for both applications and companies, allowing field-level reconstruction of important changes.
 
----
+The codebase leans on a clear boundary split:
+
+- `src/app/**` contains routes, layouts, and feature-local UI.
+- `src/shared/actions/**` and `src/app/**/actions/**` expose server actions.
+- `src/shared/lib/**` owns database access, transactions, normalization, and audit generation.
+- `prisma/schema.prisma` is the source of truth for persistence.
+
+## Feature Set
+
+### Application lifecycle tracking
+
+The application form models much more than a basic company + title pair. The persisted `Application` record includes:
+
+- job identity: `position`, `company`, `listingDetails`, `jobUrl`
+- workflow state: `status`, `priority`, `nextActionType`, `nextStepAt`, `nextStepNote`, `outcomeReason`
+- compensation: `salaryMin`, `salaryMax`, `targetSalaryMin`, `targetSalaryMax`, `currency`
+- discovery metadata: `source`, `sourceType`, `applicationMethod`, `referralName`
+- work context: `location`, `workMode`, `employmentType`, `team`, `department`
+- eligibility context: `needsSponsorship`, `relocationPreference`, `workAuthorizationNote`, `timezoneOverlapHours`, `officeDaysPerWeek`
+- contact package: recruiter / hiring contact details, resume version, cover letter version, portfolio URL
+- content fields: Markdown notes plus many-to-many tags
+
+Validation is centralized in [`src/shared/schemas/application.ts`](src/shared/schemas/application.ts). That schema enforces:
+
+- required company and position
+- valid URLs and emails
+- numeric range guards
+- closed-status-only outcome reasons
+- referral name only when `sourceType === REFERRAL`
+- consistency between sponsorship flags and work authorization notes
+
+The listing surface parses typed URL filters through [`src/shared/lib/parseFilters.ts`](src/shared/lib/parseFilters.ts) and converts them into Prisma `where` conditions through [`src/shared/lib/applications.ts`](src/shared/lib/applications.ts). Supported filters cover search text, status, work mode, priority, source type, relocation preference, company size, application method, sponsorship, next action type, outcome reason, tag IDs, date range, and sort order.
+
+### Company intelligence and bidirectional linkage
+
+Companies are not just labels attached to applications. The `Company` model stores identity, location, online presence, business context, culture, contacts, and private tracking notes in a dedicated table.
+
+Important behavior:
+
+- companies are deduplicated by `normalizedName`
+- application creation can auto-create a company when no matching company exists
+- company edits sync `name`, `industry`, and `companySize` back into linked applications
+- company detail pages expose overview, linked applications, and company activity history
+- company activity has its own audit stream separate from application activity
+
+This makes the project closer to a lightweight CRM for job search operations than a simple application list.
+
+### Attachments and controlled downloads
+
+Attachments are stored as object metadata in PostgreSQL and binary blobs in S3-compatible storage. The upload path in [`src/shared/actions/attachments.ts`](src/shared/actions/attachments.ts):
+
+1. validates file existence and `UPLOAD_MAX_BYTES`
+2. generates a random UUID
+3. sanitizes the original filename
+4. stores the object under `<applicationId>/<uuid>__<safeName>`
+5. creates an `Attachment` row
+6. writes an `ATTACHMENT_ADDED` activity entry
+
+Download requests go through [`src/app/api/attachments/[id]/route.ts`](src/app/api/attachments/[id]/route.ts), which requires an authenticated session, resolves the attachment record, fetches the object from S3, and streams it back with preserved MIME type and `Content-Disposition`.
+
+### Drafts local recovery and unsaved change guards
+
+Application forms have two persistence layers:
+
+- **server-side drafts** in `ApplicationDraft`
+- **browser-side recovery snapshots** in `localStorage`
+
+The draft system supports both create and edit modes, carries a schema version, and stores `baseApplicationUpdatedAt` so edit drafts can be marked stale when the underlying application has changed.
+
+Technical behavior from [`src/shared/lib/application-draft.ts`](src/shared/lib/application-draft.ts) and [`useApplicationDraft.ts`](<src/app/(app)/applications/components/ApplicationForm/hooks/useApplicationDraft.ts>):
+
+- local recovery debounce: **800 ms**
+- per-context server draft limit: **20**
+- dirty-state detection uses normalized serialized payloads
+- navigation interception works for internal links, browser unload, and router transitions
+- the unsaved-changes dialog can discard, stay, or save a draft before leaving
+
+### Reference data management
+
+Three reference-data modules are managed in-app:
+
+- **Tags** - color-coded labels linked through the `ApplicationTag` join table
+- **Sources** - reusable source options used by application records
+- **Currencies** - user-managed currencies with `usdRate`, `rateSource`, and `isDefault`
+
+Currency handling is more than static lookup:
+
+- USD is always treated as the default fallback rate `1`
+- new currencies attempt a live USD conversion fetch through `https://api.frankfurter.app/latest`
+- when the API has no rate, the UI can store a manual USD rate
+- one currency is always marked as default
+
+### Dashboard and activity surfaces
+
+The dashboard route at [`src/app/(app)/page.tsx`](<src/app/(app)/page.tsx>) aggregates:
+
+- total application count
+- active application count
+- applications created this week
+- interview count
+- status distribution
+- upcoming next steps
+- recent activity
+
+The global activity page pages through `ActivityEntry` rows ordered by `createdAt desc, id desc`, while individual application and company detail pages expose local timelines beside the main record.
+
+### Localization and validation first UX
+
+The UI is wired through `next-intl`, but the implementation is intentionally strict and single-locale for now:
+
+- locale list: `["en"]`
+- default locale: `en`
+- request time zone: `UTC`
+- message catalog: [`messages/en.json`](messages/en.json)
+- message shape validation: [`messages/messages.schema.json`](messages/messages.schema.json)
+
+Validation errors returned by server actions are usually message keys rather than user-facing literals, so the form layer can translate them consistently.
 
 ## Architecture
 
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│                         Browser (RSC + RCC)                        │
-│  Radix Themes UI · React Hook Form · Zustand (UI) · next-intl      │
-└──────────────▲────────────────────────────────────▲────────────────┘
-               │ Server Actions / RSC fetch         │ Auth.js cookies
-               │                                    │
-┌──────────────┴────────────────────────────────────┴────────────────┐
-│                Next.js 16 App Router (Node runtime)                │
-│  /app/(app)/*  domain pages    /app/api/*  REST endpoints          │
-│  src/shared/lib/*  data layer (Prisma)   src/shared/actions/*      │
-│  Auth.js v5 (Credentials + Prisma adapter)                         │
-└──────────▲──────────────────────▲──────────────────────▲───────────┘
-           │ SQL                  │ S3                   │ Auth
-   ┌───────┴───────┐      ┌───────┴────────┐      ┌──────┴──────┐
-   │  PostgreSQL   │      │  MinIO (S3)    │      │  bcryptjs   │
-   │  + Prisma 7   │      │  attachments   │      │             │
-   └───────────────┘      └────────────────┘      └─────────────┘
+### System context
+
+```mermaid
+flowchart LR
+    Browser["Browser<br/>React 19 UI + App Router navigation"] --> Next["Next.js 16 App Router<br/>RSC + client components + server actions"]
+    Next --> Auth["Auth.js v5<br/>Credentials provider + JWT session"]
+    Next --> Prisma["Prisma Client 7<br/>@prisma/adapter-pg + pg.Pool"]
+    Prisma --> Postgres["PostgreSQL 16"]
+    Next --> S3["S3 client<br/>AWS SDK v3"]
+    S3 --> Minio["MinIO / S3-compatible bucket"]
+    Next --> Intl["next-intl<br/>messages/en.json"]
 ```
 
-- **Rendering** — predominantly **React Server Components**. Client islands are scoped to forms, dialogs, and interactive widgets and live next to the route under `components/`.
-- **Mutations** — exclusively through **Server Actions** (`"use server"`), validated with **Zod 4** before they reach the data layer. Only the `/api/auth/*` and `/api/attachments/[id]` routes use the REST handler API.
-- **Data layer** — `src/shared/lib/*` exports server-only helpers that wrap the Prisma client. Route-scoped action files (`src/app/(app)/<feature>/actions/*.ts`) parse input, call the data layer, and trigger `revalidatePath` on the affected paths.
-- **Audit** — `src/shared/lib/audit.ts` and `src/shared/lib/company-audit.ts` diff the previous and next entity using a `TRACKED_FIELDS` allow-list, then emit one `*ActivityEntry` row per changed field with JSON-encoded old/new values.
+The core request path stays inside a single Next.js runtime. REST-style handlers exist only for Auth.js and attachment download. Everything else is modeled as server components plus server actions.
 
----
+### Mutation lifecycle
 
-## Tech Stack
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client component
+    participant A as Server action
+    participant Z as Zod schema
+    participant L as Shared data layer
+    participant P as Prisma transaction
+    participant DB as PostgreSQL
+    participant N as Next cache
 
-| Layer            | Choice                                                                 |
-| ---------------- | ---------------------------------------------------------------------- |
-| Framework        | Next.js **16.2.4** (App Router, RSC, Server Actions)                   |
-| UI runtime       | React **19.2.4** + React DOM 19                                        |
-| Component system | Radix Themes **3.3** + Radix Icons                                     |
-| Forms            | React Hook Form **7** + `@hookform/resolvers` + Zod **4**              |
-| Client state     | Zustand **5** (limited to UI/draft state)                              |
-| i18n             | next-intl **4.9** (single locale, JSON-Schema validated catalog)       |
-| ORM              | Prisma **7.7** with `@prisma/adapter-pg` over `pg.Pool`                |
-| Database         | PostgreSQL **16** (alpine in compose)                                  |
-| Auth             | Auth.js (NextAuth) **v5 beta** + Prisma Adapter + bcryptjs credentials |
-| Storage          | MinIO (S3 API) via `@aws-sdk/client-s3` v3                             |
-| Markdown         | react-markdown + remark-gfm                                            |
-| Lint / format    | Biome **2.4** (tabs, double quotes — see `biome.json`)                 |
-| Container build  | Multi-stage Dockerfile (Bun deps → Node 22 builder → Node 22 runner)   |
+    U->>C: Submit form / click action
+    C->>A: Invoke server action
+    A->>Z: safeParse(input)
+    Z-->>A: parsed data or field errors
+    A->>L: call domain function
+    L->>P: open transaction when needed
+    P->>DB: write entity rows
+    P->>DB: append audit rows
+    DB-->>P: committed state
+    P-->>L: entity result
+    L-->>A: domain result
+    A->>N: revalidatePath(...)
+    A-->>C: { ok, id } or redirect
+```
 
----
+The pattern is consistent across applications, companies, drafts, currencies, sources, tags, and login actions:
+
+- parse early
+- return structured error keys on validation failure
+- keep Prisma work in shared library modules
+- revalidate the exact routes that depend on mutated data
+
+### Container topology
+
+```mermaid
+flowchart TD
+    Browser["Browser :3000"] --> App["app<br/>Next.js standalone runtime"]
+    App --> Postgres["postgres<br/>PostgreSQL 16 alpine"]
+    App --> Minio["minio<br/>S3-compatible object storage"]
+    MinioInit["minio-init<br/>bucket bootstrap job"] --> Minio
+    Postgres -. healthcheck gate .-> App
+    Minio -. healthcheck gate .-> App
+    MinioInit -. completion gate .-> App
+```
+
+`docker-compose.yml` defines four services:
+
+- `postgres` for relational state
+- `minio` for attachment blobs
+- `minio-init` for creating the `attachments` bucket
+- `app` for the built Next.js runtime
+
+### Domain relationships
+
+```mermaid
+erDiagram
+    User ||--o{ ApplicationDraft : owns
+    Application ||--o{ ApplicationDraft : snapshots
+    Company ||--o{ Application : linked_to
+    Application ||--o{ Attachment : has
+    Application ||--o{ ActivityEntry : emits
+    Application ||--o{ Comment : has
+    Application ||--o{ ApplicationTag : tagged_by
+    Tag ||--o{ ApplicationTag : referenced_by
+    Company ||--o{ CompanyActivityEntry : emits
+
+    User {
+        string id PK
+        string email
+        string passwordHash
+    }
+    Application {
+        string id PK
+        string company
+        string companyId FK
+        string position
+        string status
+        string priority
+        datetime appliedAt
+        datetime nextStepAt
+    }
+    Company {
+        string id PK
+        string normalizedName
+        string name
+        string industry
+        string companySize
+    }
+    Attachment {
+        string id PK
+        string applicationId FK
+        string storagePath
+        int size
+    }
+    ActivityEntry {
+        string id PK
+        string applicationId FK
+        string type
+        string field
+    }
+    CompanyActivityEntry {
+        string id PK
+        string companyId FK
+        string type
+        string field
+    }
+    Tag {
+        string id PK
+        string name
+        string color
+    }
+    ApplicationTag {
+        string applicationId FK
+        string tagId FK
+    }
+    Comment {
+        string id PK
+        string applicationId FK
+        string content
+    }
+    ApplicationDraft {
+        string id PK
+        string userId FK
+        string applicationId FK
+        string mode
+        json payload
+    }
+```
+
+Two details are easy to miss:
+
+- `source` and `currency` are stored on `Application` as strings, not foreign keys
+- enum-like values are stored as strings and validated in Zod rather than Prisma enums
+
+That choice keeps schema changes cheap and filtering simple, while reference tables still support controlled option management in the UI.
+
+### Draft persistence lifecycle
+
+```mermaid
+flowchart TD
+    Edit["User edits application form"] --> Serialize["Serialize normalized form payload"]
+    Serialize --> Dirty{"Diff from baseline?"}
+    Dirty -- No --> Idle["Keep form clean"]
+    Dirty -- Yes --> Local["Write local recovery snapshot<br/>after 800 ms debounce"]
+    Dirty -- Yes --> Guard["Mark unsaved-changes guard as dirty"]
+    Guard --> Leave{"User tries to navigate away?"}
+    Leave -- No --> Continue["Continue editing"]
+    Leave -- Yes --> Dialog["Open unsaved changes dialog"]
+    Dialog --> Save["Save server draft"]
+    Dialog --> Discard["Discard changes"]
+    Dialog --> Stay["Stay on page"]
+    Save --> DraftRow["Persist ApplicationDraft row"]
+    DraftRow --> Picker["Draft picker can restore later"]
+```
+
+## Technology Stack
+
+### Runtime stack
+
+| Layer              | Choice                                               |
+| ------------------ | ---------------------------------------------------- |
+| Web framework      | Next.js 16.2.4 App Router                            |
+| UI runtime         | React 19.2.4 + React DOM 19.2.4                      |
+| UI components      | Radix Themes 3.3 + Radix Icons                       |
+| Forms              | React Hook Form 7 + `@hookform/resolvers`            |
+| Validation         | Zod 4                                                |
+| i18n               | next-intl 4.9                                        |
+| ORM                | Prisma 7.7 with `@prisma/adapter-pg`                 |
+| Database driver    | `pg` Pool                                            |
+| Authentication     | Auth.js / NextAuth v5 beta with Credentials provider |
+| Password hashing   | bcryptjs                                             |
+| Object storage     | MinIO or any S3-compatible endpoint via AWS SDK v3   |
+| Markdown rendering | react-markdown + remark-gfm                          |
+| Client state       | Zustand 5 for local UI state                         |
+
+### Developer tooling
+
+| Area                     | Tooling                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| Formatter and linter     | Biome 2.4                                                      |
+| Type checking            | TypeScript 5                                                   |
+| Unit tests               | Vitest + Testing Library + jsdom                               |
+| E2E tests                | Playwright                                                     |
+| Containerized test infra | Testcontainers                                                 |
+| Build pipeline           | Bun for install/test scripts, Node 22 for build/runtime images |
+| CI                       | GitHub Actions                                                 |
 
 ## Repository Layout
 
-```text
-src/
-  auth.ts                       # Auth.js v5 configuration
-  proxy.ts                      # (Optional) HTTP proxy plumbing
-  app/
-    layout.tsx                  # Root layout (themes, providers, intl)
-    (app)/                      # Authenticated app shell
-      page.tsx                  # Dashboard
-      activity/                 # Global activity feed
-      applications/             # CRUD + detail (tabs: details/activity/attachments)
-      companies/                # CRUD + detail (overview/applications/activity)
-      currencies/ sources/ tags/  # Reference-data managers
-    api/
-      attachments/[id]/route.ts # Authenticated attachment download
-      auth/[...nextauth]/route.ts
-    login/                      # Credentials login page
-  i18n/                         # next-intl request config + types
-  shared/
-    actions/                    # Cross-feature server actions
-    components/                 # AppShell, Header, Sidebar, dialogs
-    constants/                  # Domain enums (status, work mode, …)
-    lib/                        # Server-only data layer (Prisma)
-    schemas/                    # Zod schemas reused across features
-  types/next-auth.d.ts          # Module augmentation for Auth.js
-prisma/
-  schema.prisma                 # Single source of truth (db push)
-  seed.ts                       # Idempotent seed (admin + reference data)
-docker/
-  entrypoint.sh                 # Runtime: db push → seed → next start
-messages/
-  en.json                       # Locale catalog
-  messages.schema.json          # JSON Schema enforcing the catalog shape
-docker-compose.yml              # postgres + minio + minio-init + app
-Dockerfile                      # Multi-stage build
-biome.json                      # Lint + format rules
+```mermaid
+flowchart TD
+    Root["application-tracker/"] --> Src["src/"]
+    Root --> Prisma["prisma/"]
+    Root --> Docker["docker/"]
+    Root --> Messages["messages/"]
+    Root --> Test["test/"]
+
+    Src --> App["app/ routes"]
+    Src --> Auth["auth.ts"]
+    Src --> I18n["i18n/"]
+    Src --> Proxy["proxy.ts"]
+    Src --> Shared["shared/"]
+
+    App --> Protected["(app)/ authenticated pages"]
+    App --> Api["api/ auth + attachments"]
+    App --> Login["login/"]
+
+    Shared --> Actions["actions/"]
+    Shared --> Components["components/"]
+    Shared --> Constants["constants/"]
+    Shared --> Lib["lib/"]
+    Shared --> Schemas["schemas/"]
+
+    Prisma --> Schema["schema.prisma"]
+    Prisma --> Seed["seed.ts"]
+    Docker --> Entrypoint["entrypoint.sh"]
+    Messages --> Locale["en.json"]
+    Messages --> MessageSchema["messages.schema.json"]
+    Test --> Unit["unit/"]
+    Test --> E2E["e2e/"]
 ```
 
----
+## Execution Model
 
-## Quick Start (Docker Compose)
+### Rendering boundaries
 
-Prerequisites: Docker 24+ with the Compose plugin.
+The application is mostly server-rendered:
+
+- route pages use async server components for database reads
+- interactive form sections, tables, dialogs, and guard logic use client components
+- the authenticated shell wraps everything in `AppShell` and `UnsavedChangesShell`
+
+This keeps data-fetching close to the route while limiting client-side state to places that need browser APIs or fine-grained interaction.
+
+### Server action pattern
+
+The dominant mutation pattern is:
+
+1. create a `"use server"` action file
+2. validate raw input with Zod or simple guards
+3. call shared domain logic in `src/shared/lib`
+4. wrap related writes in Prisma transactions
+5. append activity rows when a tracked entity changed
+6. call `revalidatePath` for affected list/detail/edit routes
+
+Examples:
+
+- [`src/shared/actions/applications.ts`](src/shared/actions/applications.ts)
+- [`src/app/(app)/companies/actions/companies.ts`](<src/app/(app)/companies/actions/companies.ts>)
+- [`src/app/(app)/currencies/actions/currencies.ts`](<src/app/(app)/currencies/actions/currencies.ts>)
+
+### Filtering and query model
+
+`parseFilters()` turns search params into a typed `ListFilters` object. `buildWhere()` then produces a Prisma filter object.
+
+This gives the list page a stable server-side query model:
+
+- filter state is URL-addressable
+- server and UI agree on field names
+- tag filters become relation filters (`tags.some.tagId`)
+- date filters become `appliedAt.gte/lte`
+
+## Quick Start with Docker Compose
+
+Prerequisites:
+
+- Docker 24+
+- Docker Compose plugin
 
 ```bash
-# 1. Set required secrets (or write to .env)
 cp .env.example .env
-# Edit .env and change at least AUTH_SECRET and ADMIN_PASSWORD
+# Change AUTH_SECRET and ADMIN_PASSWORD before first boot
 
-# 2. Build and start the full stack
 docker compose up --build -d
-
-# 3. Visit the app
-open http://localhost:3000
 ```
 
-On first boot the `app` container will:
+Then open `http://localhost:3000`.
 
-1. Wait for `postgres` and `minio` health checks.
-2. Run `prisma db push` against `DATABASE_URL` (see [docker/entrypoint.sh](docker/entrypoint.sh)).
-3. Execute `prisma/seed.ts` to provision the admin user, default tags, sources, and currencies.
-4. Start `next start` on port `3000`.
+The default deployment publishes only the application on `:3000`. PostgreSQL and MinIO stay internal to the Compose network unless you add explicit port mappings.
 
-The MinIO console (`9001`) and S3 endpoint (`9000`) are intentionally **not published** — they are only reachable from inside the compose network. To inspect MinIO, add a `ports:` block to the `minio` service.
+### Bootstrap sequence
 
----
+```mermaid
+sequenceDiagram
+    participant DC as docker compose
+    participant PG as postgres
+    participant M as minio
+    participant MI as minio-init
+    participant APP as app entrypoint
+
+    DC->>PG: start
+    DC->>M: start
+    PG-->>DC: healthy
+    M-->>DC: healthy
+    DC->>MI: run once
+    MI->>M: create attachments bucket
+    MI-->>DC: success
+    DC->>APP: start app container
+    APP->>PG: prisma db push --accept-data-loss
+    APP->>PG: seed.ts
+    APP->>APP: start Next.js standalone server
+```
+
+Docker-specific implementation details:
+
+- `Dockerfile` uses Bun in the dependency stage, Node 22 in builder/runtime stages
+- Next.js is built with `output: "standalone"`
+- the runtime image includes `prisma`, `tsx`, and the schema so startup can run `db push` and seed
+- [`docker/entrypoint.sh`](docker/entrypoint.sh) continues booting even if the seed command fails
 
 ## Local Development
 
 ```bash
-# 1. Bring up only the infra dependencies
+# Start only infrastructure
 docker compose up -d postgres minio minio-init
 
-# 2. Install JS deps (Bun is what the Dockerfile uses, but npm/pnpm work too)
-bun install              # or: npm install
+# Install dependencies
+bun install
 
-# 3. Point Prisma + the app at the local containers
-cat > .env.local <<'EOF'
-DATABASE_URL="postgresql://appuser:apppassword@localhost:5432/appdb?schema=public"
-AUTH_SECRET="dev-secret-change-me"
-AUTH_TRUST_HOST="true"
-ADMIN_EMAIL="admin@example.com"
-ADMIN_PASSWORD="admin"
-ADMIN_NAME="Admin"
-UPLOAD_MAX_BYTES="10485760"
-S3_ENDPOINT="http://localhost:9000"
-S3_REGION="us-east-1"
-S3_ACCESS_KEY_ID="minioadmin"
-S3_SECRET_ACCESS_KEY="minioadmin"
-S3_BUCKET="attachments"
-S3_FORCE_PATH_STYLE="true"
-EOF
+# Prepare local env
+cp .env.example .env.local
 
-# (publish the postgres/minio ports locally if you haven't:
-#   docker compose run --service-ports … or add `ports:` blocks)
+# If postgres/minio are published locally, adjust hostnames to localhost in .env.local
 
-# 4. Sync schema, seed, run
-npx prisma generate
-npx prisma db push
-bun run db:seed          # or: npm run db:seed
-bun run dev              # or: npm run dev
+# Sync schema and generate client
+bunx prisma db push
+bunx prisma generate
+
+# Seed bootstrap data
+bun run db:seed
+
+# Run dev server
+bun run dev
 ```
 
-### NPM scripts
+For local non-Docker application runtime, the common change is switching:
 
-| Script         | Purpose                                            |
-| -------------- | -------------------------------------------------- |
-| `dev`          | `next dev`                                         |
-| `build`        | `next build`                                       |
-| `start`        | `next start`                                       |
-| `typecheck`    | `tsc --noEmit`                                     |
-| `format`       | `biome format --write`                             |
-| `lint`         | `biome lint --write --unsafe`                      |
-| `check`        | `biome check --write --unsafe` (combined)          |
-| `db:migrate`   | `prisma migrate dev` *(unused — see workflow)*     |
-| `db:seed`      | `tsx prisma/seed.ts`                               |
-| `db:studio`    | `prisma studio`                                    |
-| `db:reset`     | `prisma migrate reset`                             |
+- `DATABASE_URL` host from `postgres` to `localhost`
+- `S3_ENDPOINT` host from `minio` to `localhost`
 
----
+### Package scripts
+
+| Script               | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `dev`                | Start Next.js dev server               |
+| `build`              | Build standalone production output     |
+| `start`              | Run production server                  |
+| `typecheck`          | Run `tsc --noEmit`                     |
+| `format`             | Run Biome formatter                    |
+| `lint`               | Run Biome linter with autofix          |
+| `check`              | Run Biome combined checks with autofix |
+| `db:migrate`         | `prisma migrate dev`                   |
+| `db:seed`            | Execute `prisma/seed.ts` via `tsx`     |
+| `db:studio`          | Open Prisma Studio                     |
+| `db:reset`           | Reset Prisma-managed database          |
+| `test` / `test:unit` | Run Vitest once                        |
+| `test:coverage`      | Run Vitest with coverage               |
+| `test:e2e:server`    | Start the E2E test web server          |
+| `test:e2e`           | Run Playwright suite                   |
+| `test:e2e:ui`        | Run Playwright in UI mode              |
 
 ## Environment Variables
 
-| Variable                | Required | Default (compose)                                            | Notes                                                              |
-| ----------------------- | :------: | ------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `DATABASE_URL`          | yes      | `postgresql://appuser:apppassword@postgres:5432/appdb?schema=public` | PostgreSQL DSN consumed by Prisma + `pg.Pool`.            |
-| `AUTH_SECRET`           | yes      | `change-me-to-a-long-random-string`                          | 32+ byte hex / base64 secret for Auth.js JWT.                      |
-| `AUTH_TRUST_HOST`       | yes (compose) | `true`                                                  | Required behind any reverse proxy / non-localhost host.            |
-| `ADMIN_EMAIL`           | yes      | `admin@example.com`                                          | Seed creates this user if missing.                                 |
-| `ADMIN_PASSWORD`        | yes      | `change-me`                                                  | Hashed with bcryptjs in the seed.                                  |
-| `ADMIN_NAME`            | no       | `Admin`                                                      | Display name.                                                      |
-| `UPLOAD_MAX_BYTES`      | no       | `10485760` (10 MiB)                                          | Per-file attachment size limit.                                    |
-| `S3_ENDPOINT`           | yes      | `http://minio:9000`                                          | S3-compatible endpoint URL.                                        |
-| `S3_REGION`             | yes      | `us-east-1`                                                  | Required by the AWS SDK; arbitrary for MinIO.                      |
-| `S3_ACCESS_KEY_ID`      | yes      | `minioadmin`                                                 |                                                                    |
-| `S3_SECRET_ACCESS_KEY`  | yes      | `minioadmin`                                                 |                                                                    |
-| `S3_BUCKET`             | yes      | `attachments`                                                | Created on boot by the `minio-init` one-shot.                      |
-| `S3_FORCE_PATH_STYLE`   | yes (MinIO) | `true`                                                    | Path-style addressing — required for MinIO.                        |
+| Variable               | Required                   | Default example                                                      | Purpose                                                   |
+| ---------------------- | -------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`         | Yes                        | `postgresql://appuser:apppassword@postgres:5432/appdb?schema=public` | PostgreSQL connection string used by Prisma and `pg.Pool` |
+| `AUTH_SECRET`          | Yes                        | `change-me-to-a-long-random-string`                                  | JWT/session secret for Auth.js                            |
+| `AUTH_TRUST_HOST`      | Yes in proxied deployments | `true`                                                               | Required when the app is not running on plain localhost   |
+| `ADMIN_EMAIL`          | Yes                        | `admin@example.com`                                                  | Email for seed-created admin user                         |
+| `ADMIN_PASSWORD`       | Yes                        | `change-me`                                                          | Plain-text seed password, hashed before persistence       |
+| `ADMIN_NAME`           | No                         | `Admin`                                                              | Display name for the seeded admin                         |
+| `UPLOAD_MAX_BYTES`     | No                         | `10485760`                                                           | Max attachment size in bytes                              |
+| `S3_ENDPOINT`          | Yes                        | `http://minio:9000`                                                  | S3-compatible endpoint                                    |
+| `S3_REGION`            | Yes                        | `us-east-1`                                                          | AWS SDK region value                                      |
+| `S3_ACCESS_KEY_ID`     | Yes                        | `minioadmin`                                                         | Storage credential                                        |
+| `S3_SECRET_ACCESS_KEY` | Yes                        | `minioadmin`                                                         | Storage credential                                        |
+| `S3_BUCKET`            | Yes                        | `attachments`                                                        | Attachment bucket name                                    |
+| `S3_FORCE_PATH_STYLE`  | Yes for MinIO              | `true`                                                               | Path-style addressing toggle                              |
 
-> Production: rotate `AUTH_SECRET`, `ADMIN_PASSWORD`, and the MinIO root credentials, and put the app behind TLS-terminating reverse proxy (e.g. Caddy / Traefik).
+## Database and Persistence Model
 
----
+The schema lives in [`prisma/schema.prisma`](prisma/schema.prisma). The central write-heavy tables are:
 
-## Database & Prisma Workflow
+- `Application`
+- `Company`
+- `ActivityEntry`
+- `CompanyActivityEntry`
+- `Attachment`
+- `ApplicationDraft`
 
-This project intentionally uses **`prisma db push`** rather than `prisma migrate` so the schema can evolve quickly during early development.
+Notable indexing and storage choices:
 
-### Local
+- `Application` is indexed by `status`, `priority`, `companySize`, `applicationMethod`, `appliedAt`, and `companyId`
+- `CompanyActivityEntry` and `ActivityEntry` are indexed by `(foreignKey, createdAt)` and by `createdAt`
+- enums are stored as strings instead of Prisma enums
+- audit old/new values are JSON-encoded strings for round-trip rendering
 
-```bash
-# After editing prisma/schema.prisma
-DATABASE_URL="postgresql://appuser:apppassword@localhost:5432/appdb?schema=public" \
-  npx prisma db push
-DATABASE_URL="postgresql://appuser:apppassword@localhost:5432/appdb?schema=public" \
-  npx prisma generate
-```
+### Schema management
 
-### Inside the running container
+The project currently favors **`prisma db push`** over migration history.
 
-The deployed image is *built*, not bind-mounted, so the schema must be copied in before pushing:
+Implications:
 
-```bash
-docker cp prisma/schema.prisma application-tracker-app-1:/app/prisma/schema.prisma
-docker compose exec -T app sh -lc \
-  'node node_modules/prisma/build/index.js db push --url "$DATABASE_URL" \
-   && node node_modules/prisma/build/index.js generate'
-```
+- fast schema iteration
+- no checked-in migration timeline yet
+- container startup applies schema automatically
+- production operators should treat startup schema sync as a powerful operation because the entrypoint uses `--accept-data-loss`
 
-> Prisma 7's `db push` does **not** accept `--skip-generate`; run `generate` separately when needed.
+The shared Prisma client is initialized in [`src/shared/lib/prisma.ts`](src/shared/lib/prisma.ts) with:
 
-### Seeding
+- `pg.Pool`
+- `PrismaPg` adapter
+- a global singleton cache in non-production environments
 
-`prisma/seed.ts` is invoked automatically by [docker/entrypoint.sh](docker/entrypoint.sh) on every container start. It is idempotent: it upserts the admin user, default tags, sources, and currency options.
+### Seeded bootstrap data
 
----
+[`prisma/seed.ts`](prisma/seed.ts) is idempotent and currently ensures:
 
-## Authentication
+- an admin user from `ADMIN_*`
+- a starter tag set
+- starter source options
+- starter currencies with USD conversion metadata
+- a company backfill pass for legacy applications that have `companyId = null`
 
-- Provider: **Credentials** (email + password) via Auth.js v5 (`next-auth@5.0.0-beta`).
-- Adapter: `@auth/prisma-adapter` over the same Prisma client.
-- Hashing: `bcryptjs` (12 rounds in the seed; check `src/auth.ts` for the runtime cost).
-- Session strategy: JWT (cookie). `AUTH_TRUST_HOST=true` is required behind any proxy.
-- Module augmentation: [src/types/next-auth.d.ts](src/types/next-auth.d.ts) widens the `Session.user` type.
+The currency seed tries to fetch conversion rates from Frankfurter and falls back to `null` when the API is unavailable.
 
-The login page lives at [src/app/login/page.tsx](src/app/login/page.tsx) and the protected shell is rooted at [src/app/(app)/layout.tsx](src/app/(app)/layout.tsx).
+## Authentication and Route Protection
 
----
+Authentication is implemented in [`src/auth.ts`](src/auth.ts) with:
 
-## File Storage (MinIO / S3)
+- Auth.js v5
+- credentials provider only
+- bcrypt password verification against `User.passwordHash`
+- JWT session strategy
+- `session.user.id` augmentation via [`src/types/next-auth.d.ts`](src/types/next-auth.d.ts)
 
-- Bucket bootstrap: the `minio-init` one-shot in [docker-compose.yml](docker-compose.yml) runs `mc mb local/attachments` and sets it to anonymous `download` so download URLs work without per-object signing.
-- Client wrapper: [src/shared/lib/s3.ts](src/shared/lib/s3.ts) constructs the AWS SDK v3 client from `S3_*` env vars.
-- Uploads / downloads: handled in [src/shared/actions/attachments.ts](src/shared/actions/attachments.ts) and [src/app/api/attachments/[id]/route.ts](src/app/api/attachments/%5Bid%5D/route.ts), gated by the authenticated session.
-- Hard limit: `UPLOAD_MAX_BYTES` (default 10 MiB).
+Route protection is implemented in [`src/proxy.ts`](src/proxy.ts):
 
-For a real S3 bucket simply point the `S3_*` env vars elsewhere and set `S3_FORCE_PATH_STYLE=false`.
+- public paths: `/login` and `/api/auth`
+- everything else under the matcher requires authentication
+- unauthenticated access redirects to `/login?callbackUrl=<pathname>`
+- authenticated users hitting `/login` are redirected to `/`
 
----
+This gives the app a simple but effective single-user / private-instance security model.
+
+## Storage and Attachment Delivery
+
+Storage configuration lives in [`src/shared/lib/s3.ts`](src/shared/lib/s3.ts). The same code works against:
+
+- MinIO in local Docker environments
+- real AWS S3
+- any other S3-compatible endpoint
+
+Operational details:
+
+- bucket name is read from `S3_BUCKET`
+- path-style access defaults to `true`
+- attachments are application-scoped by key prefix
+- attachment metadata rows are written after the object upload succeeds
+- attachment add/remove events are mirrored into the activity log
+
+The Compose bootstrap job creates the `attachments` bucket automatically. If you move to production object storage, review bucket privacy, credentials, and endpoint configuration rather than assuming the local MinIO defaults are appropriate.
 
 ## Internationalization
 
-- Catalog: [messages/en.json](messages/en.json), validated against [messages/messages.schema.json](messages/messages.schema.json).
-- Wiring: [src/i18n/request.ts](src/i18n/request.ts) is the `next-intl` request config; client components consume `useTranslations(namespace)` and server components consume `getTranslations(namespace)`.
-- Conventions:
-  - Every user-visible string lives in the catalog. No literal English in components.
-  - Validation errors returned from server actions are i18n keys (e.g. `validation.required`); the form layer translates them via `t(key)`.
-  - Enum-style values reuse top-level namespaces such as `status.*`, `priority.*`, `companyType.*`, `fundingStage.*`, etc.
+`next-intl` configuration is minimal and explicit:
 
-Adding a locale: copy `messages/en.json` to e.g. `messages/tr.json`, translate values, and extend the `next-intl` config in `src/i18n/request.ts`. The schema enforces shape parity automatically.
+- [`src/i18n/request.ts`](src/i18n/request.ts) pins locale resolution to `en`
+- messages are dynamically loaded from `messages/en.json`
+- the request config sets `timeZone: "UTC"`
 
----
+Practical conventions in the codebase:
 
-## Coding Standards & Tooling
+- user-facing labels come from translation keys
+- server action validation errors are returned as translation keys
+- enum-like display strings use shared namespaces such as `status.*`, `priority.*`, and related domain groups
 
-- **Formatter / linter**: [Biome 2.4](https://biomejs.dev/). Rules in [biome.json](biome.json) — **tabs** for indentation, **double quotes** for strings.
-- **Type safety**: strict TypeScript (`tsc --noEmit` is the gate).
-- **Module boundaries**:
-  - `src/shared/lib/*` — `import "server-only"` (or implicit through Prisma usage). Never import into client components.
-  - `src/shared/actions/*` and `src/app/**/actions/*` — `"use server"` files exporting server actions. Always validate input with Zod before calling the data layer.
-  - Client components live next to the route they belong to under `components/`.
-- **Form pattern** — for an example of the canonical full-width multi-card form layout (cards → grid → `Field` helper → `Select` / `TextField.Root` / `TextArea`), see [src/shared/components/ApplicationForm.tsx](src/shared/components/ApplicationForm.tsx) and [src/app/(app)/companies/components/CompanyForm.tsx](src/app/(app)/companies/components/CompanyForm.tsx).
-- **Revalidation** — every successful mutation calls `revalidatePath` on each affected route segment. Detail pages use `revalidatePath('/applications/[id]/edit', 'page')` style so dynamic segments are invalidated correctly.
+## Testing and CI
 
-Run before committing:
+Unit testing is configured in [`vitest.config.ts`](vitest.config.ts):
+
+- environment: `jsdom`
+- React plugin enabled
+- setup file: `test/setup.ts`
+- suite glob: `test/unit/**/*.test.{ts,tsx}`
+- coverage provider: V8
+
+Playwright E2E coverage lives under `test/e2e/` and targets authentication, applications, companies, filters, management screens, and application detail flows.
+
+The E2E harness supports two modes:
+
+- local managed bootstrap using Testcontainers and the project test web server
+- GitHub Actions service containers defined in [`.github/workflows/test.yml`](.github/workflows/test.yml)
+
+The setup project in Playwright captures admin auth state once and reuses it across Chromium specs.
+
+Run locally:
 
 ```bash
-bun run check        # biome check --write --unsafe
-bun run typecheck    # tsc --noEmit
+bun run test
+bun run test:coverage
+bun x playwright install --with-deps chromium
+bun run test:e2e
 ```
-
----
-
-## Domain Model
-
-Defined in [prisma/schema.prisma](prisma/schema.prisma).
-
-- **User** — authenticated principal (single user expected). Owns `ApplicationDraft`s.
-- **Application** — central entity. Indexed on `status`, `priority`, `companySize`, `applicationMethod`, `appliedAt`, `companyId`.
-- **Company** — rich profile (~50 fields) grouped into Identity / Location / Online Presence / Business / Tech & Culture / Contact / Personal Tracking / Notes. `normalizedName` is unique to deduplicate variants.
-- **Tag**, **SourceOption**, **CurrencyOption** — user-managed reference data.
-- **ApplicationTag** — many-to-many join.
-- **Attachment** — S3-backed file metadata.
-- **ActivityEntry** — append-only audit per application; `type ∈ {CREATED, FIELD_CHANGE, STATUS_CHANGE, COMMENT, ATTACHMENT_ADDED, ATTACHMENT_REMOVED}`.
-- **CompanyActivityEntry** — append-only audit per company; `type ∈ {CREATED, FIELD_CHANGE, NOTE_ADDED, BOOTSTRAPPED_FROM_APPLICATION, LINKED_APPLICATION, UNLINKED_APPLICATION}`.
-- **Comment** — Markdown comments on an application.
-- **ApplicationDraft** — per-user JSON draft (`payload`) with `mode ∈ {CREATE, EDIT}`, `schemaVersion`, and `baseApplicationUpdatedAt` for stale detection.
-
-Enums are stored as `String` columns and validated centrally in zod (`src/shared/schemas/*` and route-local `actions/*.ts`) — this keeps migrations cheap and makes string-based filtering trivial.
-
----
-
-## Server Actions & Data Layer
-
-```text
-client component ──▶ server action ──▶ data layer (Prisma) ──▶ PostgreSQL
-                  │              │
-                  │              └─▶ audit (diff + write *ActivityEntry)
-                  │
-                  └─▶ revalidatePath(...)
-```
-
-Pattern (illustrated by [src/app/(app)/companies/actions/companies.ts](src/app/(app)/companies/actions/companies.ts)):
-
-1. Mark the file `"use server"`.
-2. Define a zod schema with reusable helpers (`optionalUrl`, `optionalStr(max)`, `optionalEnum([...])`, `optionalInt(min,max)`, `optionalFloat(min,max)`).
-3. `safeParse` the input; on failure return `{ ok: false, error: "invalid_data", fieldErrors }` — **field errors are i18n keys**.
-4. Call into `src/shared/lib/<entity>.ts` for the actual Prisma work.
-5. On success, call `revalidate(id?)` (a small helper that invalidates all relevant routes), then `redirect` or return `{ ok: true, id }`.
-
-The data layer (`src/shared/lib/*`) owns:
-
-- Input mapping (`toCompanyData`, `toApplicationData`) — converts loose form input into Prisma data, normalizing `""` → `null` and coercing numerics.
-- Domain logic — name normalization, draft hydration, currency conversion, etc.
-- Audit emission — wraps writes in a transaction that calls `diffApplication` / `diffCompany` and inserts one row per changed field.
-
----
-
-## Audit / Activity Log
-
-Both `Application` and `Company` have a parallel auditing system:
-
-- A `TRACKED_FIELDS` allow-list (e.g. exported from [src/shared/lib/company-audit.ts](src/shared/lib/company-audit.ts)) defines which columns participate.
-- On update, `diff*` produces a list of `{ field, oldValue, newValue }` triples where the values are JSON-encoded so booleans, numbers, and nulls round-trip cleanly.
-- `write*ActivityEntries` inserts one `*ActivityEntry` row per changed field within the same transaction as the entity update.
-- The activity tab decodes the JSON values and renders human-readable diffs (with i18n labels via `fields.*`).
-
-Other auditable events (status change, comment, attachment add/remove, link/unlink) are written explicitly by their respective server actions.
-
----
 
 ## Common Operations
 
 ```bash
-# Tail app logs
+# View app logs
 docker compose logs -f app
 
-# Open a shell inside the running app
+# Enter the runtime container
 docker compose exec app sh
 
-# Manual schema push from your laptop into the container
-docker cp prisma/schema.prisma application-tracker-app-1:/app/prisma/schema.prisma
+# Re-run schema push inside the app container
 docker compose exec -T app sh -lc \
-  'node node_modules/prisma/build/index.js db push --url "$DATABASE_URL" \
-   && node node_modules/prisma/build/index.js generate'
+  'node node_modules/prisma/build/index.js db push --url "$DATABASE_URL"'
 
-# Re-run the seed
-docker compose exec app sh -lc \
+# Re-run the seed script
+docker compose exec -T app sh -lc \
   'node node_modules/tsx/dist/cli.mjs prisma/seed.ts'
 
-# Open Prisma Studio against the local Postgres (publish 5432 first)
-DATABASE_URL="postgresql://appuser:apppassword@localhost:5432/appdb?schema=public" \
-  npx prisma studio
+# Generate Prisma client locally
+bunx prisma generate
 
-# Reset everything (destroys data + volumes)
-docker compose down -v
+# Open Prisma Studio
+bun run db:studio
 ```
-
----
 
 ## Troubleshooting
 
-| Symptom                                                    | Likely cause / fix                                                                         |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `prisma db push: unknown or unexpected option --skip-generate` | Prisma 7 removed that flag — omit it and run `prisma generate` separately.            |
-| Login fails with valid credentials                         | `AUTH_SECRET` mismatch between sessions or `AUTH_TRUST_HOST=true` missing behind a proxy.  |
-| Attachment upload returns 413                              | `UPLOAD_MAX_BYTES` is below the file size, or your reverse proxy enforces a smaller limit. |
-| MinIO bucket missing                                       | Restart `minio-init` (`docker compose up -d --force-recreate minio-init`).                 |
-| RSC fails with “PrismaClient unable to run in this browser environment” | A `src/shared/lib/*` helper was imported into a client component — remove the import. |
-| Schema changes not visible inside the container            | The image is built, not mounted. Use the `docker cp` + `db push` recipe above.             |
-| Form field shows raw key like `validation.required`        | Missing entry in [messages/en.json](messages/en.json); add it under the right namespace.   |
-
----
+| Symptom                                                     | Likely cause                                                                           |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Login always redirects back to login                        | `AUTH_SECRET` mismatch, missing seeded admin user, or wrong credentials                |
+| Auth works locally but fails behind a proxy                 | `AUTH_TRUST_HOST` is missing or false                                                  |
+| Attachment upload is rejected                               | File exceeds `UPLOAD_MAX_BYTES` or an upstream proxy has a smaller body limit          |
+| Attachments return 404                                      | Object missing in S3/MinIO or metadata row points to a stale key                       |
+| Company duplicates appear unexpectedly                      | Names differ before normalization or records were created before company-link backfill |
+| Updated schema is not reflected in a running image          | The image is built, not bind-mounted; push the schema again or rebuild the container   |
+| Validation keys like `validation.required` appear in the UI | Missing translation entries in `messages/en.json`                                      |
 
 ## License
 
-This project is currently distributed without an explicit license. Until one is added, all rights are reserved by the repository owner. If you intend to use, fork, or self-host this project, please open an issue to discuss licensing.
+Licensed under GPL-3.0. See [LICENSE](LICENSE).

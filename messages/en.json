@@ -193,7 +193,8 @@
 			"company": "Company",
 			"position": "Position",
 			"status": "Status",
-			"createdAt": "Created date"
+			"createdAt": "Created date",
+			"updatedAt": "Updated date"
 		}
 	},
 	"activity": {
@@ -336,6 +337,7 @@
 		"resumeVersion": "Resume Version",
 		"coverLetterVersion": "Cover Letter Version",
 		"portfolioUrl": "Portfolio URL",
+		"attachment": "Attachment",
 		"needsSponsorship": "Needs Sponsorship",
 		"relocationPreference": "Relocation Preference",
 		"workAuthorizationNote": "Work Authorization Note",

@@ -63,7 +63,12 @@ export async function createCurrencyAction(
 	}
 
 	const code = normalizeCurrencyCode(parsed.data.code);
-	const apiUsdRate = code === "USD" ? 1 : await fetchUsdRateForCurrency(code);
+	const apiUsdRate =
+		parsed.data.manualUsdRate != null
+			? null
+			: code === "USD"
+				? 1
+				: await fetchUsdRateForCurrency(code);
 	const usdRate = apiUsdRate ?? parsed.data.manualUsdRate;
 
 	if (usdRate == null) {

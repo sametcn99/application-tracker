@@ -5,6 +5,12 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
 	output: "standalone",
+	experimental: {
+		serverActions: {
+			bodySizeLimit: "16mb",
+		},
+		proxyClientMaxBodySize: "16mb",
+	},
 };
 
 export default withNextIntl(nextConfig);

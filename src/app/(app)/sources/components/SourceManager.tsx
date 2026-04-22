@@ -9,6 +9,7 @@ import {
 	Text,
 	TextField,
 } from "@radix-ui/themes";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { createSourceAction, deleteSourceAction } from "../actions/sources";
@@ -22,6 +23,7 @@ type SourceItem = {
 export function SourceManager({ sources }: { sources: SourceItem[] }) {
 	const t = useTranslations();
 	const tSources = useTranslations("sources");
+	const router = useRouter();
 	const [pending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 	const formRef = useRef<HTMLFormElement>(null);
@@ -43,6 +45,7 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 
 							setError(null);
 							formRef.current?.reset();
+							router.refresh();
 						})
 					}
 				>
@@ -103,6 +106,7 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 											startTransition(async () => {
 												setError(null);
 												await deleteSourceAction(source.id);
+												router.refresh();
 											});
 										}
 									}}

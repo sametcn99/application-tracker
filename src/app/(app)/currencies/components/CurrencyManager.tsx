@@ -10,6 +10,7 @@ import {
 	Text,
 	TextField,
 } from "@radix-ui/themes";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { formatCurrencyAmount } from "@/shared/lib/format";
@@ -39,6 +40,7 @@ export function CurrencyManager({
 }) {
 	const t = useTranslations();
 	const tCurrencies = useTranslations("currencies");
+	const router = useRouter();
 	const [pending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 	const formRef = useRef<HTMLFormElement>(null);
@@ -60,6 +62,7 @@ export function CurrencyManager({
 
 							setError(null);
 							formRef.current?.reset();
+							router.refresh();
 						})
 					}
 				>
@@ -177,7 +180,9 @@ export function CurrencyManager({
 															);
 															if (!result.ok) {
 																setError(tx(result.error));
+																return;
 															}
+															router.refresh();
 														});
 													}}
 												>
@@ -200,6 +205,7 @@ export function CurrencyManager({
 														startTransition(async () => {
 															setError(null);
 															await deleteCurrencyAction(currency.id);
+															router.refresh();
 														});
 													}
 												}}

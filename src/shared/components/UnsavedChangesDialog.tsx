@@ -49,7 +49,7 @@ export function UnsavedChangesDialog({
 					<AlertDialog.Title>{t("title")}</AlertDialog.Title>
 				</Flex>
 				<AlertDialog.Description size="2">
-					<Text as="p">{t("description")}</Text>
+					<Text as="span">{t("description")}</Text>
 				</AlertDialog.Description>
 
 				<Flex gap="3" mt="4" justify="end" wrap="wrap">

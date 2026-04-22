@@ -7,13 +7,22 @@
 		"build": "next build",
 		"start": "next start",
 		"typecheck": "tsc --noEmit",
-		"format": "biome format --write",
+		"format:md": "prettier --ignore-path .gitignore --write \"**/*.md\"",
+		"format": "biome format --write && bun run format:md",
 		"lint": "biome lint --write --unsafe",
-		"check": "biome check --write --unsafe",
+		"check:md": "prettier --ignore-path .gitignore --check \"**/*.md\"",
+		"check": "biome check --write --unsafe && bun run check:md",
 		"db:migrate": "prisma migrate dev",
 		"db:seed": "tsx prisma/seed.ts",
 		"db:studio": "prisma studio",
-		"db:reset": "prisma migrate reset"
+		"db:reset": "prisma migrate reset",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:unit": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:e2e:server": "tsx test/e2e/web-server.ts",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
@@ -41,16 +50,26 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.12",
+		"@playwright/test": "^1.59.1",
 		"@prisma/client": "^7.7.0",
 		"@prisma/config": "^7.7.0",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
 		"@types/bcryptjs": "^3.0.0",
 		"@types/node": "^20",
 		"@types/pg": "^8.20.0",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"@vitejs/plugin-react": "^6.0.1",
+		"@vitest/coverage-v8": "^4.1.5",
+		"jsdom": "^29.0.2",
+		"prettier": "^3.8.3",
 		"prisma": "^7.7.0",
+		"testcontainers": "^11.14.0",
 		"tsx": "^4.21.0",
-		"typescript": "^5"
+		"typescript": "^5",
+		"vitest": "^4.1.5"
 	},
 	"ignoreScripts": [
 		"sharp",
