@@ -70,6 +70,10 @@ export async function createCurrencyAction(
 		return { ok: false, error: "currencies.manualRateRequired" };
 	}
 
+	const hasDefaultCurrency = await prisma.currencyOption.count({
+		where: { isDefault: true },
+	});
+
 	await prisma.currencyOption.upsert({
 		where: { code },
 		update: {
@@ -84,12 +88,34 @@ export async function createCurrencyAction(
 			code,
 			name: parsed.data.name,
 			symbol: parsed.data.symbol ?? null,
+			isDefault: hasDefaultCurrency === 0,
 			usdRate,
 			rateSource:
 				code === "USD" ? "default" : apiUsdRate != null ? "api" : "manual",
 			lastSyncedAt: apiUsdRate != null ? new Date() : null,
 		},
 	});
+
+	revalidateReferencePaths();
+	return { ok: true };
+}
+
+export async function setDefaultCurrencyAction(
+	id: string,
+): Promise<ActionResult> {
+	const currency = await prisma.currencyOption.findUnique({ where: { id } });
+
+	if (!currency) {
+		return { ok: false, error: "errors.generic" };
+	}
+
+	await prisma.$transaction([
+		prisma.currencyOption.updateMany({ data: { isDefault: false } }),
+		prisma.currencyOption.update({
+			where: { id },
+			data: { isDefault: true },
+		}),
+	]);
 
 	revalidateReferencePaths();
 	return { ok: true };

@@ -41,6 +41,17 @@ export async function ensureDefaultReferenceData(): Promise<void> {
 			create: currency,
 		});
 	}
+
+	const hasDefaultCurrency = await prisma.currencyOption.count({
+		where: { isDefault: true },
+	});
+
+	if (hasDefaultCurrency === 0) {
+		await prisma.currencyOption.update({
+			where: { code: "USD" },
+			data: { isDefault: true },
+		});
+	}
 }
 
 export const getSourceOptions = cache(
@@ -58,7 +69,7 @@ export const getCurrencyOptions = cache(
 		await ensureDefaultReferenceData();
 
 		const currencies = await prisma.currencyOption.findMany({
-			orderBy: { code: "asc" },
+			orderBy: [{ isDefault: "desc" }, { code: "asc" }],
 		});
 
 		return currencies.map((currency) => ({
@@ -66,6 +77,7 @@ export const getCurrencyOptions = cache(
 			code: currency.code,
 			name: currency.name,
 			symbol: currency.symbol,
+			isDefault: currency.isDefault,
 			usdRate: currency.usdRate ? Number(currency.usdRate) : null,
 			rateSource: currency.rateSource,
 			lastSyncedAt: currency.lastSyncedAt,

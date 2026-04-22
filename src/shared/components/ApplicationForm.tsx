@@ -111,6 +111,12 @@ export function ApplicationForm({
 	const t = useTranslations();
 	const [pending, startTransition] = useTransition();
 	const [topError, setTopError] = useState<string | null>(null);
+	const initialCurrencyCode =
+		mode === "create"
+			? (defaultValues?.currency ??
+				currencies.find((currency) => currency.isDefault)?.code ??
+				"USD")
+			: defaultValues?.currency;
 
 	const draftContext = useMemo<DraftContext>(
 		() =>
@@ -148,11 +154,11 @@ export function ApplicationForm({
 			workMode: "REMOTE",
 			employmentType: "FULL_TIME",
 			priority: "MEDIUM",
-			currency: "USD",
 			status: "APPLIED",
 			appliedAt: new Date().toISOString().slice(0, 10) as unknown as Date,
 			tagIds: selectedTagIds,
 			...defaultValues,
+			currency: initialCurrencyCode,
 		},
 	});
 
@@ -185,6 +191,7 @@ export function ApplicationForm({
 			code: defaultValues.currency,
 			name: defaultValues.currency,
 			symbol: null,
+			isDefault: false,
 			usdRate: null,
 			rateSource: "legacy",
 			lastSyncedAt: null,

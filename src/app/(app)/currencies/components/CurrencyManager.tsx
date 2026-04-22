@@ -17,6 +17,7 @@ import { convertViaUsd } from "@/shared/lib/reference-data.shared";
 import {
 	createCurrencyAction,
 	deleteCurrencyAction,
+	setDefaultCurrencyAction,
 } from "../actions/currencies";
 
 type CurrencyItem = {
@@ -24,6 +25,7 @@ type CurrencyItem = {
 	code: string;
 	name: string;
 	symbol: string | null;
+	isDefault: boolean;
 	usdRate: number | null;
 	rateSource: string | null;
 	lastSyncedAt: Date | string | null;
@@ -142,6 +144,11 @@ export function CurrencyManager({
 												{currency.symbol && (
 													<Text color="gray">{currency.symbol}</Text>
 												)}
+												{currency.isDefault && (
+													<Badge color="green" variant="soft">
+														{tCurrencies("defaultBadge")}
+													</Badge>
+												)}
 												<Badge variant="soft">
 													{currency.rateSource === "api"
 														? tCurrencies("rateSourceApi")
@@ -156,28 +163,50 @@ export function CurrencyManager({
 												})}
 											</Text>
 										</Flex>
-										<IconButton
-											size="1"
-											variant="soft"
-											color="red"
-											disabled={pending}
-											onClick={() => {
-												if (
-													confirm(
-														tCurrencies("deleteConfirm", {
-															code: currency.code,
-														}),
-													)
-												) {
-													startTransition(async () => {
-														setError(null);
-														await deleteCurrencyAction(currency.id);
-													});
-												}
-											}}
-										>
-											<TrashIcon />
-										</IconButton>
+										<Flex align="center" gap="2">
+											{!currency.isDefault && (
+												<Button
+													size="1"
+													variant="soft"
+													disabled={pending}
+													onClick={() => {
+														startTransition(async () => {
+															setError(null);
+															const result = await setDefaultCurrencyAction(
+																currency.id,
+															);
+															if (!result.ok) {
+																setError(tx(result.error));
+															}
+														});
+													}}
+												>
+													{tCurrencies("setDefaultButton")}
+												</Button>
+											)}
+											<IconButton
+												size="1"
+												variant="soft"
+												color="red"
+												disabled={pending}
+												onClick={() => {
+													if (
+														confirm(
+															tCurrencies("deleteConfirm", {
+																code: currency.code,
+															}),
+														)
+													) {
+														startTransition(async () => {
+															setError(null);
+															await deleteCurrencyAction(currency.id);
+														});
+													}
+												}}
+											>
+												<TrashIcon />
+											</IconButton>
+										</Flex>
 									</Flex>
 
 									<Text size="2">

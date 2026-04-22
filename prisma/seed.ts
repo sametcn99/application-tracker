@@ -111,10 +111,21 @@ async function main() {
 				code: currency.code,
 				name: currency.name,
 				symbol: currency.symbol,
+				isDefault: isDefaultCurrency,
 				usdRate,
 				rateSource,
 				lastSyncedAt,
 			},
+		});
+	}
+
+	const defaultCurrencyCount = await prisma.currencyOption.count({
+		where: { isDefault: true },
+	});
+	if (defaultCurrencyCount === 0) {
+		await prisma.currencyOption.update({
+			where: { code: "USD" },
+			data: { isDefault: true },
 		});
 	}
 	console.log(`✓ ${currencySeeds.length} currencies ready`);

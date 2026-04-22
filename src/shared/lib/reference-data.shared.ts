@@ -8,6 +8,7 @@ export type CurrencyOptionRecord = {
 	code: string;
 	name: string;
 	symbol: string | null;
+	isDefault: boolean;
 	usdRate: number | null;
 	rateSource: string | null;
 	lastSyncedAt: Date | null;

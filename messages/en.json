@@ -242,6 +242,8 @@
 		"manualRateRequired": "Live exchange rate could not be fetched. Enter a manual USD rate.",
 		"deleteConfirm": "Delete \"{code}\"?",
 		"applicationsCount": "{count} applications",
+		"defaultBadge": "Default selection",
+		"setDefaultButton": "Set default",
 		"rateSourceApi": "API",
 		"rateSourceManual": "Manual",
 		"rateSourceDefault": "Default",
