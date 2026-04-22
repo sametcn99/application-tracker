@@ -26,16 +26,14 @@ export default async function SourcesPage() {
 	}));
 
 	return (
-		<Container size="3">
-			<Flex direction="column" gap="4">
-				<Flex direction="column" gap="1">
-					<Heading>{t("title")}</Heading>
-					<Text size="2" color="gray">
-						{t("subtitle")}
-					</Text>
-				</Flex>
-				<SourceManager sources={items} />
+		<Flex direction="column" gap="4">
+			<Flex direction="column" gap="1">
+				<Heading>{t("title")}</Heading>
+				<Text size="2" color="gray">
+					{t("subtitle")}
+				</Text>
 			</Flex>
-		</Container>
+			<SourceManager sources={items} />
+		</Flex>
 	);
 }

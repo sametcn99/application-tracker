@@ -25,16 +25,14 @@ export default async function CurrenciesPage() {
 	}));
 
 	return (
-		<Container size="3">
-			<Flex direction="column" gap="4">
-				<Flex direction="column" gap="1">
-					<Heading>{t("title")}</Heading>
-					<Text size="2" color="gray">
-						{t("subtitle")}
-					</Text>
-				</Flex>
-				<CurrencyManager currencies={items} />
+		<Flex direction="column" gap="4">
+			<Flex direction="column" gap="1">
+				<Heading>{t("title")}</Heading>
+				<Text size="2" color="gray">
+					{t("subtitle")}
+				</Text>
 			</Flex>
-		</Container>
+			<CurrencyManager currencies={items} />
+		</Flex>
 	);
 }
