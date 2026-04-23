@@ -11,7 +11,7 @@ import {
 } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createSourceAction, deleteSourceAction } from "../actions/sources";
 
 type SourceItem = {
@@ -25,10 +25,15 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 	const tSources = useTranslations("sources");
 	const router = useRouter();
 	const [pending, startTransition] = useTransition();
+	const [items, setItems] = useState(sources);
 	const [error, setError] = useState<string | null>(null);
 	const formRef = useRef<HTMLFormElement>(null);
 
 	const tx = (key: string) => (key.includes(".") ? t(key as never) : key);
+
+	useEffect(() => {
+		setItems(sources);
+	}, [sources]);
 
 	return (
 		<Flex direction="column" gap="4">
@@ -79,11 +84,11 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 				</form>
 			</Card>
 
-			{sources.length === 0 ? (
+			{items.length === 0 ? (
 				<Text color="gray">{tSources("noSources")}</Text>
 			) : (
 				<Flex direction="column" gap="2">
-					{sources.map((source) => (
+					{items.map((source) => (
 						<Card key={source.id}>
 							<Flex align="center" justify="between" gap="3" wrap="wrap">
 								<Flex direction="column" gap="1">
@@ -106,6 +111,9 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 											startTransition(async () => {
 												setError(null);
 												await deleteSourceAction(source.id);
+												setItems((current) =>
+													current.filter((item) => item.id !== source.id),
+												);
 												router.refresh();
 											});
 										}
