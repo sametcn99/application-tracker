@@ -7,11 +7,13 @@ test("sources page creates a source and ignores duplicate submissions", async ({
 	page,
 }) => {
 	const name = `Portfolio ${createRunId()}`;
+	const addSourceButton = page.getByRole("button", { name: /add source/i });
 
 	await page.goto("/sources");
 	await expect(page.getByRole("heading", { name: /sources/i })).toBeVisible();
 	await page.getByPlaceholder(/company website/i).fill(name);
-	await page.getByRole("button", { name: /add source/i }).click();
+	await expect(addSourceButton).toBeEnabled();
+	await addSourceButton.click();
 
 	const sourceCards = page
 		.locator(".rt-Card")
@@ -19,24 +21,30 @@ test("sources page creates a source and ignores duplicate submissions", async ({
 	await expect(sourceCards).toHaveCount(1);
 
 	await page.getByPlaceholder(/company website/i).fill(name);
-	await page.getByRole("button", { name: /add source/i }).click();
+	await expect(addSourceButton).toBeEnabled();
+	await addSourceButton.click();
 	await expect(sourceCards).toHaveCount(1);
 });
 
 test("sources page deletes a created source", async ({ page }) => {
 	const name = `Delete Source ${createRunId()}`;
+	const addSourceButton = page.getByRole("button", { name: /add source/i });
 
 	await page.goto("/sources");
 	await page.getByPlaceholder(/company website/i).fill(name);
-	await page.getByRole("button", { name: /add source/i }).click();
+	await expect(addSourceButton).toBeEnabled();
+	await addSourceButton.click();
 
 	const sourceCard = page
 		.locator(".rt-Card")
 		.filter({ has: page.getByText(name, { exact: true }) });
 	await expect(sourceCard).toHaveCount(1);
 
-	page.once("dialog", (dialog) => dialog.accept());
 	await sourceCard.getByRole("button").click();
+	await page
+		.getByRole("alertdialog")
+		.getByRole("button", { name: /^delete$/i })
+		.click();
 	await expect(sourceCard).toHaveCount(0);
 });
 
@@ -47,6 +55,9 @@ test("currencies page falls back to a manual rate for unknown codes", async ({
 	const code = `XZ${runId.slice(-3).toUpperCase()}`;
 	const rawCode = code.toLowerCase();
 	const name = `Manual Currency ${runId}`;
+	const addCurrencyButton = page.getByRole("button", {
+		name: /add currency/i,
+	});
 
 	await page.goto("/currencies");
 	await expect(
@@ -54,7 +65,8 @@ test("currencies page falls back to a manual rate for unknown codes", async ({
 	).toBeVisible();
 	await page.getByPlaceholder("EUR", { exact: true }).fill(rawCode);
 	await page.getByPlaceholder("Euro", { exact: true }).fill(name);
-	await page.getByRole("button", { name: /add currency/i }).click();
+	await expect(addCurrencyButton).toBeEnabled();
+	await addCurrencyButton.click();
 
 	await expect(
 		page.getByText(/live exchange rate could not be fetched/i),
@@ -63,17 +75,16 @@ test("currencies page falls back to a manual rate for unknown codes", async ({
 	await page.getByPlaceholder("EUR", { exact: true }).fill(rawCode);
 	await page.getByPlaceholder("Euro", { exact: true }).fill(name);
 	await page.getByPlaceholder("1.08", { exact: true }).fill("1.25");
-	await page.getByRole("button", { name: /add currency/i }).click();
-	await expect(page.getByRole("button", { name: /add currency/i })).toBeEnabled(
-		{ timeout: 15_000 },
-	);
-	await page.reload();
+	await expect(addCurrencyButton).toBeEnabled();
+	await addCurrencyButton.click();
 
 	const currencyCard = page
 		.locator(".rt-Card")
 		.filter({ has: page.getByText(code, { exact: true }) })
 		.first();
-	await expect(currencyCard.getByText(code, { exact: true })).toBeVisible();
+	await expect(currencyCard.getByText(code, { exact: true })).toBeVisible({
+		timeout: 15_000,
+	});
 	await expect(currencyCard.getByText(name, { exact: true })).toBeVisible();
 	await expect(currencyCard.getByText("Manual", { exact: true })).toBeVisible();
 	await expect(currencyCard.getByText(`1 ${code} = $1.25`)).toBeVisible();
@@ -127,7 +138,10 @@ test("tags page deletes a created tag", async ({ page }) => {
 		.filter({ has: page.getByText(name, { exact: true }) });
 	await expect(tagRow).toHaveCount(1);
 
-	page.once("dialog", (dialog) => dialog.accept());
 	await tagRow.getByRole("button").click();
+	await page
+		.getByRole("alertdialog")
+		.getByRole("button", { name: /^delete$/i })
+		.click();
 	await expect(tagRow).toHaveCount(0);
 });

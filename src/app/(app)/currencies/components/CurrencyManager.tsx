@@ -12,7 +12,7 @@ import {
 } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { formatCurrencyAmount } from "@/shared/lib/format";
 import { convertViaUsd } from "@/shared/lib/reference-data.shared";
@@ -34,6 +34,16 @@ type CurrencyItem = {
 	applicationsCount: number;
 };
 
+function sortCurrencies(items: CurrencyItem[]) {
+	return [...items].sort((left, right) => {
+		if (left.isDefault !== right.isDefault) {
+			return left.isDefault ? -1 : 1;
+		}
+
+		return left.code.localeCompare(right.code);
+	});
+}
+
 export function CurrencyManager({
 	currencies,
 }: {
@@ -44,10 +54,15 @@ export function CurrencyManager({
 	const tCommon = useTranslations("common");
 	const router = useRouter();
 	const [pending, startTransition] = useTransition();
+	const [items, setItems] = useState(() => sortCurrencies(currencies));
 	const [error, setError] = useState<string | null>(null);
 	const formRef = useRef<HTMLFormElement>(null);
 
 	const tx = (key: string) => (key.includes(".") ? t(key as never) : key);
+
+	useEffect(() => {
+		setItems(sortCurrencies(currencies));
+	}, [currencies]);
 
 	return (
 		<Flex direction="column" gap="4">
@@ -64,6 +79,26 @@ export function CurrencyManager({
 
 							setError(null);
 							formRef.current?.reset();
+							setItems((current) =>
+								sortCurrencies(
+									current.some((item) => item.id === result.data.id)
+										? current.map((item) =>
+												item.id === result.data.id
+													? {
+															...item,
+															...result.data,
+														}
+													: item,
+											)
+										: [
+												...current,
+												{
+													...result.data,
+													applicationsCount: 0,
+												},
+											],
+								),
+							);
 							router.refresh();
 						})
 					}
@@ -116,15 +151,15 @@ export function CurrencyManager({
 				</form>
 			</Card>
 
-			{currencies.length === 0 ? (
+			{items.length === 0 ? (
 				<Text color="gray">{tCurrencies("noCurrencies")}</Text>
 			) : (
 				<Flex direction="column" gap="2">
-					{currencies.map((currency) => {
+					{items.map((currency) => {
 						const equivalents =
 							currency.usdRate == null
 								? []
-								: currencies
+								: items
 										.filter(
 											(item) =>
 												item.code !== currency.code && item.usdRate != null,
@@ -184,6 +219,14 @@ export function CurrencyManager({
 																setError(tx(result.error));
 																return;
 															}
+															setItems((current) =>
+																sortCurrencies(
+																	current.map((item) => ({
+																		...item,
+																		isDefault: item.id === currency.id,
+																	})),
+																),
+															);
 															router.refresh();
 														});
 													}}
@@ -199,6 +242,9 @@ export function CurrencyManager({
 												onConfirm={async () => {
 													setError(null);
 													await deleteCurrencyAction(currency.id);
+													setItems((current) =>
+														current.filter((item) => item.id !== currency.id),
+													);
 													router.refresh();
 												}}
 												trigger={

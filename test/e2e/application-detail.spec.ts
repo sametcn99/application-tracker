@@ -26,20 +26,19 @@ test("application detail records comment and attachment activity", async ({
 	const note = `detail-note-${runId}`;
 	const fileName = `attachment-${runId}.txt`;
 	const { position } = await createApplication(page, runId);
+	const addCommentButton = page.getByRole("button", { name: /add comment/i });
 
 	await page.getByRole("tab", { name: /activity/i }).click();
 	await page.getByPlaceholder(/write a note/i).fill(note);
-	await page.getByRole("button", { name: /add comment/i }).click();
-	await expect(page.getByRole("button", { name: /add comment/i })).toBeEnabled({
-		timeout: 30_000,
-	});
+	await expect(addCommentButton).toBeEnabled();
+	await addCommentButton.click();
 
 	await page.getByRole("tab", { name: /activity/i }).click();
 	const commentCard = page
 		.locator(".rt-Card")
 		.filter({ has: page.getByText(note, { exact: true }) })
 		.first();
-	await expect(commentCard).toContainText("Comment");
+	await expect(commentCard).toContainText("Comment", { timeout: 30_000 });
 	await expect(commentCard).toContainText(note);
 
 	await page.getByRole("tab", { name: /attachments/i }).click();
@@ -48,17 +47,18 @@ test("application detail records comment and attachment activity", async ({
 		mimeType: "text/plain",
 		buffer: Buffer.from(`attachment-body-${runId}`),
 	});
-	await expect(page.getByRole("button", { name: /upload/i })).toBeEnabled({
-		timeout: 30_000,
-	});
 
 	await page.getByRole("tab", { name: /attachments/i }).click();
 	const attachmentRow = page
 		.getByRole("row")
 		.filter({ has: page.getByRole("link", { name: fileName, exact: true }) });
-	await expect(attachmentRow).toHaveCount(1);
+	await expect(attachmentRow).toHaveCount(1, { timeout: 30_000 });
 
 	await attachmentRow.getByRole("button").click();
+	await page
+		.getByRole("alertdialog")
+		.getByRole("button", { name: /^delete$/i })
+		.click();
 	await page.getByRole("tab", { name: /attachments/i }).click();
 	await expect(page.getByText(/no attachments uploaded\./i)).toBeVisible();
 

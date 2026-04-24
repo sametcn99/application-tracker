@@ -32,6 +32,22 @@ const currencySchema = z.object({
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
+type CurrencyActionResult =
+	| {
+			ok: true;
+			data: {
+				id: string;
+				code: string;
+				name: string;
+				symbol: string | null;
+				isDefault: boolean;
+				usdRate: number | null;
+				rateSource: string | null;
+				lastSyncedAt: string | null;
+			};
+	  }
+	| { ok: false; error: string };
+
 function revalidateReferencePaths() {
 	revalidatePath("/currencies");
 	revalidatePath("/applications/new");
@@ -41,7 +57,7 @@ function revalidateReferencePaths() {
 
 export async function createCurrencyAction(
 	formData: FormData,
-): Promise<ActionResult> {
+): Promise<CurrencyActionResult> {
 	const parsed = currencySchema.safeParse({
 		code: formData.get("code"),
 		name: formData.get("name"),
@@ -79,7 +95,7 @@ export async function createCurrencyAction(
 		where: { isDefault: true },
 	});
 
-	await prisma.currencyOption.upsert({
+	const currency = await prisma.currencyOption.upsert({
 		where: { code },
 		update: {
 			name: parsed.data.name,
@@ -102,7 +118,19 @@ export async function createCurrencyAction(
 	});
 
 	revalidateReferencePaths();
-	return { ok: true };
+	return {
+		ok: true,
+		data: {
+			id: currency.id,
+			code: currency.code,
+			name: currency.name,
+			symbol: currency.symbol,
+			isDefault: currency.isDefault,
+			usdRate: currency.usdRate ? Number(currency.usdRate) : null,
+			rateSource: currency.rateSource,
+			lastSyncedAt: currency.lastSyncedAt?.toISOString() ?? null,
+		},
+	};
 }
 
 export async function setDefaultCurrencyAction(
