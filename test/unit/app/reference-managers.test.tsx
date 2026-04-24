@@ -45,7 +45,19 @@ describe("reference managers", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		vi.stubGlobal("ResizeObserver", ResizeObserverMock);
-		currencyActions.createCurrencyAction.mockResolvedValue({ ok: true });
+		currencyActions.createCurrencyAction.mockResolvedValue({
+			ok: true,
+			data: {
+				id: "currency-new",
+				code: "EUR",
+				name: "Euro",
+				symbol: "EUR",
+				isDefault: true,
+				usdRate: 1.2,
+				rateSource: "manual",
+				lastSyncedAt: null,
+			},
+		});
 		currencyActions.deleteCurrencyAction.mockResolvedValue(undefined);
 		currencyActions.setDefaultCurrencyAction.mockResolvedValue({ ok: true });
 		sourceActions.createSourceAction.mockResolvedValue({
@@ -151,8 +163,15 @@ describe("reference managers", () => {
 				);
 			});
 
+			const eurCard = screen
+				.getByText("EUR")
+				.closest("div")?.parentElement?.parentElement;
+			expect(eurCard).toBeTruthy();
+
 			await user.click(
-				screen.getAllByRole("button").at(-1) as HTMLButtonElement,
+				within(eurCard as HTMLElement).getByRole("button", {
+					name: 'Delete "EUR"?',
+				}),
 			);
 			await user.click(
 				within(screen.getByRole("alertdialog")).getByRole("button", {

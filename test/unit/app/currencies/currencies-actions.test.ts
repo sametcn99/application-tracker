@@ -48,11 +48,32 @@ describe("currencies actions", () => {
 
 	it("creates with USD shortcut and marks as default when none exists", async () => {
 		prisma.currencyOption.count.mockResolvedValueOnce(0);
-		prisma.currencyOption.upsert.mockResolvedValueOnce({ id: "1" });
+		prisma.currencyOption.upsert.mockResolvedValueOnce({
+			id: "1",
+			code: "USD",
+			name: "US Dollar",
+			symbol: null,
+			isDefault: true,
+			usdRate: 1,
+			rateSource: "default",
+			lastSyncedAt: null,
+		});
 		const res = await createCurrencyAction(
 			fd({ code: " usd ", name: "US Dollar" }),
 		);
-		expect(res).toEqual({ ok: true });
+		expect(res).toEqual({
+			ok: true,
+			data: {
+				id: "1",
+				code: "USD",
+				name: "US Dollar",
+				symbol: null,
+				isDefault: true,
+				usdRate: 1,
+				rateSource: "default",
+				lastSyncedAt: null,
+			},
+		});
 		expect(ref.fetchUsdRateForCurrency).not.toHaveBeenCalled();
 		const call = prisma.currencyOption.upsert.mock.calls[0][0];
 		expect(call.where).toEqual({ code: "USD" });

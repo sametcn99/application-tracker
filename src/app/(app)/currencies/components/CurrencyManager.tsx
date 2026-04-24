@@ -253,6 +253,9 @@ export function CurrencyManager({
 														variant="soft"
 														color="red"
 														disabled={pending}
+														aria-label={tCurrencies("deleteConfirm", {
+															code: currency.code,
+														})}
 													>
 														<TrashIcon />
 													</IconButton>
