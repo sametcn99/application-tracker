@@ -46,7 +46,8 @@ describe("Header", () => {
 
 		expect(screen.getByText("Dashboard")).toBeTruthy();
 		expect(screen.getByText("Applications")).toBeTruthy();
-		expect(screen.getByText("New Application")).toBeTruthy();
+		expect(screen.getByText("Companies")).toBeTruthy();
+		expect(screen.getByText("Settings")).toBeTruthy();
 		expect(screen.getByText("samet@example.com")).toBeTruthy();
 		expect(screen.getByRole("menuitem", { name: /sign out/i })).toBeTruthy();
 	});
@@ -82,11 +83,9 @@ describe("Sidebar", () => {
 
 		await user.click(screen.getByRole("button", { name: /management/i }));
 		expect(screen.getByText("Tags")).toBeTruthy();
-
-		await user.click(
-			screen.getByText("Samet").closest("button") as HTMLButtonElement,
-		);
-		expect(screen.getByRole("menuitem", { name: /sign out/i })).toBeTruthy();
+		expect(screen.getByText("Samet")).toBeTruthy();
+		expect(screen.getByText("samet@example.com")).toBeTruthy();
+		expect(screen.getByRole("button", { name: /sign out/i })).toBeTruthy();
 	});
 
 	it("omits the user profile section when no user is provided", () => {

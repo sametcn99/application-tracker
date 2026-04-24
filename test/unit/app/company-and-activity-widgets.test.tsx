@@ -1,4 +1,10 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import {
+	act,
+	fireEvent,
+	screen,
+	waitFor,
+	within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { formatDateTime } from "@/shared/lib/format";
@@ -228,26 +234,33 @@ describe("company and activity widgets", () => {
 	});
 
 	describe("DeleteCompanyButton", () => {
-		it("respects confirm and deletes only when accepted", async () => {
+		it("opens a confirmation dialog and deletes only after confirmation", async () => {
 			const user = userEvent.setup();
-			const confirmMock = vi
-				.fn(() => false)
-				.mockReturnValueOnce(false)
-				.mockReturnValueOnce(true);
-			vi.stubGlobal("confirm", confirmMock);
 
 			renderWithProviders(<DeleteCompanyButton id="company-1" name="Acme" />);
 
 			await user.click(screen.getByRole("button", { name: /delete company/i }));
 			expect(companyActions.deleteCompanyAction).not.toHaveBeenCalled();
+			expect(screen.getByRole("alertdialog")).toBeTruthy();
+
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /cancel/i,
+				}),
+			);
+			expect(companyActions.deleteCompanyAction).not.toHaveBeenCalled();
 
 			await user.click(screen.getByRole("button", { name: /delete company/i }));
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /^delete company$/i,
+				}),
+			);
 			await waitFor(() => {
 				expect(companyActions.deleteCompanyAction).toHaveBeenCalledWith(
 					"company-1",
 				);
 			});
-			expect(confirmMock).toHaveBeenCalledTimes(2);
 		});
 	});
 

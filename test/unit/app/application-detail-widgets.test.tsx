@@ -126,7 +126,7 @@ describe("application detail widgets", () => {
 			renderWithProviders(<DeleteApplicationButton id="app1" />);
 
 			await user.click(screen.getByRole("button", { name: /^delete$/i }));
-			const dialog = await screen.findByRole("dialog");
+			const dialog = await screen.findByRole("alertdialog");
 			expect(within(dialog).getByText("Delete application?")).toBeTruthy();
 			await user.click(
 				within(dialog).getAllByRole("button", { name: /^delete$/i })[0],
@@ -252,6 +252,11 @@ describe("application detail widgets", () => {
 
 			const buttons = screen.getAllByRole("button");
 			await user.click(buttons[buttons.length - 1]);
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /^delete$/i,
+				}),
+			);
 
 			await waitFor(() => {
 				expect(attachmentActions.deleteAttachmentAction).toHaveBeenCalledWith(

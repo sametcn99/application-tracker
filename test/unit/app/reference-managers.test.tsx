@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "../../helpers/intl";
@@ -44,10 +44,6 @@ function entriesOf(formData: FormData) {
 describe("reference managers", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.stubGlobal(
-			"confirm",
-			vi.fn(() => true),
-		);
 		vi.stubGlobal("ResizeObserver", ResizeObserverMock);
 		currencyActions.createCurrencyAction.mockResolvedValue({ ok: true });
 		currencyActions.deleteCurrencyAction.mockResolvedValue(undefined);
@@ -158,8 +154,12 @@ describe("reference managers", () => {
 			await user.click(
 				screen.getAllByRole("button").at(-1) as HTMLButtonElement,
 			);
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /^delete$/i,
+				}),
+			);
 			await waitFor(() => {
-				expect(globalThis.confirm).toHaveBeenCalledWith('Delete "EUR"?');
 				expect(currencyActions.deleteCurrencyAction).toHaveBeenCalledWith(
 					"eur",
 				);
@@ -216,8 +216,12 @@ describe("reference managers", () => {
 			await user.click(
 				screen.getAllByRole("button").at(-1) as HTMLButtonElement,
 			);
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /^delete$/i,
+				}),
+			);
 			await waitFor(() => {
-				expect(globalThis.confirm).toHaveBeenCalledWith('Delete "Referral"?');
 				expect(sourceActions.deleteSourceAction).toHaveBeenCalledWith("s1");
 			});
 		});
@@ -276,8 +280,12 @@ describe("reference managers", () => {
 			await user.click(
 				screen.getAllByRole("button").at(-1) as HTMLButtonElement,
 			);
+			await user.click(
+				within(screen.getByRole("alertdialog")).getByRole("button", {
+					name: /^delete$/i,
+				}),
+			);
 			await waitFor(() => {
-				expect(globalThis.confirm).toHaveBeenCalledWith('Delete "frontend"?');
 				expect(tagActions.deleteTagAction).toHaveBeenCalledWith("t1");
 			});
 		});
