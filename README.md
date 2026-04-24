@@ -460,14 +460,14 @@ Prerequisites:
 
 ```bash
 cp .env.example .env
-# Change AUTH_SECRET and ADMIN_PASSWORD before first boot
+# Fill every value in .env before first boot, especially secrets and passwords
 
 docker compose up --build -d
 ```
 
 Then open `http://localhost:3000`.
 
-The default deployment publishes only the application on `:3000`. PostgreSQL and MinIO stay internal to the Compose network unless you add explicit port mappings.
+The Compose file reads only credential and bootstrap values from environment variables. In Coolify, define the same variables from `.env.example` in the service environment. The default deployment publishes only the application on `3000:3000`; PostgreSQL and MinIO stay internal to the Compose network unless you add explicit port mappings.
 
 ### Bootstrap sequence
 
@@ -511,7 +511,7 @@ bun install
 # Prepare local env
 cp .env.example .env.local
 
-# If postgres/minio are published locally, adjust hostnames to localhost in .env.local
+# If running the app outside Compose, adjust hostnames from postgres/minio to localhost in .env.local
 
 # Apply migrations and generate client
 bunx prisma migrate deploy
@@ -552,21 +552,22 @@ For local non-Docker application runtime, the common change is switching:
 
 ## Environment Variables
 
-| Variable               | Required                   | Default example                                                      | Purpose                                                   |
-| ---------------------- | -------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
-| `DATABASE_URL`         | Yes                        | `postgresql://appuser:apppassword@postgres:5432/appdb?schema=public` | PostgreSQL connection string used by Prisma and `pg.Pool` |
-| `AUTH_SECRET`          | Yes                        | `change-me-to-a-long-random-string`                                  | JWT/session secret for Auth.js                            |
-| `AUTH_TRUST_HOST`      | Yes in proxied deployments | `true`                                                               | Required when the app is not running on plain localhost   |
-| `ADMIN_EMAIL`          | Yes                        | `admin@example.com`                                                  | Email for seed-created admin user                         |
-| `ADMIN_PASSWORD`       | Yes                        | `change-me`                                                          | Plain-text seed password, hashed before persistence       |
-| `ADMIN_NAME`           | No                         | `Admin`                                                              | Display name for the seeded admin                         |
-| `UPLOAD_MAX_BYTES`     | No                         | `10485760`                                                           | Max attachment size in bytes                              |
-| `S3_ENDPOINT`          | Yes                        | `http://minio:9000`                                                  | S3-compatible endpoint                                    |
-| `S3_REGION`            | Yes                        | `us-east-1`                                                          | AWS SDK region value                                      |
-| `S3_ACCESS_KEY_ID`     | Yes                        | `minioadmin`                                                         | Storage credential                                        |
-| `S3_SECRET_ACCESS_KEY` | Yes                        | `minioadmin`                                                         | Storage credential                                        |
-| `S3_BUCKET`            | Yes                        | `attachments`                                                        | Attachment bucket name                                    |
-| `S3_FORCE_PATH_STYLE`  | Yes for MinIO              | `true`                                                               | Path-style addressing toggle                              |
+The Docker Compose file only requires deployment-specific credentials and bootstrap values. Operational defaults such as app port, internal MinIO endpoint, upload limits, S3 bucket name, region, and path-style addressing are hardcoded in Compose.
+
+| Variable               | Required | Example                                                            | Purpose                                                   |
+| ---------------------- | -------- | ------------------------------------------------------------------ | --------------------------------------------------------- |
+| `POSTGRES_USER`        | Yes      | `appuser`                                                          | PostgreSQL service username                               |
+| `POSTGRES_PASSWORD`    | Yes      | `change-me-postgres-password`                                      | PostgreSQL service password                               |
+| `POSTGRES_DB`          | Yes      | `appdb`                                                            | PostgreSQL database name                                  |
+| `DATABASE_URL`         | Yes      | `postgresql://appuser:change-me@postgres:5432/appdb?schema=public` | PostgreSQL connection string used by Prisma and `pg.Pool` |
+| `AUTH_SECRET`          | Yes      | `change-me-to-a-long-random-string`                                | JWT/session secret for Auth.js                            |
+| `ADMIN_EMAIL`          | Yes      | `admin@example.com`                                                | Email for seed-created admin user                         |
+| `ADMIN_PASSWORD`       | Yes      | `change-me-admin-password`                                         | Plain-text seed password, hashed before persistence       |
+| `ADMIN_NAME`           | Yes      | `Admin`                                                            | Display name for the seeded admin                         |
+| `MINIO_ROOT_USER`      | Yes      | `change-me-minio-user`                                             | MinIO root username                                       |
+| `MINIO_ROOT_PASSWORD`  | Yes      | `change-me-minio-password`                                         | MinIO root password                                       |
+| `S3_ACCESS_KEY_ID`     | Yes      | `change-me-minio-user`                                             | S3 access key ID used by the app                          |
+| `S3_SECRET_ACCESS_KEY` | Yes      | `change-me-minio-password`                                         | S3 secret access key used by the app                      |
 
 ## Database and Persistence Model
 
