@@ -52,7 +52,10 @@ describe("reference managers", () => {
 		currencyActions.createCurrencyAction.mockResolvedValue({ ok: true });
 		currencyActions.deleteCurrencyAction.mockResolvedValue(undefined);
 		currencyActions.setDefaultCurrencyAction.mockResolvedValue({ ok: true });
-		sourceActions.createSourceAction.mockResolvedValue({ ok: true });
+		sourceActions.createSourceAction.mockResolvedValue({
+			ok: true,
+			data: { id: "source-new", name: "LinkedIn" },
+		});
 		sourceActions.deleteSourceAction.mockResolvedValue(undefined);
 		tagActions.createTagAction.mockResolvedValue({ ok: true });
 		tagActions.deleteTagAction.mockResolvedValue(undefined);

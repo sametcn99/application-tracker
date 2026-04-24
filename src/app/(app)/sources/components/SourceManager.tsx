@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { createSourceAction, deleteSourceAction } from "../actions/sources";
 
 type SourceItem = {
@@ -23,6 +24,7 @@ type SourceItem = {
 export function SourceManager({ sources }: { sources: SourceItem[] }) {
 	const t = useTranslations();
 	const tSources = useTranslations("sources");
+	const tCommon = useTranslations("common");
 	const router = useRouter();
 	const [pending, startTransition] = useTransition();
 	const [items, setItems] = useState(sources);
@@ -50,6 +52,20 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 
 							setError(null);
 							formRef.current?.reset();
+							setItems((current) => {
+								if (current.some((item) => item.id === result.data.id)) {
+									return current;
+								}
+
+								return [
+									...current,
+									{
+										id: result.data.id,
+										name: result.data.name,
+										applicationsCount: 0,
+									},
+								].sort((a, b) => a.name.localeCompare(b.name));
+							});
 							router.refresh();
 						})
 					}
@@ -99,28 +115,28 @@ export function SourceManager({ sources }: { sources: SourceItem[] }) {
 										})}
 									</Text>
 								</Flex>
-								<IconButton
-									size="1"
-									variant="soft"
-									color="red"
-									disabled={pending}
-									onClick={() => {
-										if (
-											confirm(tSources("deleteConfirm", { name: source.name }))
-										) {
-											startTransition(async () => {
-												setError(null);
-												await deleteSourceAction(source.id);
-												setItems((current) =>
-													current.filter((item) => item.id !== source.id),
-												);
-												router.refresh();
-											});
-										}
+								<ConfirmationDialog
+									title={tCommon("delete")}
+									description={tSources("deleteConfirm", { name: source.name })}
+									onConfirm={async () => {
+										setError(null);
+										await deleteSourceAction(source.id);
+										setItems((current) =>
+											current.filter((item) => item.id !== source.id),
+										);
+										router.refresh();
 									}}
-								>
-									<TrashIcon />
-								</IconButton>
+									trigger={
+										<IconButton
+											size="1"
+											variant="soft"
+											color="red"
+											disabled={pending}
+										>
+											<TrashIcon />
+										</IconButton>
+									}
+								/>
 							</Flex>
 						</Card>
 					))}

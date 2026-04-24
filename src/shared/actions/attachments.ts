@@ -3,6 +3,8 @@
 import { randomUUID } from "node:crypto";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
+import { validateAttachmentFile } from "@/shared/lib/attachment-validation";
+import { logger } from "@/shared/lib/logger";
 import { prisma } from "@/shared/lib/prisma";
 import { S3_BUCKET, s3 } from "@/shared/lib/s3";
 
@@ -19,44 +21,64 @@ export async function uploadAttachmentAction(
 	if (file.size > MAX_BYTES) {
 		return { ok: false, error: "attachments.tooLarge" };
 	}
+	const buf = Buffer.from(await file.arrayBuffer());
+	const validation = await validateAttachmentFile(file, buf);
+	if (!validation.ok) {
+		return { ok: false, error: validation.error };
+	}
 
 	const id = randomUUID();
 	const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 	const key = applicationId + "/" + id + "__" + safeName;
+	let uploaded = false;
 
-	const buf = Buffer.from(await file.arrayBuffer());
-	await s3.send(
-		new PutObjectCommand({
-			Bucket: S3_BUCKET,
-			Key: key,
-			Body: buf,
-			ContentType: file.type || "application/octet-stream",
-			ContentLength: file.size,
-		}),
-	);
-
-	const att = await prisma.attachment.create({
-		data: {
-			applicationId,
-			fileName: file.name,
-			mimeType: file.type || "application/octet-stream",
-			size: file.size,
-			storagePath: key,
-		},
-	});
-
-	await prisma.activityEntry.create({
-		data: {
-			applicationId,
-			type: "ATTACHMENT_ADDED",
-			field: "attachment",
-			newValue: JSON.stringify({
-				id: att.id,
-				fileName: file.name,
-				size: file.size,
+	try {
+		await s3.send(
+			new PutObjectCommand({
+				Bucket: S3_BUCKET,
+				Key: key,
+				Body: buf,
+				ContentType: validation.mimeType,
+				ContentLength: file.size,
 			}),
-		},
-	});
+		);
+		uploaded = true;
+
+		await prisma.$transaction(async (tx) => {
+			const att = await tx.attachment.create({
+				data: {
+					applicationId,
+					fileName: file.name,
+					mimeType: validation.mimeType,
+					size: file.size,
+					storagePath: key,
+				},
+			});
+
+			await tx.activityEntry.create({
+				data: {
+					applicationId,
+					type: "ATTACHMENT_ADDED",
+					field: "attachment",
+					newValue: JSON.stringify({
+						id: att.id,
+						fileName: file.name,
+						size: file.size,
+					}),
+				},
+			});
+		});
+	} catch {
+		logger.error("attachment_upload_failed", { applicationId, key });
+		if (uploaded) {
+			try {
+				await s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }));
+			} catch {
+				logger.error("attachment_cleanup_failed", { applicationId, key });
+			}
+		}
+		return { ok: false, error: "server_error" };
+	}
 
 	revalidatePath("/applications/" + applicationId);
 	return { ok: true };

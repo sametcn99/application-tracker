@@ -195,17 +195,9 @@ async function main() {
 
 	await runCommand(
 		"bun",
-		[
-			"x",
-			"prisma",
-			"db",
-			"push",
-			"--url",
-			runtimeEnv.DATABASE_URL,
-			"--accept-data-loss",
-		],
+		["x", "prisma", "migrate", "deploy"],
 		runtimeEnv,
-		"Apply Prisma schema",
+		"Apply Prisma migrations",
 	);
 	await runCommand(
 		"bun",

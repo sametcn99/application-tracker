@@ -1,13 +1,10 @@
 import { Buffer } from "node:buffer";
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const createRunId = () =>
 	`${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-async function createApplication(
-	page: Parameters<typeof test>[0]["page"],
-	runId: string,
-) {
+async function createApplication(page: Page, runId: string) {
 	const company = `Detail Co ${runId}`;
 	const position = `Detail Role ${runId}`;
 
@@ -33,6 +30,9 @@ test("application detail records comment and attachment activity", async ({
 	await page.getByRole("tab", { name: /activity/i }).click();
 	await page.getByPlaceholder(/write a note/i).fill(note);
 	await page.getByRole("button", { name: /add comment/i }).click();
+	await expect(page.getByRole("button", { name: /add comment/i })).toBeEnabled({
+		timeout: 30_000,
+	});
 
 	await page.getByRole("tab", { name: /activity/i }).click();
 	const commentCard = page
@@ -47,6 +47,9 @@ test("application detail records comment and attachment activity", async ({
 		name: fileName,
 		mimeType: "text/plain",
 		buffer: Buffer.from(`attachment-body-${runId}`),
+	});
+	await expect(page.getByRole("button", { name: /upload/i })).toBeEnabled({
+		timeout: 30_000,
 	});
 
 	await page.getByRole("tab", { name: /attachments/i }).click();

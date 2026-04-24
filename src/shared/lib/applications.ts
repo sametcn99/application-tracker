@@ -31,6 +31,83 @@ export type ListFilters = {
 	order?: "asc" | "desc";
 };
 
+export const APPLICATION_PAGE_SIZE = 20;
+
+export type ApplicationListCursor = {
+	sort: NonNullable<ListFilters["sort"]>;
+	order: NonNullable<ListFilters["order"]>;
+	value: string;
+	id: string;
+};
+
+export type ApplicationListPage<T> = {
+	items: T[];
+	nextCursor: string | null;
+	hasMore: boolean;
+};
+
+type ApplicationSort = ApplicationListCursor["sort"];
+type ApplicationOrder = ApplicationListCursor["order"];
+
+function getListSort(filters: ListFilters): ApplicationSort {
+	return filters.sort ?? "appliedAt";
+}
+
+function getListOrder(filters: ListFilters): ApplicationOrder {
+	return filters.order ?? "desc";
+}
+
+export function encodeApplicationCursor(cursor: ApplicationListCursor) {
+	return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+}
+
+export function decodeApplicationCursor(
+	cursor?: string | null,
+): ApplicationListCursor | null {
+	if (!cursor) return null;
+
+	try {
+		const parsed = JSON.parse(
+			Buffer.from(cursor, "base64url").toString("utf8"),
+		) as Partial<ApplicationListCursor>;
+		if (
+			(parsed.sort === "appliedAt" ||
+				parsed.sort === "updatedAt" ||
+				parsed.sort === "company") &&
+			(parsed.order === "asc" || parsed.order === "desc") &&
+			typeof parsed.value === "string" &&
+			typeof parsed.id === "string"
+		) {
+			return parsed as ApplicationListCursor;
+		}
+	} catch {
+		return null;
+	}
+
+	return null;
+}
+
+function getCursorValue(
+	item: { id: string; appliedAt: Date; updatedAt: Date; company: string },
+	sort: ApplicationSort,
+) {
+	const value = item[sort];
+	return value instanceof Date ? value.toISOString() : value;
+}
+
+function buildCursorWhere(cursor: ApplicationListCursor) {
+	const operator = cursor.order === "desc" ? "lt" : "gt";
+	const value =
+		cursor.sort === "company" ? cursor.value : new Date(cursor.value);
+
+	return {
+		OR: [
+			{ [cursor.sort]: { [operator]: value } },
+			{ [cursor.sort]: value, id: { [operator]: cursor.id } },
+		],
+	};
+}
+
 export function buildWhere(f: ListFilters) {
 	const where: Record<string, unknown> = {};
 	if (f.q) {
@@ -73,18 +150,61 @@ export function buildWhere(f: ListFilters) {
 }
 
 export async function listApplications(filters: ListFilters = {}) {
-	const where = buildWhere(filters);
-	const sort = filters.sort ?? "appliedAt";
-	const order = filters.order ?? "desc";
+	const sort = getListSort(filters);
+	const order = getListOrder(filters);
 
 	return prisma.application.findMany({
-		where,
-		orderBy: { [sort]: order },
+		where: buildWhere(filters),
+		orderBy: [{ [sort]: order }, { id: order }],
 		include: {
 			tags: { include: { tag: true } },
 			_count: { select: { attachments: true, activities: true } },
 		},
 	});
+}
+
+export async function listApplicationsPage(
+	filters: ListFilters = {},
+	cursor?: string | null,
+	pageSize = APPLICATION_PAGE_SIZE,
+) {
+	const where = buildWhere(filters);
+	const sort = getListSort(filters);
+	const order = getListOrder(filters);
+	const decodedCursor = decodeApplicationCursor(cursor);
+	const cursorWhere =
+		decodedCursor?.sort === sort && decodedCursor.order === order
+			? buildCursorWhere(decodedCursor)
+			: null;
+	const pageWhere = cursorWhere ? { AND: [where, cursorWhere] } : where;
+
+	const items = await prisma.application.findMany({
+		where: pageWhere,
+		take: pageSize + 1,
+		orderBy: [{ [sort]: order }, { id: order }],
+		include: {
+			tags: { include: { tag: true } },
+			_count: { select: { attachments: true, activities: true } },
+		},
+	});
+
+	const hasMore = items.length > pageSize;
+	const pageItems = hasMore ? items.slice(0, pageSize) : items;
+	const lastItem = pageItems.at(-1);
+
+	return {
+		items: pageItems,
+		hasMore,
+		nextCursor:
+			hasMore && lastItem
+				? encodeApplicationCursor({
+						sort,
+						order,
+						value: getCursorValue(lastItem, sort),
+						id: lastItem.id,
+					})
+				: null,
+	};
 }
 
 export async function getApplication(id: string) {

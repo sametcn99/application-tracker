@@ -7,7 +7,6 @@ node_modules
 .env.*.local
 storage
 prisma/dev.db
-prisma/migrations
 *.log
 README.md
 PLAN.md

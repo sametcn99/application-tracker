@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+const PUBLIC_PATHS = [
+	"/login",
+	"/api/auth",
+	...(process.env.HEALTH_ENDPOINT_PUBLIC === "true"
+		? ["/api/health", "/api/ready"]
+		: []),
+];
 
 export default auth((req) => {
 	const { pathname } = req.nextUrl;

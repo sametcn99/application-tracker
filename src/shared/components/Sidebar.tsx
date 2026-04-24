@@ -1,45 +1,26 @@
 "use client";
 
 import {
-	ActivityLogIcon,
-	BookmarkIcon,
 	CaretDownIcon,
 	CaretRightIcon,
-	DashboardIcon,
 	ExitIcon,
 	GearIcon,
-	GlobeIcon,
-	IdCardIcon,
-	ListBulletIcon,
-	MixIcon,
-	PlusIcon,
 } from "@radix-ui/react-icons";
 import {
 	Avatar,
 	Box,
-	DropdownMenu,
 	Flex,
 	Heading,
+	IconButton,
 	Text,
+	Tooltip,
 } from "@radix-ui/themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { signOutAction } from "@/shared/actions/auth";
-
-const MAIN_NAV = [
-	{ href: "/", labelKey: "dashboard", icon: DashboardIcon },
-	{ href: "/applications", labelKey: "applications", icon: ListBulletIcon },
-	{ href: "/companies", labelKey: "companies", icon: IdCardIcon },
-	{ href: "/activity", labelKey: "activity", icon: ActivityLogIcon },
-] as const;
-
-const MANAGE_NAV = [
-	{ href: "/tags", labelKey: "tags", icon: BookmarkIcon },
-	{ href: "/sources", labelKey: "sources", icon: GlobeIcon },
-	{ href: "/currencies", labelKey: "currencies", icon: MixIcon },
-] as const;
+import { MAIN_NAV, MANAGE_NAV } from "@/shared/navigation";
 
 interface UserProps {
 	name?: string | null;
@@ -112,7 +93,7 @@ export function Sidebar({ user }: { user?: UserProps }) {
 						letterSpacing: "1px",
 					}}
 				>
-					Overview
+					{t("sections.overview")}
 				</Text>
 				{MAIN_NAV.map((item) => {
 					const active =
@@ -176,7 +157,7 @@ export function Sidebar({ user }: { user?: UserProps }) {
 							color="gray"
 							style={{ textTransform: "uppercase", letterSpacing: "1px" }}
 						>
-							Management
+							{t("sections.management")}
 						</Text>
 						{isManagementOpen ? (
 							<CaretDownIcon color="var(--gray-9)" />
@@ -229,86 +210,58 @@ export function Sidebar({ user }: { user?: UserProps }) {
 			</Flex>
 
 			{/* User Profile */}
-			<Box p="4" style={{ borderTop: "1px solid var(--gray-a4)" }}>
+			<Box p="3" style={{ borderTop: "1px solid var(--gray-a4)" }}>
 				{user ? (
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger>
-							<button
+					<Flex align="center" gap="3">
+						<Avatar
+							src={user.image || undefined}
+							fallback={user.email?.[0]?.toUpperCase() || "U"}
+							size="2"
+							radius="full"
+						/>
+						<Box style={{ minWidth: 0, flex: 1 }}>
+							<Text
+								size="2"
+								weight="medium"
 								style={{
-									all: "unset",
-									boxSizing: "border-box",
-									display: "flex",
-									alignItems: "center",
-									gap: 12,
-									width: "100%",
-									padding: "8px",
-									borderRadius: 8,
-									cursor: "pointer",
-									transition: "background 0.2s",
+									display: "block",
+									textOverflow: "ellipsis",
+									overflow: "hidden",
+									whiteSpace: "nowrap",
 								}}
-								onMouseOver={(e) =>
-									(e.currentTarget.style.background = "var(--gray-a3)")
-								}
-								onMouseOut={(e) =>
-									(e.currentTarget.style.background = "transparent")
-								}
 							>
-								<Avatar
-									src={user.image || undefined}
-									fallback={user.email?.[0]?.toUpperCase() || "U"}
+								{user.name || user.email?.split("@")[0]}
+							</Text>
+							<Text
+								size="1"
+								color="gray"
+								style={{
+									display: "block",
+									textOverflow: "ellipsis",
+									overflow: "hidden",
+									whiteSpace: "nowrap",
+								}}
+							>
+								{user.email}
+							</Text>
+						</Box>
+						<form
+							action={signOutAction}
+							style={{ display: "flex", alignItems: "center", margin: 0 }}
+						>
+							<Tooltip content={tCommon("logout")}>
+								<IconButton
+									type="submit"
+									variant="ghost"
+									color="gray"
 									size="2"
-									radius="full"
-								/>
-								<Box style={{ flex: 1, minWidth: 0 }}>
-									<Text
-										size="2"
-										weight="medium"
-										style={{
-											display: "block",
-											textOverflow: "ellipsis",
-											overflow: "hidden",
-											whiteSpace: "nowrap",
-										}}
-									>
-										{user.name || user.email?.split("@")[0]}
-									</Text>
-									<Text
-										size="1"
-										color="gray"
-										style={{
-											display: "block",
-											textOverflow: "ellipsis",
-											overflow: "hidden",
-											whiteSpace: "nowrap",
-										}}
-									>
-										{user.email}
-									</Text>
-								</Box>
-								<GearIcon width={16} height={16} color="var(--gray-9)" />
-							</button>
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content align="center" side="top">
-							<form action={signOutAction}>
-								<DropdownMenu.Item asChild color="red">
-									<button
-										type="submit"
-										style={{
-											all: "unset",
-											display: "flex",
-											alignItems: "center",
-											gap: 8,
-											padding: "4px 8px",
-											width: "100%",
-											cursor: "pointer",
-										}}
-									>
-										<ExitIcon /> {tCommon("logout")}
-									</button>
-								</DropdownMenu.Item>
-							</form>
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
+									aria-label={tCommon("logout")}
+								>
+									<ExitIcon />
+								</IconButton>
+							</Tooltip>
+						</form>
+					</Flex>
 				) : null}
 			</Box>
 		</Flex>

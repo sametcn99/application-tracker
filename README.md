@@ -2,8 +2,6 @@
 
 Application Tracker is a self-hosted job search operating system built with **Next.js 16 App Router**, **React 19**, **Prisma 7**, **PostgreSQL**, **Auth.js v5 credentials auth**, and **MinIO / S3-compatible object storage**. The project is optimized for running as a single private deployment with `docker compose`, while still keeping the internal architecture explicit: typed server actions, transactional entity writes, append-only audit logs, draft persistence, and strongly validated forms.
 
-The current implementation is English-only (`en`), stores schema changes with **`prisma db push`** instead of migration history, and boots the application stack from Docker with PostgreSQL and MinIO sidecars.
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -489,7 +487,7 @@ sequenceDiagram
     MI->>M: create attachments bucket
     MI-->>DC: success
     DC->>APP: start app container
-    APP->>PG: prisma db push --accept-data-loss
+    APP->>PG: prisma migrate deploy
     APP->>PG: seed.ts
     APP->>APP: start Next.js standalone server
 ```
@@ -498,7 +496,7 @@ Docker-specific implementation details:
 
 - `Dockerfile` uses Bun in the dependency stage, Node 22 in builder/runtime stages
 - Next.js is built with `output: "standalone"`
-- the runtime image includes `prisma`, `tsx`, and the schema so startup can run `db push` and seed
+- the runtime image includes `prisma`, `tsx`, the schema, and migrations so startup can run `migrate deploy` and seed
 - [`docker/entrypoint.sh`](docker/entrypoint.sh) continues booting even if the seed command fails
 
 ## Local Development
@@ -515,8 +513,8 @@ cp .env.example .env.local
 
 # If postgres/minio are published locally, adjust hostnames to localhost in .env.local
 
-# Sync schema and generate client
-bunx prisma db push
+# Apply migrations and generate client
+bunx prisma migrate deploy
 bunx prisma generate
 
 # Seed bootstrap data
@@ -590,14 +588,22 @@ Notable indexing and storage choices:
 
 ### Schema management
 
-The project currently favors **`prisma db push`** over migration history.
+The project uses **Prisma Migrate** for schema history and production deployment.
 
 Implications:
 
 - fast schema iteration
 - no checked-in migration timeline yet
 - container startup applies schema automatically
-- production operators should treat startup schema sync as a powerful operation because the entrypoint uses `--accept-data-loss`
+- production operators should run `prisma migrate deploy` and take a backup before applying migrations
+- application comments are stored as `ActivityEntry` rows with `type = 'COMMENT'`; the legacy `Comment` table has been removed through migration
+
+Operational runbooks live under `docs/operations/`:
+
+- `backup-restore.md` for PostgreSQL and MinIO backup/restore
+- `deployment-security.md` for required secret rotation, private object storage, TLS, and migration policy
+- `observability.md` for structured logs and health/readiness probes
+- `release-checklist.md` for release validation and rollback steps
 
 The shared Prisma client is initialized in [`src/shared/lib/prisma.ts`](src/shared/lib/prisma.ts) with:
 
@@ -705,9 +711,9 @@ docker compose logs -f app
 # Enter the runtime container
 docker compose exec app sh
 
-# Re-run schema push inside the app container
+# Re-run migrations inside the app container
 docker compose exec -T app sh -lc \
-  'node node_modules/prisma/build/index.js db push --url "$DATABASE_URL"'
+  'node node_modules/prisma/build/index.js migrate deploy'
 
 # Re-run the seed script
 docker compose exec -T app sh -lc \

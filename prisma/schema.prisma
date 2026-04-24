@@ -20,10 +20,10 @@ model User {
   updatedAt    DateTime @updatedAt
 
   applicationDrafts ApplicationDraft[]
+  preference        UserPreference?
 }
 
 model Application {
-  comments        Comment[]
   id              String   @id @default(cuid())
   company         String
   companyId       String?
@@ -244,18 +244,6 @@ model ActivityEntry {
   @@index([createdAt])
 }
 
-model Comment {
-  id            String   @id @default(cuid())
-  applicationId String
-  content       String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  
-  @@index([applicationId])
-}
-
 model ApplicationDraft {
   id                       String   @id @default(cuid())
   userId                   String
@@ -274,4 +262,28 @@ model ApplicationDraft {
   @@index([userId, mode])
   @@index([userId, applicationId])
   @@index([updatedAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  email     String
+  ipAddress String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+}
+
+model UserPreference {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  locale              String   @default("en")
+  timeZone            String   @default("UTC")
+  defaultCurrencyCode String?  @default("USD")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

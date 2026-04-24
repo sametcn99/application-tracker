@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const lib = vi.hoisted(() => ({
 	listApplications: vi.fn(),
+	listApplicationsPage: vi.fn(),
 	createApplication: vi.fn(),
 	updateApplication: vi.fn(),
 	updateStatus: vi.fn(),
@@ -42,11 +43,25 @@ describe("applications server actions", () => {
 		vi.clearAllMocks();
 	});
 
-	it("forwards filters to listApplications", async () => {
-		lib.listApplications.mockResolvedValueOnce([{ id: "x" }]);
-		const out = await fetchApplicationsAction({ q: "test" } as never);
-		expect(lib.listApplications).toHaveBeenCalledWith({ q: "test" });
-		expect(out).toEqual([{ id: "x" }]);
+	it("forwards filters and cursor to listApplicationsPage", async () => {
+		lib.listApplicationsPage.mockResolvedValueOnce({
+			items: [{ id: "x" }],
+			nextCursor: null,
+			hasMore: false,
+		});
+		const out = await fetchApplicationsAction(
+			{ q: "test" } as never,
+			"cursor-1",
+		);
+		expect(lib.listApplicationsPage).toHaveBeenCalledWith(
+			{ q: "test" },
+			"cursor-1",
+		);
+		expect(out).toEqual({
+			items: [{ id: "x" }],
+			nextCursor: null,
+			hasMore: false,
+		});
 	});
 
 	describe("createApplicationAction", () => {

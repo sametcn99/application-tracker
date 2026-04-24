@@ -36,17 +36,23 @@ describe("application detail widgets", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		vi.stubGlobal("ResizeObserver", ResizeObserverMock);
-		if (!("hasPointerCapture" in HTMLElement.prototype)) {
-			HTMLElement.prototype.hasPointerCapture = () => false;
+		const htmlElementPrototype = HTMLElement.prototype as HTMLElement & {
+			hasPointerCapture?: (pointerId: number) => boolean;
+			setPointerCapture?: (pointerId: number) => void;
+			releasePointerCapture?: (pointerId: number) => void;
+			scrollIntoView?: () => void;
+		};
+		if (!htmlElementPrototype.hasPointerCapture) {
+			htmlElementPrototype.hasPointerCapture = () => false;
 		}
-		if (!("setPointerCapture" in HTMLElement.prototype)) {
-			HTMLElement.prototype.setPointerCapture = () => {};
+		if (!htmlElementPrototype.setPointerCapture) {
+			htmlElementPrototype.setPointerCapture = () => {};
 		}
-		if (!("releasePointerCapture" in HTMLElement.prototype)) {
-			HTMLElement.prototype.releasePointerCapture = () => {};
+		if (!htmlElementPrototype.releasePointerCapture) {
+			htmlElementPrototype.releasePointerCapture = () => {};
 		}
-		if (!("scrollIntoView" in HTMLElement.prototype)) {
-			HTMLElement.prototype.scrollIntoView = () => {};
+		if (!htmlElementPrototype.scrollIntoView) {
+			htmlElementPrototype.scrollIntoView = () => {};
 		}
 		appActions.addCommentAction.mockResolvedValue({ ok: true });
 		appActions.updateStatusAction.mockResolvedValue({ ok: true });

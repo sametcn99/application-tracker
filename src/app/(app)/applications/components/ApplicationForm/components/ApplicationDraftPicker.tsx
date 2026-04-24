@@ -13,12 +13,13 @@ import {
 	Text,
 } from "@radix-ui/themes";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import {
 	type DraftSummary,
 	deleteAllApplicationDraftsAction,
 	deleteApplicationDraftAction,
 } from "@/shared/actions/application-drafts";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import type {
 	DraftContext,
 	LocalRecoverySnapshot,
@@ -52,23 +53,27 @@ export function ApplicationDraftPicker({
 }: Props) {
 	const t = useTranslations("applicationDrafts");
 	const tCommon = useTranslations("common");
-	const [pending, startTransition] = useTransition();
 	const [deleting, setDeleting] = useState<string | null>(null);
+	const [deletingAll, setDeletingAll] = useState(false);
 
-	const handleDelete = (id: string) => {
+	const handleDelete = async (id: string) => {
 		setDeleting(id);
-		startTransition(async () => {
+		try {
 			const res = await deleteApplicationDraftAction(id);
-			setDeleting(null);
 			if (res.ok) onAfterDelete(id);
-		});
+		} finally {
+			setDeleting(null);
+		}
 	};
 
-	const handleDeleteAll = () => {
-		startTransition(async () => {
+	const handleDeleteAll = async () => {
+		setDeletingAll(true);
+		try {
 			const res = await deleteAllApplicationDraftsAction(context);
 			if (res.ok) onAfterDeleteAll();
-		});
+		} finally {
+			setDeletingAll(false);
+		}
 	};
 
 	const empty = drafts.length === 0 && !localRecovery;
@@ -105,14 +110,17 @@ export function ApplicationDraftPicker({
 											</Text>
 										</Box>
 										<Flex gap="2">
-											<Button
-												size="1"
-												variant="soft"
-												color="gray"
-												onClick={onClearLocalRecovery}
-											>
-												{tCommon("delete")}
-											</Button>
+											<ConfirmationDialog
+												title={t("clearRecoveryConfirmTitle")}
+												description={t("clearRecoveryConfirmDescription")}
+												confirmLabel={tCommon("delete")}
+												onConfirm={onClearLocalRecovery}
+												trigger={
+													<Button size="1" variant="soft" color="gray">
+														{tCommon("delete")}
+													</Button>
+												}
+											/>
 											<Button
 												size="1"
 												onClick={() => onPickLocalRecovery(localRecovery)}
@@ -141,19 +149,27 @@ export function ApplicationDraftPicker({
 											</Text>
 										</Box>
 										<Flex gap="2">
-											<Button
-												size="1"
-												variant="soft"
-												color="red"
-												onClick={() => handleDelete(draft.id)}
-												disabled={pending && deleting === draft.id}
-											>
-												<TrashIcon />
-											</Button>
+											<ConfirmationDialog
+												title={t("deleteConfirmTitle")}
+												description={t("deleteConfirmDescription", {
+													name: draft.label,
+												})}
+												onConfirm={() => handleDelete(draft.id)}
+												trigger={
+													<Button
+														size="1"
+														variant="soft"
+														color="red"
+														disabled={deleting === draft.id || deletingAll}
+													>
+														<TrashIcon />
+													</Button>
+												}
+											/>
 											<Button
 												size="1"
 												onClick={() => onPick(draft)}
-												disabled={pending}
+												disabled={deleting !== null || deletingAll}
 											>
 												{t("use")}
 											</Button>
@@ -168,14 +184,22 @@ export function ApplicationDraftPicker({
 				<Separator size="4" my="3" />
 
 				<Flex justify="between" align="center" gap="3" wrap="wrap">
-					<Button
-						variant="soft"
-						color="red"
-						onClick={handleDeleteAll}
-						disabled={pending || drafts.length === 0}
-					>
-						{t("deleteAll")}
-					</Button>
+					<ConfirmationDialog
+						title={t("deleteAllConfirmTitle")}
+						description={t("deleteAllConfirmDescription")}
+						confirmLabel={t("deleteAll")}
+						confirmDisabled={drafts.length === 0}
+						onConfirm={handleDeleteAll}
+						trigger={
+							<Button
+								variant="soft"
+								color="red"
+								disabled={deletingAll || drafts.length === 0}
+							>
+								{t("deleteAll")}
+							</Button>
+						}
+					/>
 					<Flex gap="2">
 						<Dialog.Close>
 							<Button variant="soft" color="gray" onClick={onClose}>

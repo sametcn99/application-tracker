@@ -1,16 +1,6 @@
 "use client";
 
-import {
-	ActivityLogIcon,
-	BookmarkIcon,
-	DashboardIcon,
-	ExitIcon,
-	GlobeIcon,
-	HamburgerMenuIcon,
-	ListBulletIcon,
-	MixIcon,
-	PlusIcon,
-} from "@radix-ui/react-icons";
+import { ExitIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import {
 	Avatar,
 	Box,
@@ -23,16 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/shared/actions/auth";
-
-const NAV = [
-	{ href: "/", labelKey: "dashboard", icon: DashboardIcon },
-	{ href: "/applications", labelKey: "applications", icon: ListBulletIcon },
-	{ href: "/applications/new", labelKey: "newApplication", icon: PlusIcon },
-	{ href: "/activity", labelKey: "activity", icon: ActivityLogIcon },
-	{ href: "/tags", labelKey: "tags", icon: BookmarkIcon },
-	{ href: "/sources", labelKey: "sources", icon: GlobeIcon },
-	{ href: "/currencies", labelKey: "currencies", icon: MixIcon },
-] as const;
+import { MOBILE_NAV } from "@/shared/navigation";
 
 export function Header({ userEmail }: { userEmail?: string | null }) {
 	const t = useTranslations("common");
@@ -68,10 +49,10 @@ export function Header({ userEmail }: { userEmail?: string | null }) {
 							color="gray"
 							style={{ textTransform: "uppercase" }}
 						>
-							Menu
+							{tNav("menu")}
 						</Text>
 					</Box>
-					{NAV.map((item) => {
+					{MOBILE_NAV.map((item) => {
 						const active =
 							item.href === "/"
 								? pathname === "/"

@@ -7,17 +7,21 @@ import {
 	createApplication,
 	deleteApplication,
 	type ListFilters,
-	listApplications,
+	listApplicationsPage,
 	updateApplication,
 	updateStatus,
 } from "@/shared/lib/applications";
+import { logger } from "@/shared/lib/logger";
 import {
 	type ApplicationFormInput,
 	applicationFormSchema,
 } from "@/shared/schemas/application";
 
-export async function fetchApplicationsAction(filters: ListFilters) {
-	return listApplications(filters);
+export async function fetchApplicationsAction(
+	filters: ListFilters,
+	cursor?: string | null,
+) {
+	return listApplicationsPage(filters, cursor);
 }
 
 export async function createApplicationAction(values: ApplicationFormInput) {
@@ -34,8 +38,8 @@ export async function createApplicationAction(values: ApplicationFormInput) {
 		const app = await createApplication(result.data);
 		revalidatePath("/applications");
 		return { ok: true, id: app.id };
-	} catch (error) {
-		console.error(error);
+	} catch {
+		logger.error("create_application_failed");
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -59,8 +63,8 @@ export async function updateApplicationAction(
 		revalidatePath(`/applications/${id}`);
 		revalidatePath(`/applications/${id}/edit`);
 		return { ok: true, id };
-	} catch (error) {
-		console.error(error);
+	} catch {
+		logger.error("update_application_failed", { id });
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -71,8 +75,8 @@ export async function updateStatusAction(id: string, status: string) {
 		revalidatePath(`/applications/${id}`);
 		revalidatePath("/applications");
 		return { ok: true };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("update_status_failed", { id });
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -83,8 +87,8 @@ export async function addCommentAction(id: string, comment: string) {
 		revalidatePath(`/applications/${id}`);
 		revalidatePath("/activity");
 		return { ok: true };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("add_comment_failed", { id });
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -92,8 +96,8 @@ export async function addCommentAction(id: string, comment: string) {
 export async function deleteApplicationAction(id: string) {
 	try {
 		await deleteApplication(id);
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("delete_application_failed", { id });
 		return { ok: false, error: "server_error" };
 	}
 	revalidatePath("/applications");

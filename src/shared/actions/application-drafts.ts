@@ -9,6 +9,7 @@ import {
 	type DraftPayload,
 	MAX_DRAFTS_PER_CONTEXT,
 } from "@/shared/lib/application-draft";
+import { logger } from "@/shared/lib/logger";
 import { prisma } from "@/shared/lib/prisma";
 
 type ActionResult<T> =
@@ -81,8 +82,8 @@ export async function listApplicationDraftsAction(
 				payload: d.payload as DraftPayload,
 			})),
 		};
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("list_application_drafts_failed");
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -171,8 +172,8 @@ export async function saveApplicationDraftAction(
 				payload: saved.payload as DraftPayload,
 			},
 		};
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("save_application_draft_failed");
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -196,8 +197,8 @@ export async function deleteApplicationDraftAction(
 			revalidatePath(`/applications/${existing.applicationId}/edit`);
 		}
 		return { ok: true, data: { id: draftId } };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("delete_application_draft_failed", { draftId });
 		return { ok: false, error: "server_error" };
 	}
 }
@@ -217,8 +218,8 @@ export async function deleteAllApplicationDraftsAction(
 			revalidatePath(`/applications/${ctx.applicationId}/edit`);
 		}
 		return { ok: true, data: { count: result.count } };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("delete_all_application_drafts_failed");
 		return { ok: false, error: "server_error" };
 	}
 }

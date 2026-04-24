@@ -2,7 +2,7 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { buildWhere, listApplications } from "@/shared/lib/applications";
+import { buildWhere, listApplicationsPage } from "@/shared/lib/applications";
 import { parseFilters } from "@/shared/lib/parseFilters";
 import { prisma } from "@/shared/lib/prisma";
 import { ApplicationsTable } from "./components/ApplicationsTable";
@@ -18,8 +18,8 @@ export default async function ApplicationsPage({
 	const filters = parseFilters(sp);
 
 	const where = buildWhere(filters);
-	const [items, totalCount, tags] = await Promise.all([
-		listApplications(filters),
+	const [applicationPage, totalCount, tags] = await Promise.all([
+		listApplicationsPage(filters),
 		prisma.application.count({ where }),
 		prisma.tag.findMany({ orderBy: { name: "asc" } }),
 	]);
@@ -41,7 +41,12 @@ export default async function ApplicationsPage({
 			</Flex>
 
 			<FiltersBar tags={tags} />
-			<ApplicationsTable initialItems={items} filters={filters} />
+			<ApplicationsTable
+				initialItems={applicationPage.items}
+				initialNextCursor={applicationPage.nextCursor}
+				initialHasMore={applicationPage.hasMore}
+				filters={filters}
+			/>
 		</Flex>
 	);
 }

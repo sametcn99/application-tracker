@@ -75,7 +75,9 @@ describe("listApplications", () => {
 		prisma.application.findMany.mockResolvedValueOnce([]);
 		await listApplications();
 		expect(prisma.application.findMany).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: { appliedAt: "desc" } }),
+			expect.objectContaining({
+				orderBy: [{ appliedAt: "desc" }, { id: "desc" }],
+			}),
 		);
 	});
 
@@ -83,7 +85,9 @@ describe("listApplications", () => {
 		prisma.application.findMany.mockResolvedValueOnce([]);
 		await listApplications({ sort: "company", order: "asc" });
 		expect(prisma.application.findMany).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: { company: "asc" } }),
+			expect.objectContaining({
+				orderBy: [{ company: "asc" }, { id: "asc" }],
+			}),
 		);
 	});
 });

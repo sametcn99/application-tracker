@@ -12,7 +12,9 @@ const sourceSchema = z.object({
 		.max(100, "validation.tooLong"),
 });
 
-type ActionResult = { ok: true } | { ok: false; error: string };
+type ActionResult =
+	| { ok: true; data: { id: string; name: string } }
+	| { ok: false; error: string };
 
 function revalidateReferencePaths() {
 	revalidatePath("/sources");
@@ -35,14 +37,15 @@ export async function createSourceAction(
 		};
 	}
 
-	await prisma.sourceOption.upsert({
+	const source = await prisma.sourceOption.upsert({
 		where: { name: parsed.data.name },
 		update: {},
 		create: { name: parsed.data.name },
+		select: { id: true, name: true },
 	});
 
 	revalidateReferencePaths();
-	return { ok: true };
+	return { ok: true, data: source };
 }
 
 export async function deleteSourceAction(id: string): Promise<void> {

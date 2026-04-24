@@ -88,22 +88,33 @@ describe("listing tables", () => {
 
 	describe("ApplicationsTable", () => {
 		it("renders an empty state when there are no items", () => {
-			renderWithProviders(<ApplicationsTable initialItems={[]} filters={{}} />);
+			renderWithProviders(
+				<ApplicationsTable
+					initialItems={[]}
+					initialNextCursor={null}
+					initialHasMore={false}
+					filters={{}}
+				/>,
+			);
 			expect(
 				screen.getByText("No applications match your filters."),
 			).toBeTruthy();
 		});
 
 		it("renders application rows with formatted values and loads more items without duplicates", async () => {
-			appActions.fetchApplicationsAction.mockResolvedValueOnce([
-				appItem,
-				{
-					...appItem,
-					id: "a2",
-					position: "Staff Engineer",
-					company: "Beta",
-				},
-			]);
+			appActions.fetchApplicationsAction.mockResolvedValueOnce({
+				items: [
+					appItem,
+					{
+						...appItem,
+						id: "a2",
+						position: "Staff Engineer",
+						company: "Beta",
+					},
+				],
+				nextCursor: null,
+				hasMore: false,
+			});
 
 			renderWithProviders(
 				<ApplicationsTable
@@ -111,6 +122,8 @@ describe("listing tables", () => {
 						...appItem,
 						id: `seed-${index}`,
 					}))}
+					initialNextCursor="cursor-1"
+					initialHasMore={true}
 					filters={{ status: ["APPLIED"] }}
 				/>,
 			);
@@ -129,9 +142,10 @@ describe("listing tables", () => {
 			});
 
 			await waitFor(() => {
-				expect(appActions.fetchApplicationsAction).toHaveBeenCalledWith({
-					status: ["APPLIED"],
-				});
+				expect(appActions.fetchApplicationsAction).toHaveBeenCalledWith(
+					{ status: ["APPLIED"] },
+					"cursor-1",
+				);
 			});
 
 			await waitFor(() => {

@@ -1,9 +1,9 @@
 "use client";
 
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import { AlertDialog, Button, Flex, Text } from "@radix-ui/themes";
+import { Button, Flex } from "@radix-ui/themes";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
 type Props = {
 	open: boolean;
@@ -42,16 +42,16 @@ export function UnsavedChangesDialog({
 	};
 
 	return (
-		<AlertDialog.Root open={open} onOpenChange={(o) => !o && onStay()}>
-			<AlertDialog.Content maxWidth="480px">
-				<Flex align="center" gap="2" mb="2">
-					<ExclamationTriangleIcon color="orange" />
-					<AlertDialog.Title>{t("title")}</AlertDialog.Title>
-				</Flex>
-				<AlertDialog.Description size="2">
-					<Text as="span">{t("description")}</Text>
-				</AlertDialog.Description>
-
+		<ConfirmationDialog
+			open={open}
+			onOpenChange={(nextOpen) => {
+				if (!nextOpen) onStay();
+			}}
+			tone="warning"
+			title={t("title")}
+			description={t("description")}
+			maxWidth="480px"
+			footer={
 				<Flex gap="3" mt="4" justify="end" wrap="wrap">
 					<Button
 						variant="soft"
@@ -77,7 +77,7 @@ export function UnsavedChangesDialog({
 						{savingDraft ? tCommon("loading") : t("saveDraft")}
 					</Button>
 				</Flex>
-			</AlertDialog.Content>
-		</AlertDialog.Root>
+			}
+		/>
 	);
 }

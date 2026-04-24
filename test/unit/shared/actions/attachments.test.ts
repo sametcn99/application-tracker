@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const prisma = vi.hoisted(() => ({
-	attachment: {
-		create: vi.fn(),
-		findUnique: vi.fn(),
-		delete: vi.fn(),
-	},
-	activityEntry: {
-		create: vi.fn(),
-	},
-}));
+const prisma = vi.hoisted(() => {
+	const mocked = {
+		attachment: {
+			create: vi.fn(),
+			findUnique: vi.fn(),
+			delete: vi.fn(),
+		},
+		activityEntry: {
+			create: vi.fn(),
+		},
+	};
+	return {
+		...mocked,
+		$transaction: vi.fn(async (callback) => callback(mocked)),
+	};
+});
 const cache = vi.hoisted(() => ({ revalidatePath: vi.fn() }));
 const s3send = vi.hoisted(() => vi.fn());
 

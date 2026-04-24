@@ -8,6 +8,7 @@ import {
 	deleteAttachmentAction,
 	uploadAttachmentAction,
 } from "@/shared/actions/attachments";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { formatRelative } from "@/shared/lib/format";
 
 type Attachment = {
@@ -26,6 +27,7 @@ export function AttachmentList({
 	attachments: Attachment[];
 }) {
 	const t = useTranslations();
+	const tCommon = useTranslations("common");
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [pending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
@@ -110,15 +112,22 @@ export function AttachmentList({
 									<Table.Cell>{(a.size / 1024).toFixed(1)} KB</Table.Cell>
 									<Table.Cell>{formatRelative(a.createdAt)}</Table.Cell>
 									<Table.Cell>
-										<IconButton
-											variant="ghost"
-											color="red"
-											onClick={() =>
-												startTransition(() => deleteAttachmentAction(a.id))
+										<ConfirmationDialog
+											title={tCommon("delete")}
+											description={t("attachments.deleteConfirm", {
+												name: a.fileName,
+											})}
+											onConfirm={() => deleteAttachmentAction(a.id)}
+											trigger={
+												<IconButton
+													variant="ghost"
+													color="red"
+													disabled={pending}
+												>
+													<TrashIcon />
+												</IconButton>
 											}
-										>
-											<TrashIcon />
-										</IconButton>
+										/>
 									</Table.Cell>
 								</Table.Row>
 							))}

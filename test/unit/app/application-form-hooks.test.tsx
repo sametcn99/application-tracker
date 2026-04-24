@@ -177,7 +177,10 @@ describe("application form hooks", () => {
 					tx,
 				}),
 			{
-				initialProps: { mode: "create" as const },
+				initialProps: { mode: "create" } as {
+					mode: "create" | "edit";
+					applicationId?: string;
+				},
 				wrapper: TestProviders,
 			},
 		);
@@ -284,10 +287,14 @@ describe("application form hooks", () => {
 			);
 		});
 
-		const registered = unsavedGuard.registerGuard.mock.calls[0]?.[0];
+		const registerCalls = unsavedGuard.registerGuard.mock.calls as unknown as [
+			[{ onConfirm: () => Promise<boolean> }],
+		];
+		const registered = registerCalls[0]?.[0];
+		expect(registered).toBeDefined();
 		let saved = false;
 		await act(async () => {
-			saved = await registered.onConfirm();
+			saved = await registered!.onConfirm();
 		});
 		expect(saved).toBe(true);
 		expect(draftActions.saveApplicationDraftAction).toHaveBeenCalledWith(

@@ -9,6 +9,7 @@ import {
 	searchCompanies,
 	updateCompany,
 } from "@/shared/lib/companies";
+import { logger } from "@/shared/lib/logger";
 import { type CompanyFormInput, companyFormSchema } from "./companies.schema";
 
 function revalidate(id?: string) {
@@ -48,7 +49,7 @@ export async function createCompanyAction(values: CompanyFormInput) {
 		revalidate(created.id);
 		return { ok: true as const, id: created.id };
 	} catch (err) {
-		console.error(err);
+		logger.error("create_company_failed");
 		const msg = err instanceof Error ? err.message : "server_error";
 		const isDup = msg.includes("Unique") || msg.includes("normalizedName");
 		return {
@@ -74,8 +75,8 @@ export async function updateCompanyAction(
 		await updateCompany(id, parsed.data);
 		revalidate(id);
 		return { ok: true as const, id };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("update_company_failed", { id });
 		return { ok: false as const, error: "server_error" };
 	}
 }
@@ -85,8 +86,8 @@ export async function addCompanyNoteAction(id: string, note: string) {
 		await addCompanyNote(id, note);
 		revalidate(id);
 		return { ok: true as const };
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("add_company_note_failed", { id });
 		return { ok: false as const, error: "server_error" };
 	}
 }
@@ -94,8 +95,8 @@ export async function addCompanyNoteAction(id: string, note: string) {
 export async function deleteCompanyAction(id: string) {
 	try {
 		await deleteCompany(id);
-	} catch (err) {
-		console.error(err);
+	} catch {
+		logger.error("delete_company_failed", { id });
 		return { ok: false as const, error: "server_error" };
 	}
 	revalidate();

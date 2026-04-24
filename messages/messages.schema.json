@@ -4,7 +4,9 @@
 	"title": "ApplicationTrackerMessages",
 	"description": "Schema for next-intl message catalogs in this project. All locale JSON files must conform to this schema.",
 	"type": "object",
+	"additionalProperties": false,
 	"required": [
+		"$schema",
 		"common",
 		"nav",
 		"auth",
@@ -16,20 +18,40 @@
 		"filters",
 		"activity",
 		"tags",
+		"sources",
+		"currencies",
 		"attachments",
+		"settings",
 		"comments",
+		"unsavedChanges",
+		"applicationDrafts",
 		"errors",
 		"validation",
 		"fields",
+		"priority",
 		"status",
 		"workMode",
 		"employmentType",
+		"sourceType",
+		"nextActionType",
+		"outcomeReason",
+		"relocationPreference",
+		"companySize",
+		"companyType",
+		"fundingStage",
+		"remotePolicy",
+		"hiringStatus",
+		"trackingStatus",
+		"applicationMethod",
 		"activityType",
+		"companies",
+		"companyForm",
 		"metadata"
 	],
-	"additionalProperties": false,
 	"properties": {
-		"$schema": { "type": "string" },
+		"$schema": {
+			"type": "string"
+		},
 		"common": {
 			"type": "object",
 			"additionalProperties": false,
@@ -59,29 +81,75 @@
 				"logout"
 			],
 			"properties": {
-				"save": { "type": "string" },
-				"cancel": { "type": "string" },
-				"delete": { "type": "string" },
-				"edit": { "type": "string" },
-				"create": { "type": "string" },
-				"add": { "type": "string" },
-				"remove": { "type": "string" },
-				"loading": { "type": "string" },
-				"back": { "type": "string" },
-				"yes": { "type": "string" },
-				"no": { "type": "string" },
-				"search": { "type": "string" },
-				"reset": { "type": "string" },
-				"all": { "type": "string" },
-				"tryAgain": { "type": "string" },
-				"viewAll": { "type": "string" },
-				"noData": { "type": "string" },
-				"open": { "type": "string" },
-				"close": { "type": "string" },
-				"submit": { "type": "string" },
-				"actions": { "type": "string" },
-				"appName": { "type": "string" },
-				"logout": { "type": "string" }
+				"save": {
+					"type": "string"
+				},
+				"cancel": {
+					"type": "string"
+				},
+				"delete": {
+					"type": "string"
+				},
+				"edit": {
+					"type": "string"
+				},
+				"create": {
+					"type": "string"
+				},
+				"add": {
+					"type": "string"
+				},
+				"remove": {
+					"type": "string"
+				},
+				"loading": {
+					"type": "string"
+				},
+				"back": {
+					"type": "string"
+				},
+				"yes": {
+					"type": "string"
+				},
+				"no": {
+					"type": "string"
+				},
+				"search": {
+					"type": "string"
+				},
+				"reset": {
+					"type": "string"
+				},
+				"all": {
+					"type": "string"
+				},
+				"tryAgain": {
+					"type": "string"
+				},
+				"viewAll": {
+					"type": "string"
+				},
+				"noData": {
+					"type": "string"
+				},
+				"open": {
+					"type": "string"
+				},
+				"close": {
+					"type": "string"
+				},
+				"submit": {
+					"type": "string"
+				},
+				"actions": {
+					"type": "string"
+				},
+				"appName": {
+					"type": "string"
+				},
+				"logout": {
+					"type": "string"
+				}
 			}
 		},
 		"nav": {
@@ -92,14 +160,58 @@
 				"applications",
 				"newApplication",
 				"activity",
-				"tags"
+				"companies",
+				"tags",
+				"sources",
+				"currencies",
+				"settings",
+				"menu",
+				"sections"
 			],
 			"properties": {
-				"dashboard": { "type": "string" },
-				"applications": { "type": "string" },
-				"newApplication": { "type": "string" },
-				"activity": { "type": "string" },
-				"tags": { "type": "string" }
+				"dashboard": {
+					"type": "string"
+				},
+				"applications": {
+					"type": "string"
+				},
+				"newApplication": {
+					"type": "string"
+				},
+				"activity": {
+					"type": "string"
+				},
+				"companies": {
+					"type": "string"
+				},
+				"tags": {
+					"type": "string"
+				},
+				"sources": {
+					"type": "string"
+				},
+				"currencies": {
+					"type": "string"
+				},
+				"settings": {
+					"type": "string"
+				},
+				"menu": {
+					"type": "string"
+				},
+				"sections": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["overview", "management"],
+					"properties": {
+						"overview": {
+							"type": "string"
+						},
+						"management": {
+							"type": "string"
+						}
+					}
+				}
 			}
 		},
 		"auth": {
@@ -111,15 +223,31 @@
 				"email",
 				"password",
 				"invalidCredentials",
+				"rateLimited",
 				"unauthorized"
 			],
 			"properties": {
-				"signIn": { "type": "string" },
-				"signOut": { "type": "string" },
-				"email": { "type": "string" },
-				"password": { "type": "string" },
-				"invalidCredentials": { "type": "string" },
-				"unauthorized": { "type": "string" }
+				"signIn": {
+					"type": "string"
+				},
+				"signOut": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"invalidCredentials": {
+					"type": "string"
+				},
+				"rateLimited": {
+					"type": "string"
+				},
+				"unauthorized": {
+					"type": "string"
+				}
 			}
 		},
 		"login": {
@@ -127,10 +255,18 @@
 			"additionalProperties": false,
 			"required": ["title", "subtitle", "submit", "loggingIn"],
 			"properties": {
-				"title": { "type": "string" },
-				"subtitle": { "type": "string" },
-				"submit": { "type": "string" },
-				"loggingIn": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"submit": {
+					"type": "string"
+				},
+				"loggingIn": {
+					"type": "string"
+				}
 			}
 		},
 		"dashboard": {
@@ -149,16 +285,36 @@
 				"noActivity"
 			],
 			"properties": {
-				"title": { "type": "string" },
-				"totalApplications": { "type": "string" },
-				"active": { "type": "string" },
-				"thisWeek": { "type": "string" },
-				"interviews": { "type": "string" },
-				"statusDistribution": { "type": "string" },
-				"upcomingSteps": { "type": "string" },
-				"noUpcomingSteps": { "type": "string" },
-				"recentActivity": { "type": "string" },
-				"noActivity": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"totalApplications": {
+					"type": "string"
+				},
+				"active": {
+					"type": "string"
+				},
+				"thisWeek": {
+					"type": "string"
+				},
+				"interviews": {
+					"type": "string"
+				},
+				"statusDistribution": {
+					"type": "string"
+				},
+				"upcomingSteps": {
+					"type": "string"
+				},
+				"noUpcomingSteps": {
+					"type": "string"
+				},
+				"recentActivity": {
+					"type": "string"
+				},
+				"noActivity": {
+					"type": "string"
+				}
 			}
 		},
 		"applications": {
@@ -168,24 +324,46 @@
 				"title",
 				"newApplication",
 				"recordCount",
+				"loadingMore",
 				"noResults",
-				"columns",
 				"deleteConfirmTitle",
 				"deleteConfirmDescription",
 				"deleted",
 				"created",
-				"updated"
+				"updated",
+				"columns"
 			],
 			"properties": {
-				"title": { "type": "string" },
-				"newApplication": { "type": "string" },
-				"recordCount": { "type": "string" },
-				"noResults": { "type": "string" },
-				"deleteConfirmTitle": { "type": "string" },
-				"deleteConfirmDescription": { "type": "string" },
-				"deleted": { "type": "string" },
-				"created": { "type": "string" },
-				"updated": { "type": "string" },
+				"title": {
+					"type": "string"
+				},
+				"newApplication": {
+					"type": "string"
+				},
+				"recordCount": {
+					"type": "string"
+				},
+				"loadingMore": {
+					"type": "string"
+				},
+				"noResults": {
+					"type": "string"
+				},
+				"deleteConfirmTitle": {
+					"type": "string"
+				},
+				"deleteConfirmDescription": {
+					"type": "string"
+				},
+				"deleted": {
+					"type": "string"
+				},
+				"created": {
+					"type": "string"
+				},
+				"updated": {
+					"type": "string"
+				},
 				"columns": {
 					"type": "object",
 					"additionalProperties": false,
@@ -200,14 +378,30 @@
 						"tags"
 					],
 					"properties": {
-						"positionCompany": { "type": "string" },
-						"status": { "type": "string" },
-						"mode": { "type": "string" },
-						"location": { "type": "string" },
-						"salary": { "type": "string" },
-						"source": { "type": "string" },
-						"date": { "type": "string" },
-						"tags": { "type": "string" }
+						"positionCompany": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"mode": {
+							"type": "string"
+						},
+						"location": {
+							"type": "string"
+						},
+						"salary": {
+							"type": "string"
+						},
+						"source": {
+							"type": "string"
+						},
+						"date": {
+							"type": "string"
+						},
+						"tags": {
+							"type": "string"
+						}
 					}
 				}
 			}
@@ -218,20 +412,88 @@
 			"required": [
 				"createTitle",
 				"editTitle",
-				"sections",
-				"placeholders",
 				"noTags",
+				"manageTags",
+				"manageSources",
+				"manageCurrencies",
+				"selectSource",
+				"selectSourceType",
+				"selectCurrency",
+				"selectNeedsSponsorship",
+				"selectRelocationPreference",
+				"selectCompanySize",
+				"selectApplicationMethod",
+				"selectNextActionType",
+				"selectOutcomeReason",
+				"notSpecified",
+				"currencyRateHint",
 				"saving",
 				"saveCreate",
-				"saveUpdate"
+				"saveUpdate",
+				"sections",
+				"placeholders"
 			],
 			"properties": {
-				"createTitle": { "type": "string" },
-				"editTitle": { "type": "string" },
-				"noTags": { "type": "string" },
-				"saving": { "type": "string" },
-				"saveCreate": { "type": "string" },
-				"saveUpdate": { "type": "string" },
+				"createTitle": {
+					"type": "string"
+				},
+				"editTitle": {
+					"type": "string"
+				},
+				"noTags": {
+					"type": "string"
+				},
+				"manageTags": {
+					"type": "string"
+				},
+				"manageSources": {
+					"type": "string"
+				},
+				"manageCurrencies": {
+					"type": "string"
+				},
+				"selectSource": {
+					"type": "string"
+				},
+				"selectSourceType": {
+					"type": "string"
+				},
+				"selectCurrency": {
+					"type": "string"
+				},
+				"selectNeedsSponsorship": {
+					"type": "string"
+				},
+				"selectRelocationPreference": {
+					"type": "string"
+				},
+				"selectCompanySize": {
+					"type": "string"
+				},
+				"selectApplicationMethod": {
+					"type": "string"
+				},
+				"selectNextActionType": {
+					"type": "string"
+				},
+				"selectOutcomeReason": {
+					"type": "string"
+				},
+				"notSpecified": {
+					"type": "string"
+				},
+				"currencyRateHint": {
+					"type": "string"
+				},
+				"saving": {
+					"type": "string"
+				},
+				"saveCreate": {
+					"type": "string"
+				},
+				"saveUpdate": {
+					"type": "string"
+				},
 				"sections": {
 					"type": "object",
 					"additionalProperties": false,
@@ -239,17 +501,45 @@
 						"general",
 						"salary",
 						"contact",
+						"applicationPackage",
+						"eligibility",
+						"companyContext",
 						"nextStep",
+						"outcome",
 						"tags",
 						"notes"
 					],
 					"properties": {
-						"general": { "type": "string" },
-						"salary": { "type": "string" },
-						"contact": { "type": "string" },
-						"nextStep": { "type": "string" },
-						"tags": { "type": "string" },
-						"notes": { "type": "string" }
+						"general": {
+							"type": "string"
+						},
+						"salary": {
+							"type": "string"
+						},
+						"contact": {
+							"type": "string"
+						},
+						"applicationPackage": {
+							"type": "string"
+						},
+						"eligibility": {
+							"type": "string"
+						},
+						"companyContext": {
+							"type": "string"
+						},
+						"nextStep": {
+							"type": "string"
+						},
+						"outcome": {
+							"type": "string"
+						},
+						"tags": {
+							"type": "string"
+						},
+						"notes": {
+							"type": "string"
+						}
 					}
 				},
 				"placeholders": {
@@ -258,26 +548,98 @@
 					"required": [
 						"company",
 						"position",
+						"listingDetails",
 						"location",
 						"source",
+						"referralName",
 						"jobUrl",
 						"contactName",
+						"contactRole",
 						"contactEmail",
 						"contactPhone",
+						"contactProfileUrl",
+						"resumeVersion",
+						"coverLetterVersion",
+						"portfolioUrl",
+						"workAuthorizationNote",
+						"team",
+						"department",
+						"industry",
+						"timezoneOverlapHours",
+						"officeDaysPerWeek",
 						"nextStepNote",
 						"notes"
 					],
 					"properties": {
-						"company": { "type": "string" },
-						"position": { "type": "string" },
-						"location": { "type": "string" },
-						"source": { "type": "string" },
-						"jobUrl": { "type": "string" },
-						"contactName": { "type": "string" },
-						"contactEmail": { "type": "string" },
-						"contactPhone": { "type": "string" },
-						"nextStepNote": { "type": "string" },
-						"notes": { "type": "string" }
+						"company": {
+							"type": "string"
+						},
+						"position": {
+							"type": "string"
+						},
+						"listingDetails": {
+							"type": "string"
+						},
+						"location": {
+							"type": "string"
+						},
+						"source": {
+							"type": "string"
+						},
+						"referralName": {
+							"type": "string"
+						},
+						"jobUrl": {
+							"type": "string"
+						},
+						"contactName": {
+							"type": "string"
+						},
+						"contactRole": {
+							"type": "string"
+						},
+						"contactEmail": {
+							"type": "string"
+						},
+						"contactPhone": {
+							"type": "string"
+						},
+						"contactProfileUrl": {
+							"type": "string"
+						},
+						"resumeVersion": {
+							"type": "string"
+						},
+						"coverLetterVersion": {
+							"type": "string"
+						},
+						"portfolioUrl": {
+							"type": "string"
+						},
+						"workAuthorizationNote": {
+							"type": "string"
+						},
+						"team": {
+							"type": "string"
+						},
+						"department": {
+							"type": "string"
+						},
+						"industry": {
+							"type": "string"
+						},
+						"timezoneOverlapHours": {
+							"type": "string"
+						},
+						"officeDaysPerWeek": {
+							"type": "string"
+						},
+						"nextStepNote": {
+							"type": "string"
+						},
+						"notes": {
+							"type": "string"
+						}
 					}
 				}
 			}
@@ -285,18 +647,41 @@
 		"applicationDetail": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["tabs", "details", "noNotes", "deleteButton"],
+			"required": [
+				"noNotes",
+				"noListingDetails",
+				"deleteButton",
+				"salaryConversions",
+				"tabs",
+				"details"
+			],
 			"properties": {
-				"noNotes": { "type": "string" },
-				"deleteButton": { "type": "string" },
+				"noNotes": {
+					"type": "string"
+				},
+				"noListingDetails": {
+					"type": "string"
+				},
+				"deleteButton": {
+					"type": "string"
+				},
+				"salaryConversions": {
+					"type": "string"
+				},
 				"tabs": {
 					"type": "object",
 					"additionalProperties": false,
 					"required": ["details", "activity", "attachments"],
 					"properties": {
-						"details": { "type": "string" },
-						"activity": { "type": "string" },
-						"attachments": { "type": "string" }
+						"details": {
+							"type": "string"
+						},
+						"activity": {
+							"type": "string"
+						},
+						"attachments": {
+							"type": "string"
+						}
 					}
 				},
 				"details": {
@@ -304,21 +689,59 @@
 					"additionalProperties": false,
 					"required": [
 						"overview",
+						"pipeline",
 						"salary",
+						"listingDetails",
 						"contact",
+						"applicationPackage",
+						"eligibility",
+						"companyContext",
 						"nextStep",
+						"outcome",
 						"notes",
 						"links",
 						"openJobUrl"
 					],
 					"properties": {
-						"overview": { "type": "string" },
-						"salary": { "type": "string" },
-						"contact": { "type": "string" },
-						"nextStep": { "type": "string" },
-						"notes": { "type": "string" },
-						"links": { "type": "string" },
-						"openJobUrl": { "type": "string" }
+						"overview": {
+							"type": "string"
+						},
+						"pipeline": {
+							"type": "string"
+						},
+						"salary": {
+							"type": "string"
+						},
+						"listingDetails": {
+							"type": "string"
+						},
+						"contact": {
+							"type": "string"
+						},
+						"applicationPackage": {
+							"type": "string"
+						},
+						"eligibility": {
+							"type": "string"
+						},
+						"companyContext": {
+							"type": "string"
+						},
+						"nextStep": {
+							"type": "string"
+						},
+						"outcome": {
+							"type": "string"
+						},
+						"notes": {
+							"type": "string"
+						},
+						"links": {
+							"type": "string"
+						},
+						"openJobUrl": {
+							"type": "string"
+						}
 					}
 				}
 			}
@@ -336,24 +759,80 @@
 				"asc",
 				"desc",
 				"status",
+				"priority",
 				"workMode",
+				"sourceType",
+				"companySize",
+				"applicationMethod",
+				"relocationPreference",
+				"needsSponsorship",
+				"nextActionType",
+				"outcomeReason",
 				"tag",
 				"reset",
 				"sortField"
 			],
 			"properties": {
-				"search": { "type": "string" },
-				"searchPlaceholder": { "type": "string" },
-				"from": { "type": "string" },
-				"to": { "type": "string" },
-				"sortBy": { "type": "string" },
-				"order": { "type": "string" },
-				"asc": { "type": "string" },
-				"desc": { "type": "string" },
-				"status": { "type": "string" },
-				"workMode": { "type": "string" },
-				"tag": { "type": "string" },
-				"reset": { "type": "string" },
+				"search": {
+					"type": "string"
+				},
+				"searchPlaceholder": {
+					"type": "string"
+				},
+				"from": {
+					"type": "string"
+				},
+				"to": {
+					"type": "string"
+				},
+				"sortBy": {
+					"type": "string"
+				},
+				"order": {
+					"type": "string"
+				},
+				"asc": {
+					"type": "string"
+				},
+				"desc": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"workMode": {
+					"type": "string"
+				},
+				"sourceType": {
+					"type": "string"
+				},
+				"companySize": {
+					"type": "string"
+				},
+				"applicationMethod": {
+					"type": "string"
+				},
+				"relocationPreference": {
+					"type": "string"
+				},
+				"needsSponsorship": {
+					"type": "string"
+				},
+				"nextActionType": {
+					"type": "string"
+				},
+				"outcomeReason": {
+					"type": "string"
+				},
+				"tag": {
+					"type": "string"
+				},
+				"reset": {
+					"type": "string"
+				},
 				"sortField": {
 					"type": "object",
 					"additionalProperties": false,
@@ -362,14 +841,28 @@
 						"company",
 						"position",
 						"status",
-						"createdAt"
+						"createdAt",
+						"updatedAt"
 					],
 					"properties": {
-						"appliedAt": { "type": "string" },
-						"company": { "type": "string" },
-						"position": { "type": "string" },
-						"status": { "type": "string" },
-						"createdAt": { "type": "string" }
+						"appliedAt": {
+							"type": "string"
+						},
+						"company": {
+							"type": "string"
+						},
+						"position": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"createdAt": {
+							"type": "string"
+						},
+						"updatedAt": {
+							"type": "string"
+						}
 					}
 				}
 			}
@@ -385,11 +878,21 @@
 				"changedTo"
 			],
 			"properties": {
-				"title": { "type": "string" },
-				"subtitle": { "type": "string" },
-				"noActivity": { "type": "string" },
-				"changedFrom": { "type": "string" },
-				"changedTo": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"noActivity": {
+					"type": "string"
+				},
+				"changedFrom": {
+					"type": "string"
+				},
+				"changedTo": {
+					"type": "string"
+				}
 			}
 		},
 		"tags": {
@@ -407,15 +910,177 @@
 				"applicationsCount"
 			],
 			"properties": {
-				"title": { "type": "string" },
-				"subtitle": { "type": "string" },
-				"name": { "type": "string" },
-				"color": { "type": "string" },
-				"addButton": { "type": "string" },
-				"deleteConfirm": { "type": "string" },
-				"noTags": { "type": "string" },
-				"namePlaceholder": { "type": "string" },
-				"applicationsCount": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"color": {
+					"type": "string"
+				},
+				"addButton": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				},
+				"noTags": {
+					"type": "string"
+				},
+				"namePlaceholder": {
+					"type": "string"
+				},
+				"applicationsCount": {
+					"type": "string"
+				}
+			}
+		},
+		"sources": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"name",
+				"addButton",
+				"noSources",
+				"namePlaceholder",
+				"applicationsCount",
+				"deleteConfirm"
+			],
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"addButton": {
+					"type": "string"
+				},
+				"noSources": {
+					"type": "string"
+				},
+				"namePlaceholder": {
+					"type": "string"
+				},
+				"applicationsCount": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				}
+			}
+		},
+		"currencies": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"code",
+				"name",
+				"symbol",
+				"manualUsdRate",
+				"usdRate",
+				"addButton",
+				"noCurrencies",
+				"codePlaceholder",
+				"namePlaceholder",
+				"symbolPlaceholder",
+				"manualUsdRatePlaceholder",
+				"manualRateHint",
+				"manualRateRequired",
+				"deleteConfirm",
+				"applicationsCount",
+				"defaultBadge",
+				"setDefaultButton",
+				"rateSourceApi",
+				"rateSourceManual",
+				"rateSourceDefault",
+				"equivalents",
+				"lastSynced"
+			],
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"code": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"symbol": {
+					"type": "string"
+				},
+				"manualUsdRate": {
+					"type": "string"
+				},
+				"usdRate": {
+					"type": "string"
+				},
+				"addButton": {
+					"type": "string"
+				},
+				"noCurrencies": {
+					"type": "string"
+				},
+				"codePlaceholder": {
+					"type": "string"
+				},
+				"namePlaceholder": {
+					"type": "string"
+				},
+				"symbolPlaceholder": {
+					"type": "string"
+				},
+				"manualUsdRatePlaceholder": {
+					"type": "string"
+				},
+				"manualRateHint": {
+					"type": "string"
+				},
+				"manualRateRequired": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				},
+				"applicationsCount": {
+					"type": "string"
+				},
+				"defaultBadge": {
+					"type": "string"
+				},
+				"setDefaultButton": {
+					"type": "string"
+				},
+				"rateSourceApi": {
+					"type": "string"
+				},
+				"rateSourceManual": {
+					"type": "string"
+				},
+				"rateSourceDefault": {
+					"type": "string"
+				},
+				"equivalents": {
+					"type": "string"
+				},
+				"lastSynced": {
+					"type": "string"
+				}
 			}
 		},
 		"attachments": {
@@ -429,56 +1094,363 @@
 				"size",
 				"uploadedAt",
 				"noAttachments",
-				"tooLarge"
+				"tooLarge",
+				"invalidType",
+				"uploadHint",
+				"deleteConfirm"
 			],
 			"properties": {
-				"title": { "type": "string" },
-				"upload": { "type": "string" },
-				"uploading": { "type": "string" },
-				"name": { "type": "string" },
-				"size": { "type": "string" },
-				"uploadedAt": { "type": "string" },
-				"noAttachments": { "type": "string" },
-				"tooLarge": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"upload": {
+					"type": "string"
+				},
+				"uploading": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"size": {
+					"type": "string"
+				},
+				"uploadedAt": {
+					"type": "string"
+				},
+				"noAttachments": {
+					"type": "string"
+				},
+				"tooLarge": {
+					"type": "string"
+				},
+				"invalidType": {
+					"type": "string"
+				},
+				"uploadHint": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				}
+			}
+		},
+		"settings": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"overviewTitle",
+				"overviewDescription",
+				"profileTitle",
+				"securityTitle",
+				"preferencesTitle",
+				"deploymentTitle",
+				"navigationTitle",
+				"navigationDescription",
+				"activeSection",
+				"openSection",
+				"profileDescription",
+				"securityDescription",
+				"preferencesDescription",
+				"deploymentDescription",
+				"currentPassword",
+				"newPassword",
+				"confirmPassword",
+				"changePassword",
+				"passwordUpdated",
+				"passwordMismatch",
+				"currentPasswordInvalid",
+				"passwordPolicy",
+				"passwordFormHint",
+				"locale",
+				"timeZone",
+				"defaultCurrency",
+				"localeHint",
+				"timeZoneHint",
+				"defaultCurrencyHint",
+				"preferencesUpdated",
+				"savePreferences",
+				"formNeedsAttention",
+				"signedInAs",
+				"signedInAccountNote",
+				"displayName",
+				"emailAddress",
+				"securityChecklistTitle",
+				"securityChecklistPasswords",
+				"securityChecklistSecrets",
+				"securityChecklistRecovery",
+				"currentDefaultsTitle",
+				"currentDefaultsDescription",
+				"notConfigured"
+			],
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"overviewTitle": {
+					"type": "string"
+				},
+				"overviewDescription": {
+					"type": "string"
+				},
+				"profileTitle": {
+					"type": "string"
+				},
+				"securityTitle": {
+					"type": "string"
+				},
+				"preferencesTitle": {
+					"type": "string"
+				},
+				"deploymentTitle": {
+					"type": "string"
+				},
+				"navigationTitle": {
+					"type": "string"
+				},
+				"navigationDescription": {
+					"type": "string"
+				},
+				"activeSection": {
+					"type": "string"
+				},
+				"openSection": {
+					"type": "string"
+				},
+				"profileDescription": {
+					"type": "string"
+				},
+				"securityDescription": {
+					"type": "string"
+				},
+				"preferencesDescription": {
+					"type": "string"
+				},
+				"deploymentDescription": {
+					"type": "string"
+				},
+				"currentPassword": {
+					"type": "string"
+				},
+				"newPassword": {
+					"type": "string"
+				},
+				"confirmPassword": {
+					"type": "string"
+				},
+				"changePassword": {
+					"type": "string"
+				},
+				"passwordUpdated": {
+					"type": "string"
+				},
+				"passwordMismatch": {
+					"type": "string"
+				},
+				"currentPasswordInvalid": {
+					"type": "string"
+				},
+				"passwordPolicy": {
+					"type": "string"
+				},
+				"passwordFormHint": {
+					"type": "string"
+				},
+				"locale": {
+					"type": "string"
+				},
+				"timeZone": {
+					"type": "string"
+				},
+				"defaultCurrency": {
+					"type": "string"
+				},
+				"localeHint": {
+					"type": "string"
+				},
+				"timeZoneHint": {
+					"type": "string"
+				},
+				"defaultCurrencyHint": {
+					"type": "string"
+				},
+				"preferencesUpdated": {
+					"type": "string"
+				},
+				"savePreferences": {
+					"type": "string"
+				},
+				"formNeedsAttention": {
+					"type": "string"
+				},
+				"signedInAs": {
+					"type": "string"
+				},
+				"signedInAccountNote": {
+					"type": "string"
+				},
+				"displayName": {
+					"type": "string"
+				},
+				"emailAddress": {
+					"type": "string"
+				},
+				"securityChecklistTitle": {
+					"type": "string"
+				},
+				"securityChecklistPasswords": {
+					"type": "string"
+				},
+				"securityChecklistSecrets": {
+					"type": "string"
+				},
+				"securityChecklistRecovery": {
+					"type": "string"
+				},
+				"currentDefaultsTitle": {
+					"type": "string"
+				},
+				"currentDefaultsDescription": {
+					"type": "string"
+				},
+				"notConfigured": {
+					"type": "string"
+				}
 			}
 		},
 		"comments": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["addPlaceholder", "addButton", "submitting"],
+			"required": [
+				"addNoteTitle",
+				"addPlaceholder",
+				"addButton",
+				"submitting",
+				"errorAddingActivity"
+			],
 			"properties": {
-				"addPlaceholder": { "type": "string" },
-				"addButton": { "type": "string" },
-				"submitting": { "type": "string" }
+				"addNoteTitle": {
+					"type": "string"
+				},
+				"addPlaceholder": {
+					"type": "string"
+				},
+				"addButton": {
+					"type": "string"
+				},
+				"submitting": {
+					"type": "string"
+				},
+				"errorAddingActivity": {
+					"type": "string"
+				}
 			}
 		},
 		"unsavedChanges": {
 			"type": "object",
 			"additionalProperties": false,
+			"required": ["title", "description", "stay", "discard", "saveDraft"],
 			"properties": {
-				"title": { "type": "string" },
-				"description": { "type": "string" },
-				"stay": { "type": "string" },
-				"discard": { "type": "string" },
-				"saveDraft": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"stay": {
+					"type": "string"
+				},
+				"discard": {
+					"type": "string"
+				},
+				"saveDraft": {
+					"type": "string"
+				}
 			}
 		},
 		"applicationDrafts": {
 			"type": "object",
 			"additionalProperties": false,
+			"required": [
+				"title",
+				"descriptionCreate",
+				"descriptionEdit",
+				"empty",
+				"use",
+				"deleteAll",
+				"deleteConfirmTitle",
+				"deleteConfirmDescription",
+				"deleteAllConfirmTitle",
+				"deleteAllConfirmDescription",
+				"clearRecoveryConfirmTitle",
+				"clearRecoveryConfirmDescription",
+				"startBlank",
+				"openPicker",
+				"recoveryBadge",
+				"recoveryLabel",
+				"recover",
+				"staleBadge"
+			],
 			"properties": {
-				"title": { "type": "string" },
-				"descriptionCreate": { "type": "string" },
-				"descriptionEdit": { "type": "string" },
-				"empty": { "type": "string" },
-				"use": { "type": "string" },
-				"deleteAll": { "type": "string" },
-				"startBlank": { "type": "string" },
-				"openPicker": { "type": "string" },
-				"recoveryBadge": { "type": "string" },
-				"recoveryLabel": { "type": "string" },
-				"recover": { "type": "string" },
-				"staleBadge": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"descriptionCreate": {
+					"type": "string"
+				},
+				"descriptionEdit": {
+					"type": "string"
+				},
+				"empty": {
+					"type": "string"
+				},
+				"use": {
+					"type": "string"
+				},
+				"deleteAll": {
+					"type": "string"
+				},
+				"deleteConfirmTitle": {
+					"type": "string"
+				},
+				"deleteConfirmDescription": {
+					"type": "string"
+				},
+				"deleteAllConfirmTitle": {
+					"type": "string"
+				},
+				"deleteAllConfirmDescription": {
+					"type": "string"
+				},
+				"clearRecoveryConfirmTitle": {
+					"type": "string"
+				},
+				"clearRecoveryConfirmDescription": {
+					"type": "string"
+				},
+				"startBlank": {
+					"type": "string"
+				},
+				"openPicker": {
+					"type": "string"
+				},
+				"recoveryBadge": {
+					"type": "string"
+				},
+				"recoveryLabel": {
+					"type": "string"
+				},
+				"recover": {
+					"type": "string"
+				},
+				"staleBadge": {
+					"type": "string"
+				}
 			}
 		},
 		"errors": {
@@ -492,11 +1464,21 @@
 				"occurred"
 			],
 			"properties": {
-				"generic": { "type": "string" },
-				"notFound": { "type": "string" },
-				"notFoundDescription": { "type": "string" },
-				"backToDashboard": { "type": "string" },
-				"occurred": { "type": "string" }
+				"generic": {
+					"type": "string"
+				},
+				"notFound": {
+					"type": "string"
+				},
+				"notFoundDescription": {
+					"type": "string"
+				},
+				"backToDashboard": {
+					"type": "string"
+				},
+				"occurred": {
+					"type": "string"
+				}
 			}
 		},
 		"validation": {
@@ -509,16 +1491,46 @@
 				"invalidUrl",
 				"invalidEmail",
 				"invalidNumber",
-				"invalidDate"
+				"invalidDate",
+				"invalidSalaryRange",
+				"referralRequiresSourceType",
+				"outcomeReasonRequiresClosedStatus",
+				"workAuthorizationNoteConflictsWithSponsorship"
 			],
 			"properties": {
-				"required": { "type": "string" },
-				"invalid": { "type": "string" },
-				"tooLong": { "type": "string" },
-				"invalidUrl": { "type": "string" },
-				"invalidEmail": { "type": "string" },
-				"invalidNumber": { "type": "string" },
-				"invalidDate": { "type": "string" }
+				"required": {
+					"type": "string"
+				},
+				"invalid": {
+					"type": "string"
+				},
+				"tooLong": {
+					"type": "string"
+				},
+				"invalidUrl": {
+					"type": "string"
+				},
+				"invalidEmail": {
+					"type": "string"
+				},
+				"invalidNumber": {
+					"type": "string"
+				},
+				"invalidDate": {
+					"type": "string"
+				},
+				"invalidSalaryRange": {
+					"type": "string"
+				},
+				"referralRequiresSourceType": {
+					"type": "string"
+				},
+				"outcomeReasonRequiresClosedStatus": {
+					"type": "string"
+				},
+				"workAuthorizationNoteConflictsWithSponsorship": {
+					"type": "string"
+				}
 			}
 		},
 		"fields": {
@@ -527,44 +1539,398 @@
 			"required": [
 				"company",
 				"position",
+				"listingDetails",
 				"location",
 				"workMode",
 				"employmentType",
+				"priority",
 				"salaryMin",
 				"salaryMax",
+				"targetSalaryMin",
+				"targetSalaryMax",
 				"currency",
 				"source",
+				"sourceType",
+				"referralName",
 				"jobUrl",
 				"appliedAt",
 				"status",
+				"outcomeReason",
 				"contactName",
+				"contactRole",
 				"contactEmail",
 				"contactPhone",
+				"contactProfileUrl",
+				"resumeVersion",
+				"coverLetterVersion",
+				"portfolioUrl",
+				"attachment",
+				"needsSponsorship",
+				"relocationPreference",
+				"workAuthorizationNote",
+				"team",
+				"department",
+				"companySize",
+				"industry",
+				"applicationMethod",
+				"timezoneOverlapHours",
+				"officeDaysPerWeek",
 				"notes",
 				"nextStepAt",
 				"nextStepNote",
-				"tags"
+				"nextActionType",
+				"tags",
+				"companyWebsite",
+				"companyCareersUrl",
+				"companyLinkedinUrl",
+				"companyLocation",
+				"name",
+				"website",
+				"careersUrl",
+				"linkedinUrl",
+				"legalName",
+				"aliases",
+				"description",
+				"tagline",
+				"foundedYear",
+				"companyType",
+				"subIndustry",
+				"stockSymbol",
+				"parentCompany",
+				"headquarters",
+				"country",
+				"timezone",
+				"officeLocations",
+				"twitterUrl",
+				"githubUrl",
+				"glassdoorUrl",
+				"crunchbaseUrl",
+				"blogUrl",
+				"youtubeUrl",
+				"revenue",
+				"fundingStage",
+				"fundingTotal",
+				"valuation",
+				"employeeCount",
+				"ceo",
+				"techStack",
+				"benefits",
+				"workCulture",
+				"remotePolicy",
+				"hiringStatus",
+				"glassdoorRating",
+				"mainContactName",
+				"mainContactRole",
+				"mainContactEmail",
+				"mainContactPhone",
+				"mainPhone",
+				"mainEmail",
+				"createdAt",
+				"updatedAt",
+				"rating",
+				"trackingStatus",
+				"pros",
+				"cons"
 			],
 			"properties": {
-				"company": { "type": "string" },
-				"position": { "type": "string" },
-				"location": { "type": "string" },
-				"workMode": { "type": "string" },
-				"employmentType": { "type": "string" },
-				"salaryMin": { "type": "string" },
-				"salaryMax": { "type": "string" },
-				"currency": { "type": "string" },
-				"source": { "type": "string" },
-				"jobUrl": { "type": "string" },
-				"appliedAt": { "type": "string" },
-				"status": { "type": "string" },
-				"contactName": { "type": "string" },
-				"contactEmail": { "type": "string" },
-				"contactPhone": { "type": "string" },
-				"notes": { "type": "string" },
-				"nextStepAt": { "type": "string" },
-				"nextStepNote": { "type": "string" },
-				"tags": { "type": "string" }
+				"company": {
+					"type": "string"
+				},
+				"position": {
+					"type": "string"
+				},
+				"listingDetails": {
+					"type": "string"
+				},
+				"location": {
+					"type": "string"
+				},
+				"workMode": {
+					"type": "string"
+				},
+				"employmentType": {
+					"type": "string"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"salaryMin": {
+					"type": "string"
+				},
+				"salaryMax": {
+					"type": "string"
+				},
+				"targetSalaryMin": {
+					"type": "string"
+				},
+				"targetSalaryMax": {
+					"type": "string"
+				},
+				"currency": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"sourceType": {
+					"type": "string"
+				},
+				"referralName": {
+					"type": "string"
+				},
+				"jobUrl": {
+					"type": "string"
+				},
+				"appliedAt": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"outcomeReason": {
+					"type": "string"
+				},
+				"contactName": {
+					"type": "string"
+				},
+				"contactRole": {
+					"type": "string"
+				},
+				"contactEmail": {
+					"type": "string"
+				},
+				"contactPhone": {
+					"type": "string"
+				},
+				"contactProfileUrl": {
+					"type": "string"
+				},
+				"resumeVersion": {
+					"type": "string"
+				},
+				"coverLetterVersion": {
+					"type": "string"
+				},
+				"portfolioUrl": {
+					"type": "string"
+				},
+				"attachment": {
+					"type": "string"
+				},
+				"needsSponsorship": {
+					"type": "string"
+				},
+				"relocationPreference": {
+					"type": "string"
+				},
+				"workAuthorizationNote": {
+					"type": "string"
+				},
+				"team": {
+					"type": "string"
+				},
+				"department": {
+					"type": "string"
+				},
+				"companySize": {
+					"type": "string"
+				},
+				"industry": {
+					"type": "string"
+				},
+				"applicationMethod": {
+					"type": "string"
+				},
+				"timezoneOverlapHours": {
+					"type": "string"
+				},
+				"officeDaysPerWeek": {
+					"type": "string"
+				},
+				"notes": {
+					"type": "string"
+				},
+				"nextStepAt": {
+					"type": "string"
+				},
+				"nextStepNote": {
+					"type": "string"
+				},
+				"nextActionType": {
+					"type": "string"
+				},
+				"tags": {
+					"type": "string"
+				},
+				"companyWebsite": {
+					"type": "string"
+				},
+				"companyCareersUrl": {
+					"type": "string"
+				},
+				"companyLinkedinUrl": {
+					"type": "string"
+				},
+				"companyLocation": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"website": {
+					"type": "string"
+				},
+				"careersUrl": {
+					"type": "string"
+				},
+				"linkedinUrl": {
+					"type": "string"
+				},
+				"legalName": {
+					"type": "string"
+				},
+				"aliases": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"tagline": {
+					"type": "string"
+				},
+				"foundedYear": {
+					"type": "string"
+				},
+				"companyType": {
+					"type": "string"
+				},
+				"subIndustry": {
+					"type": "string"
+				},
+				"stockSymbol": {
+					"type": "string"
+				},
+				"parentCompany": {
+					"type": "string"
+				},
+				"headquarters": {
+					"type": "string"
+				},
+				"country": {
+					"type": "string"
+				},
+				"timezone": {
+					"type": "string"
+				},
+				"officeLocations": {
+					"type": "string"
+				},
+				"twitterUrl": {
+					"type": "string"
+				},
+				"githubUrl": {
+					"type": "string"
+				},
+				"glassdoorUrl": {
+					"type": "string"
+				},
+				"crunchbaseUrl": {
+					"type": "string"
+				},
+				"blogUrl": {
+					"type": "string"
+				},
+				"youtubeUrl": {
+					"type": "string"
+				},
+				"revenue": {
+					"type": "string"
+				},
+				"fundingStage": {
+					"type": "string"
+				},
+				"fundingTotal": {
+					"type": "string"
+				},
+				"valuation": {
+					"type": "string"
+				},
+				"employeeCount": {
+					"type": "string"
+				},
+				"ceo": {
+					"type": "string"
+				},
+				"techStack": {
+					"type": "string"
+				},
+				"benefits": {
+					"type": "string"
+				},
+				"workCulture": {
+					"type": "string"
+				},
+				"remotePolicy": {
+					"type": "string"
+				},
+				"hiringStatus": {
+					"type": "string"
+				},
+				"glassdoorRating": {
+					"type": "string"
+				},
+				"mainContactName": {
+					"type": "string"
+				},
+				"mainContactRole": {
+					"type": "string"
+				},
+				"mainContactEmail": {
+					"type": "string"
+				},
+				"mainContactPhone": {
+					"type": "string"
+				},
+				"mainPhone": {
+					"type": "string"
+				},
+				"mainEmail": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				},
+				"rating": {
+					"type": "string"
+				},
+				"trackingStatus": {
+					"type": "string"
+				},
+				"pros": {
+					"type": "string"
+				},
+				"cons": {
+					"type": "string"
+				}
+			}
+		},
+		"priority": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["HIGH", "MEDIUM", "LOW"],
+			"properties": {
+				"HIGH": {
+					"type": "string"
+				},
+				"MEDIUM": {
+					"type": "string"
+				},
+				"LOW": {
+					"type": "string"
+				}
 			}
 		},
 		"status": {
@@ -580,13 +1946,27 @@
 				"ON_HOLD"
 			],
 			"properties": {
-				"APPLIED": { "type": "string" },
-				"SCREENING": { "type": "string" },
-				"INTERVIEW": { "type": "string" },
-				"OFFER": { "type": "string" },
-				"REJECTED": { "type": "string" },
-				"WITHDRAWN": { "type": "string" },
-				"ON_HOLD": { "type": "string" }
+				"APPLIED": {
+					"type": "string"
+				},
+				"SCREENING": {
+					"type": "string"
+				},
+				"INTERVIEW": {
+					"type": "string"
+				},
+				"OFFER": {
+					"type": "string"
+				},
+				"REJECTED": {
+					"type": "string"
+				},
+				"WITHDRAWN": {
+					"type": "string"
+				},
+				"ON_HOLD": {
+					"type": "string"
+				}
 			}
 		},
 		"workMode": {
@@ -594,9 +1974,15 @@
 			"additionalProperties": false,
 			"required": ["REMOTE", "HYBRID", "ONSITE"],
 			"properties": {
-				"REMOTE": { "type": "string" },
-				"HYBRID": { "type": "string" },
-				"ONSITE": { "type": "string" }
+				"REMOTE": {
+					"type": "string"
+				},
+				"HYBRID": {
+					"type": "string"
+				},
+				"ONSITE": {
+					"type": "string"
+				}
 			}
 		},
 		"employmentType": {
@@ -604,11 +1990,368 @@
 			"additionalProperties": false,
 			"required": ["FULL_TIME", "PART_TIME", "CONTRACT", "INTERN", "FREELANCE"],
 			"properties": {
-				"FULL_TIME": { "type": "string" },
-				"PART_TIME": { "type": "string" },
-				"CONTRACT": { "type": "string" },
-				"INTERN": { "type": "string" },
-				"FREELANCE": { "type": "string" }
+				"FULL_TIME": {
+					"type": "string"
+				},
+				"PART_TIME": {
+					"type": "string"
+				},
+				"CONTRACT": {
+					"type": "string"
+				},
+				"INTERN": {
+					"type": "string"
+				},
+				"FREELANCE": {
+					"type": "string"
+				}
+			}
+		},
+		"sourceType": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"JOB_BOARD",
+				"COMPANY_SITE",
+				"REFERRAL",
+				"RECRUITER",
+				"NETWORK",
+				"OTHER"
+			],
+			"properties": {
+				"JOB_BOARD": {
+					"type": "string"
+				},
+				"COMPANY_SITE": {
+					"type": "string"
+				},
+				"REFERRAL": {
+					"type": "string"
+				},
+				"RECRUITER": {
+					"type": "string"
+				},
+				"NETWORK": {
+					"type": "string"
+				},
+				"OTHER": {
+					"type": "string"
+				}
+			}
+		},
+		"nextActionType": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"FOLLOW_UP",
+				"RECRUITER_CALL",
+				"PHONE_SCREEN",
+				"TECH_INTERVIEW",
+				"TAKE_HOME",
+				"ONSITE",
+				"OFFER_DISCUSSION",
+				"WAITING",
+				"OTHER"
+			],
+			"properties": {
+				"FOLLOW_UP": {
+					"type": "string"
+				},
+				"RECRUITER_CALL": {
+					"type": "string"
+				},
+				"PHONE_SCREEN": {
+					"type": "string"
+				},
+				"TECH_INTERVIEW": {
+					"type": "string"
+				},
+				"TAKE_HOME": {
+					"type": "string"
+				},
+				"ONSITE": {
+					"type": "string"
+				},
+				"OFFER_DISCUSSION": {
+					"type": "string"
+				},
+				"WAITING": {
+					"type": "string"
+				},
+				"OTHER": {
+					"type": "string"
+				}
+			}
+		},
+		"outcomeReason": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"NO_RESPONSE",
+				"ROLE_CLOSED",
+				"SALARY_MISMATCH",
+				"LOCATION_MISMATCH",
+				"SKILL_MISMATCH",
+				"FAILED_SCREEN",
+				"FAILED_INTERVIEW",
+				"ACCEPTED_OTHER",
+				"WITHDREW_BY_CHOICE",
+				"OTHER"
+			],
+			"properties": {
+				"NO_RESPONSE": {
+					"type": "string"
+				},
+				"ROLE_CLOSED": {
+					"type": "string"
+				},
+				"SALARY_MISMATCH": {
+					"type": "string"
+				},
+				"LOCATION_MISMATCH": {
+					"type": "string"
+				},
+				"SKILL_MISMATCH": {
+					"type": "string"
+				},
+				"FAILED_SCREEN": {
+					"type": "string"
+				},
+				"FAILED_INTERVIEW": {
+					"type": "string"
+				},
+				"ACCEPTED_OTHER": {
+					"type": "string"
+				},
+				"WITHDREW_BY_CHOICE": {
+					"type": "string"
+				},
+				"OTHER": {
+					"type": "string"
+				}
+			}
+		},
+		"relocationPreference": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["OPEN", "CONDITIONAL", "NOT_OPEN"],
+			"properties": {
+				"OPEN": {
+					"type": "string"
+				},
+				"CONDITIONAL": {
+					"type": "string"
+				},
+				"NOT_OPEN": {
+					"type": "string"
+				}
+			}
+		},
+		"companySize": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["STARTUP", "SMALL", "MID_SIZE", "LARGE", "ENTERPRISE"],
+			"properties": {
+				"STARTUP": {
+					"type": "string"
+				},
+				"SMALL": {
+					"type": "string"
+				},
+				"MID_SIZE": {
+					"type": "string"
+				},
+				"LARGE": {
+					"type": "string"
+				},
+				"ENTERPRISE": {
+					"type": "string"
+				}
+			}
+		},
+		"companyType": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"PUBLIC",
+				"PRIVATE",
+				"NONPROFIT",
+				"GOVERNMENT",
+				"STARTUP",
+				"SUBSIDIARY",
+				"OTHER"
+			],
+			"properties": {
+				"PUBLIC": {
+					"type": "string"
+				},
+				"PRIVATE": {
+					"type": "string"
+				},
+				"NONPROFIT": {
+					"type": "string"
+				},
+				"GOVERNMENT": {
+					"type": "string"
+				},
+				"STARTUP": {
+					"type": "string"
+				},
+				"SUBSIDIARY": {
+					"type": "string"
+				},
+				"OTHER": {
+					"type": "string"
+				}
+			}
+		},
+		"fundingStage": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"SEED",
+				"SERIES_A",
+				"SERIES_B",
+				"SERIES_C",
+				"SERIES_D",
+				"LATE_STAGE",
+				"IPO",
+				"BOOTSTRAPPED",
+				"ACQUIRED",
+				"UNKNOWN"
+			],
+			"properties": {
+				"SEED": {
+					"type": "string"
+				},
+				"SERIES_A": {
+					"type": "string"
+				},
+				"SERIES_B": {
+					"type": "string"
+				},
+				"SERIES_C": {
+					"type": "string"
+				},
+				"SERIES_D": {
+					"type": "string"
+				},
+				"LATE_STAGE": {
+					"type": "string"
+				},
+				"IPO": {
+					"type": "string"
+				},
+				"BOOTSTRAPPED": {
+					"type": "string"
+				},
+				"ACQUIRED": {
+					"type": "string"
+				},
+				"UNKNOWN": {
+					"type": "string"
+				}
+			}
+		},
+		"remotePolicy": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["FULLY_REMOTE", "HYBRID", "ONSITE", "FLEXIBLE", "UNKNOWN"],
+			"properties": {
+				"FULLY_REMOTE": {
+					"type": "string"
+				},
+				"HYBRID": {
+					"type": "string"
+				},
+				"ONSITE": {
+					"type": "string"
+				},
+				"FLEXIBLE": {
+					"type": "string"
+				},
+				"UNKNOWN": {
+					"type": "string"
+				}
+			}
+		},
+		"hiringStatus": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["ACTIVELY_HIRING", "LIMITED", "FROZEN", "UNKNOWN"],
+			"properties": {
+				"ACTIVELY_HIRING": {
+					"type": "string"
+				},
+				"LIMITED": {
+					"type": "string"
+				},
+				"FROZEN": {
+					"type": "string"
+				},
+				"UNKNOWN": {
+					"type": "string"
+				}
+			}
+		},
+		"trackingStatus": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"INTERESTED",
+				"RESEARCHING",
+				"APPLIED",
+				"TALKING",
+				"ARCHIVED"
+			],
+			"properties": {
+				"INTERESTED": {
+					"type": "string"
+				},
+				"RESEARCHING": {
+					"type": "string"
+				},
+				"APPLIED": {
+					"type": "string"
+				},
+				"TALKING": {
+					"type": "string"
+				},
+				"ARCHIVED": {
+					"type": "string"
+				}
+			}
+		},
+		"applicationMethod": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"EASY_APPLY",
+				"COMPANY_ATS",
+				"REFERRAL",
+				"RECRUITER_DIRECT",
+				"EMAIL",
+				"OTHER"
+			],
+			"properties": {
+				"EASY_APPLY": {
+					"type": "string"
+				},
+				"COMPANY_ATS": {
+					"type": "string"
+				},
+				"REFERRAL": {
+					"type": "string"
+				},
+				"RECRUITER_DIRECT": {
+					"type": "string"
+				},
+				"EMAIL": {
+					"type": "string"
+				},
+				"OTHER": {
+					"type": "string"
+				}
 			}
 		},
 		"activityType": {
@@ -620,15 +2363,302 @@
 				"STATUS_CHANGE",
 				"COMMENT",
 				"ATTACHMENT_ADDED",
-				"ATTACHMENT_REMOVED"
+				"ATTACHMENT_REMOVED",
+				"NOTE_ADDED",
+				"BOOTSTRAPPED_FROM_APPLICATION",
+				"LINKED_APPLICATION",
+				"UNLINKED_APPLICATION"
 			],
 			"properties": {
-				"CREATED": { "type": "string" },
-				"FIELD_CHANGE": { "type": "string" },
-				"STATUS_CHANGE": { "type": "string" },
-				"COMMENT": { "type": "string" },
-				"ATTACHMENT_ADDED": { "type": "string" },
-				"ATTACHMENT_REMOVED": { "type": "string" }
+				"CREATED": {
+					"type": "string"
+				},
+				"FIELD_CHANGE": {
+					"type": "string"
+				},
+				"STATUS_CHANGE": {
+					"type": "string"
+				},
+				"COMMENT": {
+					"type": "string"
+				},
+				"ATTACHMENT_ADDED": {
+					"type": "string"
+				},
+				"ATTACHMENT_REMOVED": {
+					"type": "string"
+				},
+				"NOTE_ADDED": {
+					"type": "string"
+				},
+				"BOOTSTRAPPED_FROM_APPLICATION": {
+					"type": "string"
+				},
+				"LINKED_APPLICATION": {
+					"type": "string"
+				},
+				"UNLINKED_APPLICATION": {
+					"type": "string"
+				}
+			}
+		},
+		"companies": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"newCompany",
+				"noCompanies",
+				"applicationsCount",
+				"deleteConfirm",
+				"deleteButton",
+				"created",
+				"updated",
+				"alreadyExists",
+				"linkedApplications",
+				"noLinkedApplications",
+				"profile",
+				"editTitle",
+				"createTitle",
+				"linkedTo",
+				"hydrateHint",
+				"newWillBeCreated",
+				"tabs"
+			],
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"newCompany": {
+					"type": "string"
+				},
+				"noCompanies": {
+					"type": "string"
+				},
+				"applicationsCount": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				},
+				"deleteButton": {
+					"type": "string"
+				},
+				"created": {
+					"type": "string"
+				},
+				"updated": {
+					"type": "string"
+				},
+				"alreadyExists": {
+					"type": "string"
+				},
+				"linkedApplications": {
+					"type": "string"
+				},
+				"noLinkedApplications": {
+					"type": "string"
+				},
+				"profile": {
+					"type": "string"
+				},
+				"editTitle": {
+					"type": "string"
+				},
+				"createTitle": {
+					"type": "string"
+				},
+				"linkedTo": {
+					"type": "string"
+				},
+				"hydrateHint": {
+					"type": "string"
+				},
+				"newWillBeCreated": {
+					"type": "string"
+				},
+				"tabs": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["overview", "applications", "activity"],
+					"properties": {
+						"overview": {
+							"type": "string"
+						},
+						"applications": {
+							"type": "string"
+						},
+						"activity": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"companyForm": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"placeholders",
+				"sections",
+				"addNote",
+				"notePlaceholder",
+				"notesTitle"
+			],
+			"properties": {
+				"placeholders": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"name",
+						"website",
+						"careersUrl",
+						"linkedinUrl",
+						"location",
+						"industry",
+						"notes",
+						"legalName",
+						"aliases",
+						"tagline",
+						"description",
+						"subIndustry",
+						"parentCompany",
+						"ceo",
+						"headquarters",
+						"country",
+						"officeLocations",
+						"techStack",
+						"benefits",
+						"workCulture",
+						"pros",
+						"cons"
+					],
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"website": {
+							"type": "string"
+						},
+						"careersUrl": {
+							"type": "string"
+						},
+						"linkedinUrl": {
+							"type": "string"
+						},
+						"location": {
+							"type": "string"
+						},
+						"industry": {
+							"type": "string"
+						},
+						"notes": {
+							"type": "string"
+						},
+						"legalName": {
+							"type": "string"
+						},
+						"aliases": {
+							"type": "string"
+						},
+						"tagline": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"subIndustry": {
+							"type": "string"
+						},
+						"parentCompany": {
+							"type": "string"
+						},
+						"ceo": {
+							"type": "string"
+						},
+						"headquarters": {
+							"type": "string"
+						},
+						"country": {
+							"type": "string"
+						},
+						"officeLocations": {
+							"type": "string"
+						},
+						"techStack": {
+							"type": "string"
+						},
+						"benefits": {
+							"type": "string"
+						},
+						"workCulture": {
+							"type": "string"
+						},
+						"pros": {
+							"type": "string"
+						},
+						"cons": {
+							"type": "string"
+						}
+					}
+				},
+				"sections": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"general",
+						"links",
+						"notes",
+						"identity",
+						"location",
+						"business",
+						"culture",
+						"contact",
+						"tracking"
+					],
+					"properties": {
+						"general": {
+							"type": "string"
+						},
+						"links": {
+							"type": "string"
+						},
+						"notes": {
+							"type": "string"
+						},
+						"identity": {
+							"type": "string"
+						},
+						"location": {
+							"type": "string"
+						},
+						"business": {
+							"type": "string"
+						},
+						"culture": {
+							"type": "string"
+						},
+						"contact": {
+							"type": "string"
+						},
+						"tracking": {
+							"type": "string"
+						}
+					}
+				},
+				"addNote": {
+					"type": "string"
+				},
+				"notePlaceholder": {
+					"type": "string"
+				},
+				"notesTitle": {
+					"type": "string"
+				}
 			}
 		},
 		"metadata": {
@@ -636,8 +2666,12 @@
 			"additionalProperties": false,
 			"required": ["title", "description"],
 			"properties": {
-				"title": { "type": "string" },
-				"description": { "type": "string" }
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				}
 			}
 		}
 	}

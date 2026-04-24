@@ -14,6 +14,7 @@ import {
 } from "@radix-ui/themes";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { createTagAction, deleteTagAction } from "../actions/tags";
 
 const COLORS = [
@@ -38,6 +39,7 @@ type Tag = {
 
 export function TagManager({ tags }: { tags: Tag[] }) {
 	const t = useTranslations();
+	const tCommon = useTranslations("common");
 	const [name, setName] = useState("");
 	const [color, setColor] = useState<(typeof COLORS)[number]>("gray");
 	const [error, setError] = useState<string | null>(null);
@@ -142,19 +144,20 @@ export function TagManager({ tags }: { tags: Tag[] }) {
 										})}
 									</Table.Cell>
 									<Table.Cell>
-										<IconButton
-											variant="ghost"
-											color="red"
-											onClick={() => {
-												if (
-													confirm(t("tags.deleteConfirm", { name: tag.name }))
-												) {
-													startTransition(() => deleteTagAction(tag.id));
-												}
-											}}
-										>
-											<TrashIcon />
-										</IconButton>
+										<ConfirmationDialog
+											title={tCommon("delete")}
+											description={t("tags.deleteConfirm", { name: tag.name })}
+											onConfirm={() => deleteTagAction(tag.id)}
+											trigger={
+												<IconButton
+													variant="ghost"
+													color="red"
+													disabled={pending}
+												>
+													<TrashIcon />
+												</IconButton>
+											}
+										/>
 									</Table.Cell>
 								</Table.Row>
 							))}

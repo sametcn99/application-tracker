@@ -36,7 +36,8 @@ type AuthConfig = {
 };
 
 function getConfig() {
-	return nextAuth.mock.calls[0][0] as AuthConfig;
+	const calls = nextAuth.mock.calls as unknown as [[AuthConfig]];
+	return calls[0][0];
 }
 
 describe("auth module", () => {

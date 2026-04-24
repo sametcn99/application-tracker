@@ -27,44 +27,51 @@ type Item = {
 
 export function ApplicationsTable({
 	initialItems,
+	initialNextCursor,
+	initialHasMore,
 	filters,
 }: {
 	initialItems: Item[];
+	initialNextCursor: string | null;
+	initialHasMore: boolean;
 	filters: ListFilters;
 }) {
 	const t = useTranslations();
 
 	const [items, setItems] = useState<Item[]>(initialItems);
-	const [page, setPage] = useState(1);
-	const [hasMore, setHasMore] = useState(initialItems.length === 20);
+	const [nextCursor, setNextCursor] = useState<string | null>(
+		initialNextCursor,
+	);
+	const [hasMore, setHasMore] = useState(initialHasMore);
 	const [loading, setLoading] = useState(false);
 
 	// Sync initial items when filters change (React server components remount strategy vs effect)
 	useEffect(() => {
 		setItems(initialItems);
-		setPage(1);
-		setHasMore(initialItems.length === 20);
-	}, [initialItems]);
+		setNextCursor(initialNextCursor);
+		setHasMore(initialHasMore);
+	}, [initialItems, initialNextCursor, initialHasMore]);
 
 	const loadMore = useCallback(async () => {
+		if (!nextCursor || loading) return;
+
 		setLoading(true);
 		try {
-			const nextPage = page + 1;
-			const newItems = await fetchApplicationsAction(filters);
+			const page = await fetchApplicationsAction(filters, nextCursor);
 			setItems((prev) => {
 				// Prevent duplicates in StrictMode
 				const existingIds = new Set(prev.map((i) => i.id));
-				const filtered = newItems.filter((n) => !existingIds.has(n.id));
+				const filtered = page.items.filter((n) => !existingIds.has(n.id));
 				return [...prev, ...filtered];
 			});
-			setPage(nextPage);
-			setHasMore(newItems.length === 20);
+			setNextCursor(page.nextCursor);
+			setHasMore(page.hasMore);
 		} catch (err) {
 			console.error(err);
 		} finally {
 			setLoading(false);
 		}
-	}, [page, filters]);
+	}, [filters, loading, nextCursor]);
 
 	const observer = useRef<IntersectionObserver | null>(null);
 	const lastElementRef = useCallback(
@@ -191,7 +198,7 @@ export function ApplicationsTable({
 						<Spinner />
 					) : (
 						<Text size="2" color="gray">
-							Loading more...
+							{t("applications.loadingMore")}
 						</Text>
 					)}
 				</Flex>

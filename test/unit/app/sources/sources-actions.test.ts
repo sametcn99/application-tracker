@@ -33,13 +33,17 @@ describe("sources actions", () => {
 	});
 
 	it("trims and upserts on success", async () => {
-		prisma.sourceOption.upsert.mockResolvedValueOnce({ id: "1" });
+		prisma.sourceOption.upsert.mockResolvedValueOnce({
+			id: "1",
+			name: "LinkedIn",
+		});
 		const res = await createSourceAction(fd("  LinkedIn "));
-		expect(res).toEqual({ ok: true });
+		expect(res).toEqual({ ok: true, data: { id: "1", name: "LinkedIn" } });
 		expect(prisma.sourceOption.upsert).toHaveBeenCalledWith({
 			where: { name: "LinkedIn" },
 			update: {},
 			create: { name: "LinkedIn" },
+			select: { id: true, name: true },
 		});
 		expect(cache.revalidatePath).toHaveBeenCalledWith("/sources");
 		expect(cache.revalidatePath).toHaveBeenCalledWith("/applications/new");

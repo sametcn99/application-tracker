@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { formatCurrencyAmount } from "@/shared/lib/format";
 import { convertViaUsd } from "@/shared/lib/reference-data.shared";
 import {
@@ -40,6 +41,7 @@ export function CurrencyManager({
 }) {
 	const t = useTranslations();
 	const tCurrencies = useTranslations("currencies");
+	const tCommon = useTranslations("common");
 	const router = useRouter();
 	const [pending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
@@ -189,29 +191,27 @@ export function CurrencyManager({
 													{tCurrencies("setDefaultButton")}
 												</Button>
 											)}
-											<IconButton
-												size="1"
-												variant="soft"
-												color="red"
-												disabled={pending}
-												onClick={() => {
-													if (
-														confirm(
-															tCurrencies("deleteConfirm", {
-																code: currency.code,
-															}),
-														)
-													) {
-														startTransition(async () => {
-															setError(null);
-															await deleteCurrencyAction(currency.id);
-															router.refresh();
-														});
-													}
+											<ConfirmationDialog
+												title={tCommon("delete")}
+												description={tCurrencies("deleteConfirm", {
+													code: currency.code,
+												})}
+												onConfirm={async () => {
+													setError(null);
+													await deleteCurrencyAction(currency.id);
+													router.refresh();
 												}}
-											>
-												<TrashIcon />
-											</IconButton>
+												trigger={
+													<IconButton
+														size="1"
+														variant="soft"
+														color="red"
+														disabled={pending}
+													>
+														<TrashIcon />
+													</IconButton>
+												}
+											/>
 										</Flex>
 									</Flex>
 
