@@ -3,7 +3,7 @@
 ############################
 # 1. Dependencies
 ############################
-FROM oven/bun:1.2-alpine AS deps
+FROM oven/bun:alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 COPY package.json bun.lock ./
