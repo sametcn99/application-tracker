@@ -163,9 +163,8 @@ describe("reference managers", () => {
 				);
 			});
 
-			const eurCard = screen
-				.getByText("EUR")
-				.closest("div")?.parentElement?.parentElement;
+			const eurCard = screen.getByText("EUR").closest("div")
+				?.parentElement?.parentElement;
 			expect(eurCard).toBeTruthy();
 
 			await user.click(

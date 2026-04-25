@@ -16,9 +16,8 @@ RUN bun install --frozen-lockfile
 FROM node:22-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
-ARG DATABASE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=$DATABASE_URL
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Generate Prisma client then build Next.js

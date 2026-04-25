@@ -6,8 +6,8 @@ import { S3Client } from "@aws-sdk/client-s3";
  * Env vars:
  *   S3_ENDPOINT          e.g. http://minio:9000
  *   S3_REGION            e.g. us-east-1
- *   S3_ACCESS_KEY_ID
- *   S3_SECRET_ACCESS_KEY
+ *   MINIO_ROOT_USER
+ *   MINIO_ROOT_PASSWORD
  *   S3_BUCKET            e.g. attachments
  *   S3_FORCE_PATH_STYLE  "true" for MinIO
  */
@@ -18,7 +18,7 @@ export const s3 = new S3Client({
 	endpoint: process.env.S3_ENDPOINT,
 	forcePathStyle: (process.env.S3_FORCE_PATH_STYLE ?? "true") === "true",
 	credentials: {
-		accessKeyId: process.env.S3_ACCESS_KEY_ID || "minioadmin",
-		secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "minioadmin",
+		accessKeyId: process.env.MINIO_ROOT_USER || "minioadmin",
+		secretAccessKey: process.env.MINIO_ROOT_PASSWORD || "minioadmin",
 	},
 });

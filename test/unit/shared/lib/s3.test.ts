@@ -25,8 +25,8 @@ describe("s3 module", () => {
 		delete process.env.S3_BUCKET;
 		delete process.env.S3_REGION;
 		delete process.env.S3_ENDPOINT;
-		delete process.env.S3_ACCESS_KEY_ID;
-		delete process.env.S3_SECRET_ACCESS_KEY;
+		delete process.env.MINIO_ROOT_USER;
+		delete process.env.MINIO_ROOT_PASSWORD;
 		delete process.env.S3_FORCE_PATH_STYLE;
 	});
 
@@ -52,8 +52,8 @@ describe("s3 module", () => {
 		process.env.S3_BUCKET = "custom-bucket";
 		process.env.S3_REGION = "eu-west-1";
 		process.env.S3_ENDPOINT = "http://localhost:9000";
-		process.env.S3_ACCESS_KEY_ID = "key";
-		process.env.S3_SECRET_ACCESS_KEY = "secret";
+		process.env.MINIO_ROOT_USER = "key";
+		process.env.MINIO_ROOT_PASSWORD = "secret";
 		process.env.S3_FORCE_PATH_STYLE = "false";
 
 		const mod = await loadS3Module();

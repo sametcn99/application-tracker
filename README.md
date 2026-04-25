@@ -465,9 +465,9 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-Then open `http://localhost:3000`.
+The app listens on container port `3000`.
 
-The Compose file reads only credential and bootstrap values from environment variables. In Coolify, define the same variables from `.env.example` in the service environment. The default deployment publishes only the application on `3000:3000`; PostgreSQL and MinIO stay internal to the Compose network unless you add explicit port mappings.
+The Compose file reads only credential and bootstrap values from environment variables. In Coolify, define the same variables from `.env.example` in the service environment and route traffic to the `app` service on port `3000`. The app derives its internal PostgreSQL connection string from `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB`; PostgreSQL, MinIO, and the app port stay internal unless you add explicit port mappings.
 
 ### Bootstrap sequence
 
@@ -511,7 +511,7 @@ bun install
 # Prepare local env
 cp .env.example .env.local
 
-# If running the app outside Compose, adjust hostnames from postgres/minio to localhost in .env.local
+# If running the app outside Compose, add POSTGRES_HOST="localhost" and S3_ENDPOINT="http://localhost:9000" to .env.local
 
 # Apply migrations and generate client
 bunx prisma migrate deploy
@@ -524,10 +524,7 @@ bun run db:seed
 bun run dev
 ```
 
-For local non-Docker application runtime, the common change is switching:
-
-- `DATABASE_URL` host from `postgres` to `localhost`
-- `S3_ENDPOINT` host from `minio` to `localhost`
+For local non-Docker application runtime, set `POSTGRES_HOST="localhost"` because the default PostgreSQL hostname is the Compose service name `postgres`.
 
 ### Package scripts
 
@@ -552,22 +549,19 @@ For local non-Docker application runtime, the common change is switching:
 
 ## Environment Variables
 
-The Docker Compose file only requires deployment-specific credentials and bootstrap values. Operational defaults such as app port, internal MinIO endpoint, upload limits, S3 bucket name, region, and path-style addressing are hardcoded in Compose.
+The Docker Compose file only requires deployment-specific credentials and bootstrap values. Operational defaults such as app port, internal database host, internal MinIO endpoint, upload limits, S3 bucket name, region, and path-style addressing are hardcoded in Compose.
 
-| Variable               | Required | Example                                                            | Purpose                                                   |
-| ---------------------- | -------- | ------------------------------------------------------------------ | --------------------------------------------------------- |
-| `POSTGRES_USER`        | Yes      | `appuser`                                                          | PostgreSQL service username                               |
-| `POSTGRES_PASSWORD`    | Yes      | `change-me-postgres-password`                                      | PostgreSQL service password                               |
-| `POSTGRES_DB`          | Yes      | `appdb`                                                            | PostgreSQL database name                                  |
-| `DATABASE_URL`         | Yes      | `postgresql://appuser:change-me@postgres:5432/appdb?schema=public` | PostgreSQL connection string used by Prisma and `pg.Pool` |
-| `AUTH_SECRET`          | Yes      | `change-me-to-a-long-random-string`                                | JWT/session secret for Auth.js                            |
-| `ADMIN_EMAIL`          | Yes      | `admin@example.com`                                                | Email for seed-created admin user                         |
-| `ADMIN_PASSWORD`       | Yes      | `change-me-admin-password`                                         | Plain-text seed password, hashed before persistence       |
-| `ADMIN_NAME`           | Yes      | `Admin`                                                            | Display name for the seeded admin                         |
-| `MINIO_ROOT_USER`      | Yes      | `change-me-minio-user`                                             | MinIO root username                                       |
-| `MINIO_ROOT_PASSWORD`  | Yes      | `change-me-minio-password`                                         | MinIO root password                                       |
-| `S3_ACCESS_KEY_ID`     | Yes      | `change-me-minio-user`                                             | S3 access key ID used by the app                          |
-| `S3_SECRET_ACCESS_KEY` | Yes      | `change-me-minio-password`                                         | S3 secret access key used by the app                      |
+| Variable              | Required | Example                             | Purpose                                             |
+| --------------------- | -------- | ----------------------------------- | --------------------------------------------------- |
+| `POSTGRES_USER`       | Yes      | `appuser`                           | PostgreSQL service username                         |
+| `POSTGRES_PASSWORD`   | Yes      | `change-me-postgres-password`       | PostgreSQL service password                         |
+| `POSTGRES_DB`         | Yes      | `appdb`                             | PostgreSQL database name                            |
+| `AUTH_SECRET`         | Yes      | `change-me-to-a-long-random-string` | JWT/session secret for Auth.js                      |
+| `ADMIN_EMAIL`         | Yes      | `admin@example.com`                 | Email for seed-created admin user                   |
+| `ADMIN_PASSWORD`      | Yes      | `change-me-admin-password`          | Plain-text seed password, hashed before persistence |
+| `ADMIN_NAME`          | Yes      | `Admin`                             | Display name for the seeded admin                   |
+| `MINIO_ROOT_USER`     | Yes      | `change-me-minio-user`              | MinIO root username                                 |
+| `MINIO_ROOT_PASSWORD` | Yes      | `change-me-minio-password`          | MinIO root password                                 |
 
 ## Database and Persistence Model
 

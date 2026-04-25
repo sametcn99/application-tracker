@@ -18,8 +18,8 @@ const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? "admin@example.com";
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? "change-me";
 const ADMIN_NAME =
 	process.env.E2E_ADMIN_NAME ?? process.env.ADMIN_NAME ?? "Admin";
-const S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID ?? "minioadmin";
-const S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY ?? "minioadmin";
+const MINIO_ROOT_USER = process.env.MINIO_ROOT_USER ?? "minioadmin";
+const MINIO_ROOT_PASSWORD = process.env.MINIO_ROOT_PASSWORD ?? "minioadmin";
 const S3_BUCKET = process.env.S3_BUCKET ?? "attachments";
 const S3_REGION = process.env.S3_REGION ?? "us-east-1";
 
@@ -47,10 +47,10 @@ function buildRuntimeEnv() {
 		ADMIN_PASSWORD,
 		ADMIN_NAME,
 		UPLOAD_MAX_BYTES: process.env.UPLOAD_MAX_BYTES ?? "10485760",
+		MINIO_ROOT_USER,
+		MINIO_ROOT_PASSWORD,
 		S3_ENDPOINT: `http://${minioHost}:${minioPort}`,
 		S3_REGION,
-		S3_ACCESS_KEY_ID,
-		S3_SECRET_ACCESS_KEY,
 		S3_BUCKET,
 		S3_FORCE_PATH_STYLE: "true",
 		E2E_ADMIN_EMAIL: ADMIN_EMAIL,
@@ -93,8 +93,8 @@ async function ensureBucket(endpoint: string) {
 		endpoint,
 		forcePathStyle: true,
 		credentials: {
-			accessKeyId: S3_ACCESS_KEY_ID,
-			secretAccessKey: S3_SECRET_ACCESS_KEY,
+			accessKeyId: MINIO_ROOT_USER,
+			secretAccessKey: MINIO_ROOT_PASSWORD,
 		},
 	});
 	for (let attempt = 1; attempt <= 20; attempt++) {
@@ -183,8 +183,8 @@ async function main() {
 	)
 		.withCommand(["server", "/data"])
 		.withEnvironment({
-			MINIO_ROOT_USER: S3_ACCESS_KEY_ID,
-			MINIO_ROOT_PASSWORD: S3_SECRET_ACCESS_KEY,
+			MINIO_ROOT_USER,
+			MINIO_ROOT_PASSWORD,
 		})
 		.withExposedPorts(9000)
 		.withWaitStrategy(Wait.forHttp("/minio/health/live", 9000))
