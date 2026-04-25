@@ -17,12 +17,12 @@ FROM node:alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Generate Prisma client then build Next.js
 RUN npx --no-install prisma generate
-RUN npm run build
+ARG BUILD_DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
+RUN DATABASE_URL="$BUILD_DATABASE_URL" npm run build
 
 ############################
 # 3. Runtime

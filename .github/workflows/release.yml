@@ -1,0 +1,308 @@
+name: release
+
+run-name: Release from ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_version:
+        description: Optional guard. When set, it must match package.json version.
+        required: false
+        type: string
+      publish_latest:
+        description: Also publish the latest image tag for stable releases.
+        required: true
+        default: true
+        type: boolean
+      dry_run:
+        description: Build and validate without pushing an image or creating a release.
+        required: true
+        default: false
+        type: boolean
+      platforms:
+        description: Docker platforms to build.
+        required: true
+        default: linux/amd64
+        type: choice
+        options:
+          - linux/amd64
+          - linux/amd64,linux/arm64
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_TITLE: Application Tracker
+  IMAGE_DESCRIPTION: Self-hosted job search workspace
+
+jobs:
+  validate:
+    name: Validate release candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Validate messages
+        run: bun run i18n:check
+
+      - name: Check Markdown formatting
+        run: bun run check:md
+
+      - name: Run unit tests
+        run: bun run test
+
+  publish:
+    name: Build image and publish release
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read package metadata
+        id: package
+        env:
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+        run: |
+          set -euo pipefail
+
+          package_version="$(node -p "require('./package.json').version")"
+          semver_regex='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
+
+          if [[ -z "$package_version" || "$package_version" == "undefined" ]]; then
+            echo "package.json version is missing" >&2
+            exit 1
+          fi
+
+          if [[ ! "$package_version" =~ $semver_regex ]]; then
+            echo "package.json version must be a SemVer value. Found: $package_version" >&2
+            exit 1
+          fi
+
+          if [[ -n "$EXPECTED_VERSION" && "$EXPECTED_VERSION" != "$package_version" ]]; then
+            echo "Expected version $EXPECTED_VERSION does not match package.json version $package_version" >&2
+            exit 1
+          fi
+
+          image_name="${GITHUB_REPOSITORY,,}"
+          is_prerelease="false"
+          if [[ "$package_version" == *-* ]]; then
+            is_prerelease="true"
+          fi
+
+          {
+            echo "version=$package_version"
+            echo "release_tag=v$package_version"
+            echo "image=$REGISTRY/$image_name"
+            echo "is_prerelease=$is_prerelease"
+            echo "sha_short=$(git rev-parse --short=12 HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Enforce release branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "Dry run enabled; allowing release validation from $GITHUB_REF_NAME."
+            exit 0
+          fi
+
+          if [[ "$GITHUB_REF_TYPE" != "branch" || "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]]; then
+            echo "Releases must be published from the default branch ($DEFAULT_BRANCH). Current ref: $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+      - name: Ensure GitHub release tag is unused
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Git tag $RELEASE_TAG already exists" >&2
+            exit 1
+          fi
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "GitHub release $RELEASE_TAG already exists" >&2
+            exit 1
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: ${{ !inputs.dry_run }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure image version tag is unused
+        if: ${{ !inputs.dry_run }}
+        env:
+          IMAGE: ${{ steps.package.outputs.image }}
+          VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          if docker buildx imagetools inspect "$IMAGE:$VERSION" >/dev/null 2>&1; then
+            echo "Container image tag already exists: $IMAGE:$VERSION" >&2
+            exit 1
+          fi
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.package.outputs.image }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=${{ steps.package.outputs.version }}
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable=${{ inputs.publish_latest && steps.package.outputs.is_prerelease == 'false' }}
+          labels: |
+            org.opencontainers.image.title=${{ env.IMAGE_TITLE }}
+            org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
+            org.opencontainers.image.version=${{ steps.package.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.licenses=GPL-3.0
+
+      - name: Build image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ inputs.platforms }}
+          push: ${{ !inputs.dry_run }}
+          pull: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=release
+          cache-to: type=gha,mode=max,scope=release
+          provenance: mode=max
+          sbom: true
+
+      - name: Attest image provenance
+        if: ${{ !inputs.dry_run }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.package.outputs.image }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Write release notes
+        if: ${{ !inputs.dry_run }}
+        env:
+          IMAGE: ${{ steps.package.outputs.image }}
+          VERSION: ${{ steps.package.outputs.version }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          PLATFORMS: ${{ inputs.platforms }}
+          PUBLISH_LATEST: ${{ inputs.publish_latest }}
+          IS_PRERELEASE: ${{ steps.package.outputs.is_prerelease }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "## Container image"
+            echo ""
+            echo "- Image: \`$IMAGE:$VERSION\`"
+            echo "- Digest: \`$DIGEST\`"
+            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- Platforms: \`$PLATFORMS\`"
+
+            if [[ "$PUBLISH_LATEST" == "true" && "$IS_PRERELEASE" == "false" ]]; then
+              echo "- Latest tag: \`$IMAGE:latest\`"
+            fi
+
+            echo ""
+            echo "## Verification"
+            echo ""
+            echo "- Release candidate validation completed in GitHub Actions."
+            echo "- Build provenance attestation was pushed to the registry."
+          } > release-notes.md
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
+          IS_PRERELEASE: ${{ steps.package.outputs.is_prerelease }}
+        run: |
+          set -euo pipefail
+
+          release_flags=()
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            release_flags+=(--prerelease)
+          fi
+
+          gh release create "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Application Tracker $RELEASE_TAG" \
+            --notes-file release-notes.md \
+            "${release_flags[@]}"
+
+      - name: Write job summary
+        if: always()
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          IMAGE: ${{ steps.package.outputs.image }}
+          VERSION: ${{ steps.package.outputs.version }}
+          RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          PLATFORMS: ${{ inputs.platforms }}
+        run: |
+          {
+            echo "### Release workflow"
+            echo ""
+            echo "- Mode: \`$([[ "$DRY_RUN" == "true" ]] && echo dry-run || echo publish)\`"
+            echo "- Version: \`$VERSION\`"
+            echo "- Image: \`$IMAGE:$VERSION\`"
+            echo "- Digest: \`${DIGEST:-not pushed}\`"
+            echo "- Platforms: \`$PLATFORMS\`"
+            echo "- GitHub release: \`$([[ "$DRY_RUN" == "true" ]] && echo not-created || echo "$RELEASE_TAG")\`"
+          } >> "$GITHUB_STEP_SUMMARY"
