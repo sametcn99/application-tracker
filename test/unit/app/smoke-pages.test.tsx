@@ -116,6 +116,10 @@ describe("app smoke pages", () => {
 		await expect(generateMetadata()).resolves.toEqual({
 			title: "Application Tracker",
 			description: "Track applications",
+			robots: {
+				index: false,
+				follow: false,
+			},
 		});
 	});
 

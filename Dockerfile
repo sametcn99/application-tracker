@@ -13,7 +13,7 @@ RUN bun install --frozen-lockfile
 ############################
 # 2. Builder
 ############################
-FROM node:22-alpine AS builder
+FROM node:alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -27,7 +27,7 @@ RUN npm run build
 ############################
 # 3. Runtime
 ############################
-FROM node:22-alpine AS runner
+FROM node:alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl bash curl
 ENV NODE_ENV=production \
@@ -47,6 +47,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Prisma schema + seed + full node_modules (needed for prisma CLI + tsx + bcryptjs)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/src/shared/lib/database-url.ts ./src/shared/lib/database-url.ts
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 COPY --chown=nextjs:nodejs docker/entrypoint.sh /app/entrypoint.sh

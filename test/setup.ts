@@ -2,6 +2,10 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach } from "vitest";
 
+process.env.POSTGRES_USER ??= "testuser";
+process.env.POSTGRES_PASSWORD ??= "testpassword";
+process.env.POSTGRES_DB ??= "testdb";
+
 // Vitest 4 + Node 22 ships a partial built-in `localStorage` that lacks
 // most of the Web Storage API. Replace it with an in-memory implementation
 // so jsdom tests behave like a browser.
