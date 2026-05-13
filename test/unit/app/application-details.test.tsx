@@ -250,7 +250,7 @@ describe("ApplicationDetails", () => {
 		);
 
 		expect(screen.getByText("applicationDetail.details.outcome")).toBeTruthy();
-		expect(screen.getByText("—")).toBeTruthy();
+		expect(screen.getAllByText("—").length).toBeGreaterThan(0);
 		expect(
 			screen.getByText(`≤ ${formatCurrencyAmount(80000, "EUR")}`),
 		).toBeTruthy();

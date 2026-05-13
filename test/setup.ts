@@ -1,10 +1,20 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, beforeEach } from "vitest";
+import { afterEach, beforeEach, vi } from "vitest";
 
 process.env.POSTGRES_USER ??= "testuser";
 process.env.POSTGRES_PASSWORD ??= "testpassword";
 process.env.POSTGRES_DB ??= "testdb";
+
+// Mock NextResponse for API route tests
+vi.mock("next/server", () => ({
+	NextResponse: {
+		json: vi.fn((data: unknown, init?: { status?: number }) => ({
+			status: init?.status ?? 200,
+			json: () => Promise.resolve(data),
+		})),
+	},
+}));
 
 // Vitest 4 + Node 22 ships a partial built-in `localStorage` that lacks
 // most of the Web Storage API. Replace it with an in-memory implementation

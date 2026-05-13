@@ -8,6 +8,8 @@ export default defineConfig({
 			"@": new URL("./src", import.meta.url).pathname,
 			"server-only": new URL("./test/stubs/server-only.ts", import.meta.url)
 				.pathname,
+			"next/server": new URL("./test/stubs/next-server.ts", import.meta.url)
+				.pathname,
 		},
 	},
 	test: {

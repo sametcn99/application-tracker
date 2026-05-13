@@ -2,6 +2,34 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { messages, TestProviders } from "../../helpers/intl";
 
+vi.mock("next-auth", () => {
+	return {
+		__esModule: true,
+		default: vi.fn(() => ({
+			handlers: {},
+			signIn: vi.fn(),
+			signOut: vi.fn(),
+			auth: vi.fn(),
+		})),
+		getServerSession: vi.fn(() => Promise.resolve(null)),
+	};
+});
+vi.mock("next-auth/react", () => {
+	return {
+		__esModule: true,
+		default: vi.fn(() => [null, false]),
+		useSession: vi.fn(() => [null, false]),
+		getSession: vi.fn(() => Promise.resolve(null)),
+	};
+});
+vi.mock("next-auth/jwt", () => {
+	return {
+		__esModule: true,
+		default: vi.fn(),
+		getToken: vi.fn(() => Promise.resolve(null)),
+	};
+});
+
 const router = vi.hoisted(() => ({ push: vi.fn() }));
 const applicationActions = vi.hoisted(() => ({
 	createApplicationAction: vi.fn(),
