@@ -165,6 +165,7 @@
 				"tags",
 				"sources",
 				"currencies",
+				"coverLetters",
 				"settings",
 				"menu",
 				"sections"
@@ -192,6 +193,9 @@
 					"type": "string"
 				},
 				"currencies": {
+					"type": "string"
+				},
+				"coverLetters": {
 					"type": "string"
 				},
 				"settings": {
@@ -430,11 +434,11 @@
 				"currencyRateHint",
 				"saving",
 				"saveCreate",
-			"saveUpdate",
-			"saveToLetters",
-			"sections",
-			"placeholders"
-		],
+				"saveUpdate",
+				"saveToLetters",
+				"sections",
+				"placeholders"
+			],
 			"properties": {
 				"createTitle": {
 					"type": "string"
@@ -493,13 +497,13 @@
 				"saveCreate": {
 					"type": "string"
 				},
-			"saveUpdate": {
-				"type": "string"
-			},
-			"saveToLetters": {
-				"type": "string"
-			},
-			"sections": {
+				"saveUpdate": {
+					"type": "string"
+				},
+				"saveToLetters": {
+					"type": "string"
+				},
+				"sections": {
 					"type": "object",
 					"additionalProperties": false,
 					"required": [
@@ -1572,29 +1576,29 @@
 				"invalidSalaryRange",
 				"referralRequiresSourceType",
 				"outcomeReasonRequiresClosedStatus",
-			"workAuthorizationNoteConflictsWithSponsorship",
-			"coverLetterTitleRequired"
-		],
-		"properties": {
-			"required": {
-				"type": "string"
-			},
-			"invalid": {
-				"type": "string"
-			},
-			"tooLong": {
-				"type": "string"
-			},
-			"invalidUrl": {
-				"type": "string"
-			},
-			"invalidEmail": {
-				"type": "string"
-			},
-			"invalidNumber": {
-				"type": "string"
-			},
-			"invalidDate": {
+				"workAuthorizationNoteConflictsWithSponsorship",
+				"coverLetterTitleRequired"
+			],
+			"properties": {
+				"required": {
+					"type": "string"
+				},
+				"invalid": {
+					"type": "string"
+				},
+				"tooLong": {
+					"type": "string"
+				},
+				"invalidUrl": {
+					"type": "string"
+				},
+				"invalidEmail": {
+					"type": "string"
+				},
+				"invalidNumber": {
+					"type": "string"
+				},
+				"invalidDate": {
 					"type": "string"
 				},
 				"invalidSalaryRange": {
@@ -1606,15 +1610,15 @@
 				"outcomeReasonRequiresClosedStatus": {
 					"type": "string"
 				},
-			"workAuthorizationNoteConflictsWithSponsorship": {
-				"type": "string"
-			},
-			"coverLetterTitleRequired": {
-				"type": "string"
+				"workAuthorizationNoteConflictsWithSponsorship": {
+					"type": "string"
+				},
+				"coverLetterTitleRequired": {
+					"type": "string"
+				}
 			}
-		}
-	},
-	"fields": {
+		},
+		"fields": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": [
@@ -1642,9 +1646,9 @@
 				"contactEmail",
 				"contactPhone",
 				"contactProfileUrl",
-			"resumeVersion",
-			"coverLetterContent",
-			"portfolioUrl",
+				"resumeVersion",
+				"coverLetterContent",
+				"portfolioUrl",
 				"attachment",
 				"needsSponsorship",
 				"relocationPreference",
@@ -1786,13 +1790,13 @@
 				"contactProfileUrl": {
 					"type": "string"
 				},
-			"resumeVersion": {
-				"type": "string"
-			},
-			"coverLetterContent": {
-				"type": "string"
-			},
-			"portfolioUrl": {
+				"resumeVersion": {
+					"type": "string"
+				},
+				"coverLetterContent": {
+					"type": "string"
+				},
+				"portfolioUrl": {
 					"type": "string"
 				},
 				"attachment": {

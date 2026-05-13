@@ -1,10 +1,10 @@
 {
-  "sessionID": "ses_1dcb4cdc8ffeDy3FExJ3OOOUKe",
-  "updatedAt": "2026-05-13T21:46:25.998Z",
-  "sources": {
-    "background-task": {
-      "state": "idle",
-      "updatedAt": "2026-05-13T21:46:25.998Z"
-    }
-  }
+	"sessionID": "ses_1dcb4cdc8ffeDy3FExJ3OOOUKe",
+	"updatedAt": "2026-05-13T21:46:25.998Z",
+	"sources": {
+		"background-task": {
+			"state": "idle",
+			"updatedAt": "2026-05-13T21:46:25.998Z"
+		}
+	}
 }

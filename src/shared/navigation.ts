@@ -22,7 +22,11 @@ export const MANAGE_NAV = [
 	{ href: "/tags", labelKey: "tags", icon: BookmarkIcon },
 	{ href: "/sources", labelKey: "sources", icon: GlobeIcon },
 	{ href: "/currencies", labelKey: "currencies", icon: MixIcon },
-	{ href: "/cover-letters", labelKey: "coverLetters", icon: EnvelopeClosedIcon },
+	{
+		href: "/cover-letters",
+		labelKey: "coverLetters",
+		icon: EnvelopeClosedIcon,
+	},
 	{ href: "/settings", labelKey: "settings", icon: GearIcon },
 ] as const;
 

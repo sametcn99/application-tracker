@@ -119,7 +119,10 @@ export const applicationFormSchema = z
 		contactProfileUrl: optionalUrl,
 		resumeVersion: optionalStr(100),
 		coverLetterContent: optionalStr(50_000),
-		coverLetterId: z.string().optional().or(z.literal("").transform(() => undefined)),
+		coverLetterId: z
+			.string()
+			.optional()
+			.or(z.literal("").transform(() => undefined)),
 		saveToLetters: z.boolean().optional().default(false),
 		coverLetterTitle: optionalStr(200),
 		portfolioUrl: optionalUrl,

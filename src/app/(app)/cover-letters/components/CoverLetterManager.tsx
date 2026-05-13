@@ -13,8 +13,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { formatDate } from "@/shared/lib/format";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
+import { formatDate } from "@/shared/lib/format";
 import {
 	createCoverLetterAction,
 	deleteCoverLetterAction,
@@ -189,11 +189,7 @@ export function CoverLetterManager({
 					{items.map((item) => (
 						<Card key={item.id}>
 							{editingId === item.id ? (
-								<form
-									action={(formData) =>
-										handleUpdate(item.id, formData)
-									}
-								>
+								<form action={(formData) => handleUpdate(item.id, formData)}>
 									<Flex direction="column" gap="2">
 										<Flex gap="2" align="end" wrap="wrap">
 											<Flex
@@ -207,9 +203,7 @@ export function CoverLetterManager({
 												<TextField.Root
 													name="title"
 													value={editTitle}
-													onChange={(e) =>
-														setEditTitle(e.target.value)
-													}
+													onChange={(e) => setEditTitle(e.target.value)}
 													required
 												/>
 											</Flex>
@@ -221,9 +215,7 @@ export function CoverLetterManager({
 											<TextArea
 												name="content"
 												value={editContent}
-												onChange={(e) =>
-													setEditContent(e.target.value)
-												}
+												onChange={(e) => setEditContent(e.target.value)}
 												required
 												rows={6}
 											/>
@@ -238,10 +230,7 @@ export function CoverLetterManager({
 											>
 												{tCommon("cancel")}
 											</Button>
-											<Button
-												type="submit"
-												disabled={pending}
-											>
+											<Button type="submit" disabled={pending}>
 												{t("coverLetters.editButton")}
 											</Button>
 										</Flex>
@@ -253,25 +242,16 @@ export function CoverLetterManager({
 									</Flex>
 								</form>
 							) : (
-								<Flex
-									align="start"
-									justify="between"
-									gap="3"
-									wrap="wrap"
-								>
+								<Flex align="start" justify="between" gap="3" wrap="wrap">
 									<Flex
 										direction="column"
 										gap="1"
 										style={{ flex: 1, minWidth: 0 }}
 									>
-										<Text weight="medium">
-											{item.title}
-										</Text>
+										<Text weight="medium">{item.title}</Text>
 										<Text size="1" color="gray">
 											{item.content.slice(0, 100)}
-											{item.content.length > 100
-												? "…"
-												: ""}
+											{item.content.length > 100 ? "…" : ""}
 										</Text>
 										<Text size="1" color="gray">
 											{t("coverLetters.createdAt")}:{" "}
@@ -289,9 +269,7 @@ export function CoverLetterManager({
 										</IconButton>
 										<ConfirmationDialog
 											title={tCommon("delete")}
-											description={t(
-												"coverLetters.deleteConfirm",
-											)}
+											description={t("coverLetters.deleteConfirm")}
 											onConfirm={() => handleDelete(item.id)}
 											trigger={
 												<IconButton

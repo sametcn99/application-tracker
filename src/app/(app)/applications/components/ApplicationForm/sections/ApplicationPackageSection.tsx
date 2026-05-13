@@ -1,11 +1,19 @@
 "use client";
 
+import {
+	Card,
+	Flex,
+	Grid,
+	Heading,
+	Select,
+	Text,
+	TextArea,
+	TextField,
+} from "@radix-ui/themes";
 import { useState } from "react";
-import { Card, Flex, Grid, Heading, Select, Text, TextArea, TextField } from "@radix-ui/themes";
 import { Field } from "../components/Field";
 import { useTx } from "../hooks/useTx";
-import type { SectionBaseProps } from "../types";
-import type { CoverLetterOption } from "../types";
+import type { CoverLetterOption, SectionBaseProps } from "../types";
 
 type Props = SectionBaseProps & {
 	coverLetters?: CoverLetterOption[];
@@ -23,7 +31,9 @@ export function ApplicationPackageSection({ form, coverLetters = [] }: Props) {
 	const coverLetterContent = watch("coverLetterContent");
 	const saveToLetters = watch("saveToLetters");
 	const coverLetterId = watch("coverLetterId");
-	const [selectedLetterId, setSelectedLetterId] = useState<string>(coverLetterId ?? "");
+	const [selectedLetterId, setSelectedLetterId] = useState<string>(
+		coverLetterId ?? "",
+	);
 
 	const handleSelectLetter = (letterId: string) => {
 		setSelectedLetterId(letterId);
@@ -82,9 +92,7 @@ export function ApplicationPackageSection({ form, coverLetters = [] }: Props) {
 					>
 						<TextArea
 							{...register("coverLetterContent")}
-							placeholder={t(
-								"applicationForm.placeholders.coverLetterContent",
-							)}
+							placeholder={t("applicationForm.placeholders.coverLetterContent")}
 							rows={4}
 							style={{ minHeight: 100 }}
 						/>
@@ -95,9 +103,7 @@ export function ApplicationPackageSection({ form, coverLetters = [] }: Props) {
 					>
 						<TextField.Root
 							{...register("portfolioUrl")}
-							placeholder={t(
-								"applicationForm.placeholders.portfolioUrl",
-							)}
+							placeholder={t("applicationForm.placeholders.portfolioUrl")}
 						/>
 					</Field>
 				</Grid>
@@ -117,9 +123,7 @@ export function ApplicationPackageSection({ form, coverLetters = [] }: Props) {
 						{saveToLetters && (
 							<TextField.Root
 								{...register("coverLetterTitle")}
-								placeholder={t(
-									"applicationForm.placeholders.coverLetterTitle",
-								)}
+								placeholder={t("applicationForm.placeholders.coverLetterTitle")}
 							/>
 						)}
 						{errors.coverLetterTitle?.message && (

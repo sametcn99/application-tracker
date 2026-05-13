@@ -1,5 +1,5 @@
-import { prisma } from "./prisma";
 import type { CoverLetterFormInput } from "@/shared/schemas/cover-letter";
+import { prisma } from "./prisma";
 
 export async function listCoverLetters(userId: string) {
 	return prisma.coverLetter.findMany({
@@ -14,13 +14,20 @@ export async function getCoverLetter(id: string, userId: string) {
 	});
 }
 
-export async function createCoverLetter(userId: string, data: CoverLetterFormInput) {
+export async function createCoverLetter(
+	userId: string,
+	data: CoverLetterFormInput,
+) {
 	return prisma.coverLetter.create({
 		data: { ...data, userId },
 	});
 }
 
-export async function updateCoverLetter(id: string, userId: string, data: CoverLetterFormInput) {
+export async function updateCoverLetter(
+	id: string,
+	userId: string,
+	data: CoverLetterFormInput,
+) {
 	const letter = await prisma.coverLetter.findFirst({
 		where: { id, userId },
 	});

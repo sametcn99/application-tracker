@@ -71,7 +71,10 @@ export function useApplicationSubmit({
 					formData.append("content", coverLetterContent);
 					const letterResult = await createCoverLetterAction(formData);
 					if (letterResult.ok) {
-						await updateApplicationCoverLetterAction(appId, letterResult.data.id);
+						await updateApplicationCoverLetterAction(
+							appId,
+							letterResult.data.id,
+						);
 					}
 				}
 

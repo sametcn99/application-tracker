@@ -37,7 +37,10 @@ export async function createApplicationAction(
 		return {
 			ok: false,
 			error: "invalid_data",
-			fieldErrors: result.error.flatten().fieldErrors as Record<string, string[]>,
+			fieldErrors: result.error.flatten().fieldErrors as Record<
+				string,
+				string[]
+			>,
 		};
 	}
 
@@ -60,7 +63,10 @@ export async function updateApplicationAction(
 		return {
 			ok: false,
 			error: "invalid_data",
-			fieldErrors: result.error.flatten().fieldErrors as Record<string, string[]>,
+			fieldErrors: result.error.flatten().fieldErrors as Record<
+				string,
+				string[]
+			>,
 		};
 	}
 

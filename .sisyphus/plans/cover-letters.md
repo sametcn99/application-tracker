@@ -3,8 +3,9 @@
 ## TL;DR
 
 > **Quick Summary**: Add a cover letter management system where users can save, reuse, and manage cover letter templates on a dedicated page, and select/write cover letters directly in the application form with a "save to my letters" checkbox.
-> 
+>
 > **Deliverables**:
+>
 > - New `CoverLetter` Prisma model + migration
 > - New `/cover-letters` page with CRUD operations (list, create, edit, delete)
 > - Application form integration: dropdown for saved cover letters, markdown textarea, "save to my letters" checkbox
@@ -12,7 +13,7 @@
 > - Navigation update (sidebar + mobile nav)
 > - i18n keys for all new UI strings
 > - Server actions for cover letter CRUD + application form updates
-> 
+>
 > **Estimated Effort**: Medium
 > **Parallel Execution**: YES - 3 waves
 > **Critical Path**: Task 1 (schema) → Task 5 (form integration) → Task 8 (QA)
@@ -22,7 +23,9 @@
 ## Context
 
 ### Original Request
+
 User wants to add a cover letter (önyazı) management feature. When applying to jobs, cover letters are often requested. Users should be able to:
+
 1. Save cover letters on a dedicated page
 2. Select saved cover letters from a dropdown when creating/editing applications
 3. Write new cover letters inline in the application form
@@ -31,7 +34,9 @@ User wants to add a cover letter (önyazı) management feature. When applying to
 ⚠️ CRITICAL DISTINCTION: Resume (özgeçmiş/CV) and Cover Letter (önyazı/başvuru mektubu) are DIFFERENT things. This feature only deals with cover letters.
 
 ### Interview Summary
+
 **Key Discussions**:
+
 - Format: Markdown (consistent with existing `notes` field using react-markdown)
 - Editable: When selecting from dropdown, content copies into form and is editable (template-like behavior)
 - Data model: Replace `coverLetterVersion` with `coverLetterContent` (Text) + `coverLetterId` (optional FK)
@@ -41,6 +46,7 @@ User wants to add a cover letter (önyazı) management feature. When applying to
 - No pagination for cover letters list - simple findMany
 
 **Research Findings**:
+
 - Tech stack: Next.js 16 + App Router, React 19, Prisma 7 + PostgreSQL, Radix UI Themes, react-hook-form + Zod, next-intl, Server Actions, zustand
 - CRUD pattern (Tags/Sources/Currencies): Server Component page → Client Component → Server Actions (FormData + revalidatePath)
 - Application form: Section-based architecture with react-hook-form + Zod validation
@@ -49,7 +55,9 @@ User wants to add a cover letter (önyazı) management feature. When applying to
 - Audit system tracks field changes via `ActivityEntry` model
 
 ### Metis Review
+
 **Identified Gaps** (addressed):
+
 - No explicit handling for what happens when a saved cover letter is deleted but still referenced by an application — Resolved: `coverLetterId` is optional, content is denormalized on Application, so deletion of a CoverLetter does NOT break existing applications
 - No consideration for editing a cover letter template and whether it should update all applications that used it — Resolved: Content is COPIED to Application at save time, so editing a template does NOT retroactively change existing applications (this is correct template behavior)
 - Missing consideration for the activity/audit log when coverLetterContent changes — Resolved: `coverLetterVersion` is already in the audit tracked fields list; will update to track `coverLetterContent` changes instead
@@ -59,9 +67,11 @@ User wants to add a cover letter (önyazı) management feature. When applying to
 ## Work Objectives
 
 ### Core Objective
+
 Enable users to manage reusable cover letter templates and use them in job applications with a seamless inline editing experience.
 
 ### Concrete Deliverables
+
 - `CoverLetter` model in Prisma schema + migration
 - `/cover-letters` page with list, create, edit, delete functionality
 - Updated `ApplicationPackageSection` with dropdown + textarea + checkbox
@@ -72,6 +82,7 @@ Enable users to manage reusable cover letter templates and use them in job appli
 - Unit tests for server actions and Zod schema
 
 ### Definition of Done
+
 - [ ] `bun run db:migrate` succeeds without errors
 - [ ] `/cover-letters` page loads, displays list, supports create/edit/delete
 - [ ] Application form shows cover letter dropdown with saved letters
@@ -82,6 +93,7 @@ Enable users to manage reusable cover letter templates and use them in job appli
 - [ ] `bun test` passes for all new and existing tests
 
 ### Must Have
+
 - CoverLetter CRUD (create, read, update, delete)
 - Dropdown in application form showing saved cover letters
 - Inline cover letter editing in application form
@@ -92,6 +104,7 @@ Enable users to manage reusable cover letter templates and use them in job appli
 - Data migration that preserves existing `coverLetterVersion` values
 
 ### Must NOT Have (Guardrails)
+
 - NO AI-generated cover letters
 - NO rich text editor (WYSIWYG) — markdown textarea only
 - NO cover letter sharing between users
@@ -108,12 +121,14 @@ Enable users to manage reusable cover letter templates and use them in job appli
 > **ZERO HUMAN INTERVENTION** - ALL verification is agent-executed. No exceptions.
 
 ### Test Decision
+
 - **Infrastructure exists**: YES (vitest + playwright)
 - **Automated tests**: YES (Tests After)
 - **Framework**: vitest
 - **If TDD**: N/A (Tests After)
 
 ### QA Policy
+
 Every task MUST include agent-executed QA scenarios (see TODO template below).
 Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
@@ -158,18 +173,18 @@ Max Concurrent: 4 (Wave 1)
 
 ### Dependency Matrix
 
-| Task | Depends On | Blocks |
-|------|-----------|--------|
-| 1    | -         | 5, 6, 7, 8, 9 |
-| 2    | -         | 5, 6, 7 |
-| 3    | -         | 5, 6 |
-| 4    | -         | 5 |
-| 5    | 1, 2, 3, 4 | 8, 10 |
-| 6    | 1, 3       | 8 |
-| 7    | 1, 2       | 8, 9, 10 |
-| 8    | 6, 7       | 10 |
-| 9    | 7          | 10 |
-| 10   | 5, 7, 8, 9 | F1-F4 |
+| Task | Depends On | Blocks        |
+| ---- | ---------- | ------------- |
+| 1    | -          | 5, 6, 7, 8, 9 |
+| 2    | -          | 5, 6, 7       |
+| 3    | -          | 5, 6          |
+| 4    | -          | 5             |
+| 5    | 1, 2, 3, 4 | 8, 10         |
+| 6    | 1, 3       | 8             |
+| 7    | 1, 2       | 8, 9, 10      |
+| 8    | 6, 7       | 10            |
+| 9    | 7          | 10            |
+| 10   | 5, 7, 8, 9 | F1-F4         |
 
 ### Agent Dispatch Summary
 
@@ -1038,20 +1053,20 @@ Max Concurrent: 4 (Wave 1)
 > **Never mark F1-F4 as checked before getting user's okay.**
 
 - [ ] F1. **Plan Compliance Audit** — `oracle`
-  Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
-  Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
+      Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
+      Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
 - [ ] F2. **Code Quality Review** — `unspecified-high`
-  Run `bun run typecheck` + `bun run check` + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names.
-  Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
+      Run `bun run typecheck` + `bun run check` + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names.
+      Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
 - [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
-  Start from clean state. Execute EVERY QA scenario from EVERY task. Test cross-task integration: create cover letter → use in application form → verify on details page → edit → verify update → delete → verify application still shows old content. Test edge cases: empty cover letter, very long content, special characters. Save to `.sisyphus/evidence/final-qa/`.
-  Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
+      Start from clean state. Execute EVERY QA scenario from EVERY task. Test cross-task integration: create cover letter → use in application form → verify on details page → edit → verify update → delete → verify application still shows old content. Test edge cases: empty cover letter, very long content, special characters. Save to `.sisyphus/evidence/final-qa/`.
+      Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
 - [ ] F4. **Scope Fidelity Check** — `deep`
-  For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination. Flag unaccounted changes.
-  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
+      For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination. Flag unaccounted changes.
+      Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
 ---
 
@@ -1073,6 +1088,7 @@ Max Concurrent: 4 (Wave 1)
 ## Success Criteria
 
 ### Verification Commands
+
 ```bash
 bun run db:migrate        # Expected: migration applied successfully
 bun run typecheck         # Expected: no type errors
@@ -1081,6 +1097,7 @@ bun test                  # Expected: all tests pass
 ```
 
 ### Final Checklist
+
 - [ ] All "Must Have" present
 - [ ] All "Must NOT Have" absent
 - [ ] All tests pass

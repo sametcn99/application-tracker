@@ -2,6 +2,7 @@ import { Flex, Heading } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ApplicationForm } from "@/app/(app)/applications/components/ApplicationForm";
+import { auth } from "@/auth";
 import type {
 	ApplicationMethod,
 	CompanySize,
@@ -14,7 +15,6 @@ import type {
 	Status,
 	WorkMode,
 } from "@/shared/constants/application";
-import { auth } from "@/auth";
 import { getApplication } from "@/shared/lib/applications";
 import { listCompanyFormOptions } from "@/shared/lib/companies";
 import { listCoverLetters } from "@/shared/lib/cover-letters";
@@ -33,14 +33,15 @@ export default async function EditApplicationPage({
 	const { id } = await params;
 	const session = await auth();
 	const userId = session?.user?.id;
-	const [app, tags, sources, currencies, companies, coverLetters] = await Promise.all([
-		getApplication(id),
-		prisma.tag.findMany({ orderBy: { name: "asc" } }),
-		getSourceOptions(),
-		getCurrencyOptions(),
-		listCompanyFormOptions(),
-		userId ? listCoverLetters(userId) : Promise.resolve([]),
-	]);
+	const [app, tags, sources, currencies, companies, coverLetters] =
+		await Promise.all([
+			getApplication(id),
+			prisma.tag.findMany({ orderBy: { name: "asc" } }),
+			getSourceOptions(),
+			getCurrencyOptions(),
+			listCompanyFormOptions(),
+			userId ? listCoverLetters(userId) : Promise.resolve([]),
+		]);
 	if (!app) notFound();
 	const t = await getTranslations();
 
