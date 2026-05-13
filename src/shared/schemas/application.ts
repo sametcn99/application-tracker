@@ -118,7 +118,10 @@ export const applicationFormSchema = z
 		contactPhone: optionalStr(50),
 		contactProfileUrl: optionalUrl,
 		resumeVersion: optionalStr(100),
-		coverLetterVersion: optionalStr(100),
+		coverLetterContent: optionalStr(50_000),
+		coverLetterId: z.string().optional().or(z.literal("").transform(() => undefined)),
+		saveToLetters: z.boolean().optional().default(false),
+		coverLetterTitle: optionalStr(200),
 		portfolioUrl: optionalUrl,
 		needsSponsorship: optionalBoolean,
 		relocationPreference: optionalEnum(RELOCATION_PREFERENCES),
@@ -178,6 +181,14 @@ export const applicationFormSchema = z
 				code: z.ZodIssueCode.custom,
 				message: "validation.workAuthorizationNoteConflictsWithSponsorship",
 				path: ["workAuthorizationNote"],
+			});
+		}
+
+		if (values.saveToLetters && !values.coverLetterTitle) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "validation.coverLetterTitleRequired",
+				path: ["coverLetterTitle"],
 			});
 		}
 	});

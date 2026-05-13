@@ -37,7 +37,8 @@ type App = {
 	contactPhone: string | null;
 	contactProfileUrl: string | null;
 	resumeVersion: string | null;
-	coverLetterVersion: string | null;
+	coverLetterContent: string | null;
+	coverLetterId: string | null;
 	portfolioUrl: string | null;
 	needsSponsorship: boolean | null;
 	relocationPreference: string | null;
@@ -241,8 +242,8 @@ export async function ApplicationDetails({
 						value={app.resumeVersion ?? "—"}
 					/>
 					<Field
-						label={t("fields.coverLetterVersion")}
-						value={app.coverLetterVersion ?? "—"}
+						label={t("fields.coverLetterContent")}
+						value={app.coverLetterContent ?? "—"}
 					/>
 					<Field
 						label={t("fields.portfolioUrl")}

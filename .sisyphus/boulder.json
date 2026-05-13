@@ -1,0 +1,23 @@
+{
+  "active_plan": "/home/samet/Documents/github/sametcn99/application-tracker/.sisyphus/plans/cover-letters.md",
+  "started_at": "2026-05-13T21:49:13.914Z",
+  "session_ids": [
+    "ses_1dcb8561fffe0b3KaDPEgkU3lz"
+  ],
+  "session_origins": {
+    "ses_1dcb8561fffe0b3KaDPEgkU3lz": "direct"
+  },
+  "plan_name": "cover-letters",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "**Prisma Schema & Migration**",
+      "session_id": "ses_1dcae2feeffeUqtxRdOlKLaTU3",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-13T21:51:59.491Z"
+    }
+  }
+}

@@ -70,7 +70,8 @@ export default async function EditApplicationPage({
 		contactPhone: app.contactPhone ?? undefined,
 		contactProfileUrl: app.contactProfileUrl ?? undefined,
 		resumeVersion: app.resumeVersion ?? undefined,
-		coverLetterVersion: app.coverLetterVersion ?? undefined,
+		coverLetterContent: app.coverLetterContent ?? undefined,
+		coverLetterId: app.coverLetterId ?? undefined,
 		portfolioUrl: app.portfolioUrl ?? undefined,
 		needsSponsorship: app.needsSponsorship ?? undefined,
 		relocationPreference:
