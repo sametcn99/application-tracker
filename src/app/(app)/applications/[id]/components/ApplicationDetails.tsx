@@ -1,5 +1,7 @@
 import { Box, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import { getTranslations } from "next-intl/server";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
 	formatCurrencyAmount,
 	formatDate,
@@ -241,10 +243,28 @@ export async function ApplicationDetails({
 						label={t("fields.resumeVersion")}
 						value={app.resumeVersion ?? "—"}
 					/>
-					<Field
-						label={t("fields.coverLetterContent")}
-						value={app.coverLetterContent ?? "—"}
-					/>
+					<Flex direction="column" gap="1">
+						<Text size="1" color="gray">
+							{t("fields.coverLetterContent")}
+						</Text>
+						{app.coverLetterContent ? (
+							<Box
+								style={{
+									maxHeight: 300,
+									overflowY: "auto",
+									padding: 12,
+									background: "var(--gray-a2)",
+									borderRadius: 6,
+								}}
+							>
+								<ReactMarkdown remarkPlugins={[remarkGfm]}>
+									{app.coverLetterContent}
+								</ReactMarkdown>
+							</Box>
+						) : (
+							<Text>—</Text>
+						)}
+					</Flex>
 					<Field
 						label={t("fields.portfolioUrl")}
 						value={
