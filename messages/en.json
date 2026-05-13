@@ -34,6 +34,7 @@
 		"tags": "Tags",
 		"sources": "Sources",
 		"currencies": "Currencies",
+		"coverLetters": "Cover Letters",
 		"settings": "Settings",
 		"menu": "Menu",
 		"sections": {
@@ -261,6 +262,23 @@
 		"equivalents": "Approximate equivalents",
 		"lastSynced": "Last synced {date}"
 	},
+	"coverLetters": {
+		"title": "Cover Letters",
+		"subtitle": "Manage your reusable cover letter templates.",
+		"name": "Title",
+		"namePlaceholder": "e.g. Software Engineer Cover Letter",
+		"content": "Content",
+		"contentPlaceholder": "Write your cover letter here…",
+		"addButton": "Add Cover Letter",
+		"editButton": "Save",
+		"deleteButton": "Delete",
+		"deleteConfirm": "Are you sure you want to delete this cover letter?",
+		"emptyState": "No cover letters yet. Create your first one above.",
+		"selectExisting": "Select a saved cover letter",
+		"noSavedLetters": "No saved cover letters",
+		"createdAt": "Created",
+		"updatedAt": "Updated"
+	},
 	"attachments": {
 		"title": "Attachments",
 		"upload": "Upload file",
@@ -373,7 +391,8 @@
 		"invalidSalaryRange": "Max salary must be greater than or equal to min salary.",
 		"referralRequiresSourceType": "Referral name can only be set when source type is Referral.",
 		"outcomeReasonRequiresClosedStatus": "Outcome reason can only be set for Rejected or Withdrawn applications.",
-		"workAuthorizationNoteConflictsWithSponsorship": "The work authorization note conflicts with the sponsorship setting."
+		"workAuthorizationNoteConflictsWithSponsorship": "The work authorization note conflicts with the sponsorship setting.",
+		"coverLetterTitleRequired": "Please enter a title to save this cover letter."
 	},
 	"fields": {
 		"company": "Company",

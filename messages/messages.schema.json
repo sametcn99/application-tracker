@@ -20,6 +20,7 @@
 		"tags",
 		"sources",
 		"currencies",
+		"coverLetters",
 		"attachments",
 		"settings",
 		"comments",
@@ -429,10 +430,11 @@
 				"currencyRateHint",
 				"saving",
 				"saveCreate",
-				"saveUpdate",
-				"sections",
-				"placeholders"
-			],
+			"saveUpdate",
+			"saveToLetters",
+			"sections",
+			"placeholders"
+		],
 			"properties": {
 				"createTitle": {
 					"type": "string"
@@ -491,10 +493,13 @@
 				"saveCreate": {
 					"type": "string"
 				},
-				"saveUpdate": {
-					"type": "string"
-				},
-				"sections": {
+			"saveUpdate": {
+				"type": "string"
+			},
+			"saveToLetters": {
+				"type": "string"
+			},
+			"sections": {
 					"type": "object",
 					"additionalProperties": false,
 					"required": [
@@ -559,7 +564,8 @@
 						"contactPhone",
 						"contactProfileUrl",
 						"resumeVersion",
-						"coverLetterVersion",
+						"coverLetterContent",
+						"coverLetterTitle",
 						"portfolioUrl",
 						"workAuthorizationNote",
 						"team",
@@ -610,7 +616,10 @@
 						"resumeVersion": {
 							"type": "string"
 						},
-						"coverLetterVersion": {
+						"coverLetterContent": {
+							"type": "string"
+						},
+						"coverLetterTitle": {
 							"type": "string"
 						},
 						"portfolioUrl": {
@@ -1083,6 +1092,74 @@
 				}
 			}
 		},
+		"coverLetters": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"title",
+				"subtitle",
+				"name",
+				"namePlaceholder",
+				"content",
+				"contentPlaceholder",
+				"addButton",
+				"editButton",
+				"deleteButton",
+				"deleteConfirm",
+				"emptyState",
+				"selectExisting",
+				"noSavedLetters",
+				"createdAt",
+				"updatedAt"
+			],
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"namePlaceholder": {
+					"type": "string"
+				},
+				"content": {
+					"type": "string"
+				},
+				"contentPlaceholder": {
+					"type": "string"
+				},
+				"addButton": {
+					"type": "string"
+				},
+				"editButton": {
+					"type": "string"
+				},
+				"deleteButton": {
+					"type": "string"
+				},
+				"deleteConfirm": {
+					"type": "string"
+				},
+				"emptyState": {
+					"type": "string"
+				},
+				"selectExisting": {
+					"type": "string"
+				},
+				"noSavedLetters": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			}
+		},
 		"attachments": {
 			"type": "object",
 			"additionalProperties": false,
@@ -1495,28 +1572,29 @@
 				"invalidSalaryRange",
 				"referralRequiresSourceType",
 				"outcomeReasonRequiresClosedStatus",
-				"workAuthorizationNoteConflictsWithSponsorship"
-			],
-			"properties": {
-				"required": {
-					"type": "string"
-				},
-				"invalid": {
-					"type": "string"
-				},
-				"tooLong": {
-					"type": "string"
-				},
-				"invalidUrl": {
-					"type": "string"
-				},
-				"invalidEmail": {
-					"type": "string"
-				},
-				"invalidNumber": {
-					"type": "string"
-				},
-				"invalidDate": {
+			"workAuthorizationNoteConflictsWithSponsorship",
+			"coverLetterTitleRequired"
+		],
+		"properties": {
+			"required": {
+				"type": "string"
+			},
+			"invalid": {
+				"type": "string"
+			},
+			"tooLong": {
+				"type": "string"
+			},
+			"invalidUrl": {
+				"type": "string"
+			},
+			"invalidEmail": {
+				"type": "string"
+			},
+			"invalidNumber": {
+				"type": "string"
+			},
+			"invalidDate": {
 					"type": "string"
 				},
 				"invalidSalaryRange": {
@@ -1528,12 +1606,15 @@
 				"outcomeReasonRequiresClosedStatus": {
 					"type": "string"
 				},
-				"workAuthorizationNoteConflictsWithSponsorship": {
-					"type": "string"
-				}
+			"workAuthorizationNoteConflictsWithSponsorship": {
+				"type": "string"
+			},
+			"coverLetterTitleRequired": {
+				"type": "string"
 			}
-		},
-		"fields": {
+		}
+	},
+	"fields": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": [
@@ -1561,9 +1642,9 @@
 				"contactEmail",
 				"contactPhone",
 				"contactProfileUrl",
-				"resumeVersion",
-				"coverLetterVersion",
-				"portfolioUrl",
+			"resumeVersion",
+			"coverLetterContent",
+			"portfolioUrl",
 				"attachment",
 				"needsSponsorship",
 				"relocationPreference",
@@ -1705,13 +1786,13 @@
 				"contactProfileUrl": {
 					"type": "string"
 				},
-				"resumeVersion": {
-					"type": "string"
-				},
-				"coverLetterVersion": {
-					"type": "string"
-				},
-				"portfolioUrl": {
+			"resumeVersion": {
+				"type": "string"
+			},
+			"coverLetterContent": {
+				"type": "string"
+			},
+			"portfolioUrl": {
 					"type": "string"
 				},
 				"attachment": {
