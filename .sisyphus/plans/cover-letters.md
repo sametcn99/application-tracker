@@ -197,7 +197,7 @@ Max Concurrent: 4 (Wave 1)
 
 ## TODOs
 
-- [ ] 1. **Prisma Schema & Migration**
+- [x] 1. **Prisma Schema & Migration**
 
   **What to do**:
   - Add `CoverLetter` model to `prisma/schema.prisma` with fields: `id` (cuid), `userId` (FK to User), `title` (String, max 200), `content` (String, @db.Text), `createdAt`, `updatedAt`, and relation `applications Application[]`
@@ -276,7 +276,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `prisma/schema.prisma`, migration file
   - Pre-commit: `bunx prisma generate && bun run typecheck`
 
-- [ ] 2. **CoverLetter Zod Schema + Server Actions**
+- [x] 2. **CoverLetter Zod Schema + Server Actions**
 
   **What to do**:
   - Create `src/shared/schemas/cover-letter.ts` with Zod schema:
@@ -358,7 +358,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/shared/schemas/cover-letter.ts`, `src/shared/lib/cover-letters.ts`, `src/app/(app)/cover-letters/actions/cover-letters.ts`
   - Pre-commit: `bun run typecheck`
 
-- [ ] 3. **i18n Keys for Cover Letters**
+- [x] 3. **i18n Keys for Cover Letters**
 
   **What to do**:
   - Add `coverLetters` section to `messages/en.json` with all necessary keys:
@@ -425,7 +425,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `messages/en.json`, `messages/schema.json`
   - Pre-commit: `bun run i18n:check`
 
-- [ ] 4. **Navigation Update for Cover Letters**
+- [x] 4. **Navigation Update for Cover Letters**
 
   **What to do**:
   - Add cover letters entry to `MANAGE_NAV` in `src/shared/navigation.ts`:
@@ -483,7 +483,7 @@ Max Concurrent: 4 (Wave 1)
 
 ---
 
-- [ ] 5. **Cover Letters Management Page (CRUD)**
+- [x] 5. **Cover Letters Management Page (CRUD)**
 
   **What to do**:
   - Create `src/app/(app)/cover-letters/page.tsx` (Server Component):
@@ -594,7 +594,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/app/(app)/cover-letters/`
   - Pre-commit: `bun run typecheck && bun run check`
 
-- [ ] 6. **Application Form: Cover Letter Integration (Dropdown + Textarea + Checkbox)**
+- [x] 6. **Application Form: Cover Letter Integration (Dropdown + Textarea + Checkbox)**
 
   **What to do**:
   - Modify `ApplicationPackageSection.tsx` to include:
@@ -729,7 +729,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/app/(app)/applications/components/ApplicationForm/`, `src/app/(app)/applications/new/page.tsx`, `src/app/(app)/applications/[id]/edit/page.tsx`
   - Pre-commit: `bun run typecheck`
 
-- [ ] 7. **Application Server Actions: Cover Letter Fields Update**
+- [x] 7. **Application Server Actions: Cover Letter Fields Update**
 
   **What to do**:
   - Remove `coverLetterVersion` mapping from `src/shared/lib/applications.ts` (line ~249)
@@ -825,7 +825,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/shared/schemas/application.ts`, `src/shared/lib/applications.ts`, `src/shared/actions/applications.ts`, `src/shared/lib/audit.ts`, `src/app/(app)/applications/[id]/components/ApplicationDetails.tsx`
   - Pre-commit: `bun run typecheck`
 
-- [ ] 8. **Application Details: Cover Letter Content Display**
+- [x] 8. **Application Details: Cover Letter Content Display**
 
   **What to do**:
   - Update `ApplicationDetails.tsx` to display `coverLetterContent` as rendered markdown (using `react-markdown` + `remark-gfm`, already installed)
@@ -893,7 +893,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/app/(app)/applications/[id]/components/ApplicationDetails.tsx`
   - Pre-commit: `bun run typecheck`
 
-- [ ] 9. **Audit Log: Track Cover Letter Content Changes**
+- [x] 9. **Audit Log: Track Cover Letter Content Changes**
 
   **What to do**:
   - In `src/shared/lib/audit.ts`, update the tracked fields array:
@@ -958,7 +958,7 @@ Max Concurrent: 4 (Wave 1)
   - Files: `src/shared/lib/audit.ts`
   - Pre-commit: `bun run typecheck`
 
-- [ ] 10. **Unit Tests for Cover Letter Feature**
+- [x] 10. **Unit Tests for Cover Letter Feature**
 
   **What to do**:
   - Create test files following existing test patterns:
@@ -1052,19 +1052,19 @@ Max Concurrent: 4 (Wave 1)
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.**
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
       Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
       Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
       Run `bun run typecheck` + `bun run check` + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names.
       Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
+- [x] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
       Start from clean state. Execute EVERY QA scenario from EVERY task. Test cross-task integration: create cover letter → use in application form → verify on details page → edit → verify update → delete → verify application still shows old content. Test edge cases: empty cover letter, very long content, special characters. Save to `.sisyphus/evidence/final-qa/`.
       Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
       For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination. Flag unaccounted changes.
       Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
