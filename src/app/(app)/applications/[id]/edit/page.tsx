@@ -14,8 +14,10 @@ import type {
 	Status,
 	WorkMode,
 } from "@/shared/constants/application";
+import { auth } from "@/auth";
 import { getApplication } from "@/shared/lib/applications";
 import { listCompanyFormOptions } from "@/shared/lib/companies";
+import { listCoverLetters } from "@/shared/lib/cover-letters";
 import { prisma } from "@/shared/lib/prisma";
 import {
 	getCurrencyOptions,
@@ -29,12 +31,15 @@ export default async function EditApplicationPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const [app, tags, sources, currencies, companies] = await Promise.all([
+	const session = await auth();
+	const userId = session?.user?.id;
+	const [app, tags, sources, currencies, companies, coverLetters] = await Promise.all([
 		getApplication(id),
 		prisma.tag.findMany({ orderBy: { name: "asc" } }),
 		getSourceOptions(),
 		getCurrencyOptions(),
 		listCompanyFormOptions(),
+		userId ? listCoverLetters(userId) : Promise.resolve([]),
 	]);
 	if (!app) notFound();
 	const t = await getTranslations();
@@ -103,6 +108,7 @@ export default async function EditApplicationPage({
 				sources={sources}
 				currencies={currencies}
 				companies={companies}
+				coverLetters={coverLetters}
 			/>
 		</Flex>
 	);

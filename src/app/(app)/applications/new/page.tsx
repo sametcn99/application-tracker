@@ -2,19 +2,24 @@ import { Flex, Heading } from "@radix-ui/themes";
 import { getTranslations } from "next-intl/server";
 import { ApplicationForm } from "@/app/(app)/applications/components/ApplicationForm";
 import { listCompanyFormOptions } from "@/shared/lib/companies";
+import { listCoverLetters } from "@/shared/lib/cover-letters";
 import { prisma } from "@/shared/lib/prisma";
 import {
 	getCurrencyOptions,
 	getSourceOptions,
 } from "@/shared/lib/reference-data";
+import { auth } from "@/auth";
 
 export default async function NewApplicationPage() {
 	const t = await getTranslations();
-	const [tags, sources, currencies, companies] = await Promise.all([
+	const session = await auth();
+	const userId = session?.user?.id;
+	const [tags, sources, currencies, companies, coverLetters] = await Promise.all([
 		prisma.tag.findMany({ orderBy: { name: "asc" } }),
 		getSourceOptions(),
 		getCurrencyOptions(),
 		listCompanyFormOptions(),
+		userId ? listCoverLetters(userId) : Promise.resolve([]),
 	]);
 	return (
 		<Flex direction="column" gap="4">
@@ -25,6 +30,7 @@ export default async function NewApplicationPage() {
 				sources={sources}
 				currencies={currencies}
 				companies={companies}
+				coverLetters={coverLetters}
 			/>
 		</Flex>
 	);

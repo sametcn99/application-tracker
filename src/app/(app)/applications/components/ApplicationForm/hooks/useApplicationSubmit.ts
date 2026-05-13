@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
+import { createCoverLetterAction } from "@/app/(app)/cover-letters/actions/cover-letters";
 import {
 	createApplicationAction,
 	updateApplicationAction,
+	updateApplicationCoverLetterAction,
 } from "@/shared/actions/applications";
 import {
 	clearLocalRecovery,
@@ -52,7 +54,7 @@ export function useApplicationSubmit({
 				mode === "create"
 					? await createApplicationAction(values)
 					: await updateApplicationAction(applicationId!, values);
-			if (result && !result.ok) {
+			if (!result.ok) {
 				setTopError(tx(result.error) ?? t("errors.generic"));
 				if (result.fieldErrors) {
 					for (const [k, v] of Object.entries(result.fieldErrors)) {
@@ -60,12 +62,24 @@ export function useApplicationSubmit({
 							setError(k as keyof ApplicationFormInput, { message: v[0] });
 					}
 				}
-			} else if (result && result.ok) {
+			} else {
+				const appId = result.id;
+				const { saveToLetters, coverLetterTitle, coverLetterContent } = values;
+				if (saveToLetters && coverLetterTitle && coverLetterContent) {
+					const formData = new FormData();
+					formData.append("title", coverLetterTitle);
+					formData.append("content", coverLetterContent);
+					const letterResult = await createCoverLetterAction(formData);
+					if (letterResult.ok) {
+						await updateApplicationCoverLetterAction(appId, letterResult.data.id);
+					}
+				}
+
 				clearLocalRecovery(draftContext);
 				setLocalRecovery(null);
 				guard.setDirty(false);
 				guard.allowNext();
-				router.push(`/applications/${result.id}`);
+				router.push(`/applications/${appId}`);
 			}
 		});
 	};

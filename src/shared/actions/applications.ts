@@ -12,10 +12,15 @@ import {
 	updateStatus,
 } from "@/shared/lib/applications";
 import { logger } from "@/shared/lib/logger";
+import { prisma } from "@/shared/lib/prisma";
 import {
 	type ApplicationFormInput,
 	applicationFormSchema,
 } from "@/shared/schemas/application";
+
+export type ApplicationActionResult =
+	| { ok: true; id: string }
+	| { ok: false; error: string; fieldErrors?: Record<string, string[]> };
 
 export async function fetchApplicationsAction(
 	filters: ListFilters,
@@ -24,13 +29,15 @@ export async function fetchApplicationsAction(
 	return listApplicationsPage(filters, cursor);
 }
 
-export async function createApplicationAction(values: ApplicationFormInput) {
+export async function createApplicationAction(
+	values: ApplicationFormInput,
+): Promise<ApplicationActionResult> {
 	const result = applicationFormSchema.safeParse(values);
 	if (!result.success) {
 		return {
 			ok: false,
 			error: "invalid_data",
-			fieldErrors: result.error.flatten().fieldErrors,
+			fieldErrors: result.error.flatten().fieldErrors as Record<string, string[]>,
 		};
 	}
 
@@ -47,13 +54,13 @@ export async function createApplicationAction(values: ApplicationFormInput) {
 export async function updateApplicationAction(
 	id: string,
 	values: ApplicationFormInput,
-) {
+): Promise<ApplicationActionResult> {
 	const result = applicationFormSchema.safeParse(values);
 	if (!result.success) {
 		return {
 			ok: false,
 			error: "invalid_data",
-			fieldErrors: result.error.flatten().fieldErrors,
+			fieldErrors: result.error.flatten().fieldErrors as Record<string, string[]>,
 		};
 	}
 
@@ -65,6 +72,25 @@ export async function updateApplicationAction(
 		return { ok: true, id };
 	} catch {
 		logger.error("update_application_failed", { id });
+		return { ok: false, error: "server_error" };
+	}
+}
+
+export async function updateApplicationCoverLetterAction(
+	id: string,
+	coverLetterId: string,
+) {
+	try {
+		await prisma.application.update({
+			where: { id },
+			data: { coverLetterId },
+		});
+		revalidatePath("/applications");
+		revalidatePath(`/applications/${id}`);
+		revalidatePath(`/applications/${id}/edit`);
+		return { ok: true };
+	} catch {
+		logger.error("update_cover_letter_link_failed", { id });
 		return { ok: false, error: "server_error" };
 	}
 }

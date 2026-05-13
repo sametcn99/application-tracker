@@ -32,6 +32,7 @@ export function ApplicationForm({
 	sources,
 	currencies,
 	companies,
+	coverLetters = [],
 }: ApplicationFormProps) {
 	const { t, tx } = useTx();
 	const {
@@ -131,7 +132,7 @@ export function ApplicationForm({
 						selectedCurrency={selectedCurrency}
 					/>
 					<ContactSection form={form} />
-					<ApplicationPackageSection form={form} />
+					<ApplicationPackageSection form={form} coverLetters={coverLetters} />
 					<EligibilitySection
 						form={form}
 						showWorkAuthorizationNote={showWorkAuthorizationNote}

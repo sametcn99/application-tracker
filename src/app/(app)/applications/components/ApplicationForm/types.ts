@@ -19,6 +19,12 @@ export type CompanyOption = {
 	companySize: string | null;
 };
 
+export type CoverLetterOption = {
+	id: string;
+	title: string;
+	content: string;
+};
+
 export type ApplicationFormProps = {
 	mode: "create" | "edit";
 	applicationId?: string;
@@ -28,6 +34,7 @@ export type ApplicationFormProps = {
 	sources: SourceOptionRecord[];
 	currencies: CurrencyOptionRecord[];
 	companies: CompanyOption[];
+	coverLetters?: CoverLetterOption[];
 };
 
 export type FormApi = UseFormReturn<ApplicationFormInput>;
