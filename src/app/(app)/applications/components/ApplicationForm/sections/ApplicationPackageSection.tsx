@@ -67,16 +67,13 @@ export function ApplicationPackageSection({ form, coverLetters = [] }: Props) {
 					{coverLetters.length > 0 && (
 						<Field label={t("coverLetters.selectExisting")}>
 							<Select.Root
-								value={selectedLetterId}
+								value={selectedLetterId || undefined}
 								onValueChange={handleSelectLetter}
 							>
 								<Select.Trigger
 									placeholder={t("coverLetters.selectExisting")}
 								/>
 								<Select.Content>
-									<Select.Item value="">
-										{t("coverLetters.selectExisting")}
-									</Select.Item>
 									{coverLetters.map((letter) => (
 										<Select.Item key={letter.id} value={letter.id}>
 											{letter.title}
