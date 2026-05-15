@@ -21,6 +21,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    # Override command: start postgres, then sync the configured user's
+    # password on every boot so that credential changes in env vars
+    # take effect even when a volume with old credentials persists.
+    command: >
+      sh -c "
+      /usr/local/bin/docker-entrypoint.sh postgres &
+      PID=$!;
+      trap \"kill $PID\" TERM INT;
+      until pg_isready -U postgres -h localhost; do sleep 1; done;
+      echo \"ALTER USER \"$POSTGRES_USER\" WITH PASSWORD '$POSTGRES_PASSWORD';\" |
+        psql -U postgres -h localhost;
+      wait $PID;
+      "
 
   minio:
     image: minio/minio:latest
@@ -65,7 +78,19 @@ services:
       minio-init:
         condition: service_completed_successfully
     environment:
-      <<: [*postgres-env, *minio-env]
+      # Database — use DATABASE_URL from Coolify (managed DB) or fall back to
+      # the constructed value. These variables are *not* inherited from the
+      # postgres-env anchor so Coolify's own POSTGRES_* overrides never reach
+      # the app container.
+      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+      # MinIO
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER is required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required}
+      S3_ENDPOINT: "http://minio:9000"
+      # App
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
       AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is required}
@@ -77,7 +102,6 @@ services:
       UPLOAD_ALLOWED_MIME_TYPES: "application/pdf,text/plain,image/png,image/jpeg"
       UPLOAD_ALLOWED_EXTENSIONS: ".pdf,.txt,.png,.jpg,.jpeg"
       HEALTH_ENDPOINT_PUBLIC: "false"
-      S3_ENDPOINT: "http://minio:9000"
       S3_REGION: "us-east-1"
       S3_BUCKET: "attachments"
       S3_FORCE_PATH_STYLE: "true"
