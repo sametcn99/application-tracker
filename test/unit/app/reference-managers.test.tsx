@@ -156,7 +156,13 @@ describe("reference managers", () => {
 			expect(screen.getAllByText("Approximate equivalents").length).toBe(2);
 			expect(screen.getByText(/Last synced/)).toBeTruthy();
 
-			await user.click(screen.getByRole("button", { name: /set default/i }));
+			const setDefaultBtn = screen.getByRole("button", {
+				name: /set default/i,
+			});
+			await waitFor(() => {
+				expect(setDefaultBtn).not.toBeDisabled();
+			});
+			await user.click(setDefaultBtn);
 			await waitFor(() => {
 				expect(currencyActions.setDefaultCurrencyAction).toHaveBeenCalledWith(
 					"eur",
