@@ -22,7 +22,7 @@ COPY . .
 # Generate Prisma client then build Next.js
 RUN npx --no-install prisma generate
 ARG BUILD_DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
-RUN DATABASE_URL="$BUILD_DATABASE_URL" npm run build
+RUN NODE_OPTIONS="--max-old-space-size=2048" DATABASE_URL="$BUILD_DATABASE_URL" npm run build
 
 ############################
 # 3. Runtime
