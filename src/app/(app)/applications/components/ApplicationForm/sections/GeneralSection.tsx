@@ -154,8 +154,13 @@ export function GeneralSection({
 							control={control}
 							name="workMode"
 							render={({ field }) => (
-								<Select.Root value={field.value} onValueChange={field.onChange}>
-									<Select.Trigger />
+								<Select.Root
+									value={field.value || undefined}
+									onValueChange={field.onChange}
+								>
+									<Select.Trigger
+										placeholder={t("applicationForm.selectWorkMode")}
+									/>
 									<Select.Content>
 										{WORK_MODES.map((m) => (
 											<Select.Item key={m} value={m}>
@@ -175,8 +180,13 @@ export function GeneralSection({
 							control={control}
 							name="employmentType"
 							render={({ field }) => (
-								<Select.Root value={field.value} onValueChange={field.onChange}>
-									<Select.Trigger />
+								<Select.Root
+									value={field.value || undefined}
+									onValueChange={field.onChange}
+								>
+									<Select.Trigger
+										placeholder={t("applicationForm.selectEmploymentType")}
+									/>
 									<Select.Content>
 										{EMPLOYMENT_TYPES.map((m) => (
 											<Select.Item key={m} value={m}>
@@ -193,8 +203,13 @@ export function GeneralSection({
 							control={control}
 							name="status"
 							render={({ field }) => (
-								<Select.Root value={field.value} onValueChange={field.onChange}>
-									<Select.Trigger />
+								<Select.Root
+									value={field.value || undefined}
+									onValueChange={field.onChange}
+								>
+									<Select.Trigger
+										placeholder={t("applicationForm.selectStatus")}
+									/>
 									<Select.Content>
 										{STATUSES.map((s) => (
 											<Select.Item key={s} value={s}>
@@ -214,8 +229,13 @@ export function GeneralSection({
 							control={control}
 							name="priority"
 							render={({ field }) => (
-								<Select.Root value={field.value} onValueChange={field.onChange}>
-									<Select.Trigger />
+								<Select.Root
+									value={field.value || undefined}
+									onValueChange={field.onChange}
+								>
+									<Select.Trigger
+										placeholder={t("applicationForm.selectPriority")}
+									/>
 									<Select.Content>
 										{PRIORITIES.map((priority) => (
 											<Select.Item key={priority} value={priority}>
@@ -270,11 +290,13 @@ export function GeneralSection({
 										<Select.Item value={NONE_VALUE}>
 											{t("applicationForm.notSpecified")}
 										</Select.Item>
-										{sourceOptions.map((source) => (
-											<Select.Item key={source.id} value={source.name}>
-												{source.name}
-											</Select.Item>
-										))}
+										{sourceOptions
+											.filter((s) => s.name)
+											.map((source) => (
+												<Select.Item key={source.id} value={source.name}>
+													{source.name}
+												</Select.Item>
+											))}
 									</Select.Content>
 								</Select.Root>
 							)}

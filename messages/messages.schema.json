@@ -423,6 +423,10 @@
 				"manageCurrencies",
 				"selectSource",
 				"selectSourceType",
+				"selectWorkMode",
+				"selectEmploymentType",
+				"selectStatus",
+				"selectPriority",
 				"selectCurrency",
 				"selectNeedsSponsorship",
 				"selectRelocationPreference",
@@ -462,6 +466,18 @@
 					"type": "string"
 				},
 				"selectSourceType": {
+					"type": "string"
+				},
+				"selectWorkMode": {
+					"type": "string"
+				},
+				"selectEmploymentType": {
+					"type": "string"
+				},
+				"selectStatus": {
+					"type": "string"
+				},
+				"selectPriority": {
 					"type": "string"
 				},
 				"selectCurrency": {

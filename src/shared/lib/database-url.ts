@@ -8,7 +8,8 @@ export function getDatabaseUrl(): string {
 	}
 
 	const user = process.env.POSTGRES_USER || "appuser";
-	const password = process.env.POSTGRES_PASSWORD || "change-me-postgres-password";
+	const password =
+		process.env.POSTGRES_PASSWORD || "change-me-postgres-password";
 	const database = process.env.POSTGRES_DB || "appdb";
 	const host = process.env.POSTGRES_HOST || DEFAULT_POSTGRES_HOST;
 	const port = process.env.POSTGRES_PORT || DEFAULT_POSTGRES_PORT;
